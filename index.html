@@ -59,6 +59,974 @@
         .selectable-text {
             user-select: text !important;
             -webkit-user-select: text !important;
+        }
+
+        img, video, svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        input, textarea, select { user-select: text; }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #8c1c1c;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #631212;
+        }
+
+        .paper-sheet {
+            background-color: var(--paper-bg);
+            box-shadow: 2px 3px 25px rgba(0,0,0,0.8);
+            position: relative; overflow: hidden;
+            border: 1px solid #8c8680;
+        }
+        .paper-sheet::before {
+            content: ""; position: absolute; inset: 0; background-image: var(--paper-texture);
+            pointer-events: none; z-index: 0; mix-blend-mode: multiply;
+        }
+        
+        .paper-dirt {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
+            mix-blend-mode: multiply;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 25%),
+                repeating-conic-gradient(#0000 0% 25%, rgba(0,0,0,0.05) 0% 50%) 
+                50% / 20px 20px;
+        }
+
+        h1, h2, h3, .propaganda-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+
+        .stamp-container { position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 20; }
+        .stamp-border { position: absolute; inset: 0; border: 4px solid currentColor; opacity: 0.8; mix-blend-mode: multiply; border-style: dashed; }
+        .stamp-inner { position: relative; z-index: 2; font-family: 'Special Elite', cursive; font-weight: 900; text-transform: uppercase; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.9; text-shadow: 0 0 1px currentColor; }
+        .shape-rect { border-radius: 2px; } .shape-round { border-radius: 50%; } .shape-oval { border-radius: 50%; } .shape-tri { border: 4px solid currentColor; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .shape-none { border: none; clip-path: none; }
+        
+        .col-red { color: var(--stamp-red); } .col-blue { color: var(--stamp-blue); } .col-violet { color: var(--stamp-violet); } .col-green { color: var(--stamp-green); }
+        
+        .stamp-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; } 
+        .stamp-icon svg { width: 32px; height: 32px; fill: currentColor; }
+        .stamp-icon img { max-width: 100px; max-height: 60px; width: auto; height: auto; object-fit: contain; mix-blend-mode: multiply; }
+
+        .prl-input {
+            background: transparent; border: none; border-bottom: 2px dashed #57534e;
+            font-family: 'Courier Prime', monospace; padding: 4px; color: #1c1917; outline: none;
+        }
+        .prl-input:focus { border-bottom-style: solid; border-color: #000; background-color: rgba(255,255,255,0.1); }
+        
+        .quote-banner {
+            background-color: #8c1c1c; 
+            color: #e5e5e5; padding: 8px;
+            font-family: 'Oswald', sans-serif; text-transform: uppercase;
+            letter-spacing: 1px; text-align: center; font-size: 0.9rem;
+            margin-bottom: 20px; border: 2px solid #2b2b2b; transform: rotate(0.5deg);
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.3); cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .quote-banner:active { transform: scale(0.99); }
+
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; 
+            font-family: 'Courier Prime', monospace; font-size: 0.6rem; 
+        }
+        
+        .calendar-cell {
+            aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2);
+            position: relative; cursor: pointer; display: flex; flex-direction: column; 
+            padding: 1px; overflow: hidden;
+        }
+        .calendar-cell:hover { background-color: rgba(255,255,255,0.5); }
+        .calendar-cell.today { background-color: #fca5a5; border: 2px solid #8c1c1c; }
+        .calendar-cell.active { background-color: #bfdbfe; }
+        .calendar-cell.empty { background-color: transparent; border: none; cursor: default; pointer-events: none; }
+        
+        .cal-header {
+            text-align: center; font-weight: bold; background-color: #a8a29e; padding: 1px;
+            font-family: 'Courier Prime', monospace; font-size: 0.6rem; color: #1c1917;
+        }
+
+        .cal-event-text {
+            font-size: 0.6rem; 
+            line-height: 1;
+            word-break: break-word; 
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #1e3a8a;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.7);
+            margin-top: 1px;
+            padding: 1px;
+        }
+
+        .event-marker { 
+            width: 6px; height: 6px; background-color: #8c1c1c; border-radius: 50%; 
+            position: absolute; top: 2px; right: 2px; z-index: 5;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+
+        .wire-clip-container { 
+            position: absolute; 
+            top: -20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 60px; 
+            height: 80px; 
+            z-index: 20; 
+            pointer-events: none; 
+        }
+        .wire-clip-part { 
+            position: absolute; 
+            border: 3px solid #555; 
+            border-radius: 20px; 
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.4); 
+        }
+        .clip-outer { 
+            top: 0; left: 10px; right: 10px; bottom: 30px; 
+            border-bottom: none; border-radius: 20px 20px 0 0; 
+        }
+        .clip-inner { 
+            top: 20px; left: 20px; right: 20px; bottom: 10px; 
+            border-top: none; border-radius: 0 0 20px 20px; z-index: 2; 
+        }
+
+        .app-modal-overlay {
+            position: fixed; inset: 0; z-index: 9999; display: none;
+            align-items: center; justify-content: center; 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(2px); 
+        }
+        .app-modal-overlay.active { display: flex !important; }
+        
+        #alert-modal, #confirm-modal, #note-view-modal { z-index: 20000; }
+        
+        .app-modal-window {
+            background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px;
+            width: 85%; max-width: 320px; text-align: center; position: relative;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg);
+        }
+
+        .stamp-item {
+            height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; transition: background 0.2s;
+        }
+        .stamp-item:hover { background-color: rgba(255,255,255,0.8); }
+        .stamp-item.selected { border: 2px solid #1f2937; background-color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+        
+        .sc-label { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; display: block; color: #374151; }
+        .sc-input { width: 100%; background: transparent; border: none; border-bottom: 1px dashed #4b5563; font-family: 'Courier Prime', monospace; font-size: 0.8rem; padding: 2px 0; outline: none; margin-bottom: 0.5rem; }
+        .sc-input:focus { border-bottom-style: solid; background-color: rgba(255,255,255,0.2); }
+
+        .bg-graph-paper {
+            background-color: #f5eedc;
+            background-image: 
+                linear-gradient(rgba(180, 110, 50, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(180, 110, 50, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+            box-shadow: inset 0 0 10px rgba(80, 40, 0, 0.1);
+        }
+        
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px; 
+            height: 280px; 
+            padding: 10px;
+            padding-top: 40px; 
+            padding-bottom: 90px; 
+            overflow-x: auto; 
+            border: 2px solid #333;
+        }
+        
+        .chart-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90px; 
+            flex-shrink: 0;
+            position: relative;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        
+        .bar-track {
+            width: 100%;
+            height: 100%; 
+            background: rgba(255,255,255,0.2);
+            border: 2px solid #444;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .bar-fill {
+            width: 100%;
+            background-color: #8c1c1c;
+            transition: height 0.5s ease-out;
+            position: relative;
+            border-top: 2px solid #000;
+            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px);
+        }
+        
+        .bar-fill.complete {
+            background-color: #15803d;
+        }
+        
+        .bar-label-vertical {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            font-size: 10px; 
+            font-weight: 900;
+            color: #1f1f1f;
+            background-color: rgba(255,255,255,0.6); 
+            padding: 4px 2px;
+            border-radius: 4px;
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+            max-height: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 10;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -24px; 
+            width: 140%; 
+            left: -20%;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+            font-family: monospace;
+            color: #1c1917;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            padding: 1px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            z-index: 20;
+        }
+        
+        .chart-controls {
+            position: absolute;
+            bottom: -70px; 
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            gap: 2px;
+        }
+        
+        .chart-btn {
+            flex: 1;
+            height: 50px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px; 
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            border: 2px solid rgba(0,0,0,0.3);
+            user-select: none;
+            font-family: monospace;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+        .btn-plus { background: #15803d; }
+        .btn-minus { background: #8c1c1c; }
+        .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
+
+        .archive-item {
+            cursor: pointer;
+            padding: 4px;
+            border-bottom: 1px dashed #a8a29e;
+            transition: background 0.2s;
+        }
+        .archive-item:hover { background-color: rgba(255,255,255,0.5); }
+        .archive-item.active { background-color: #e7e5e4; font-weight: bold; border-left: 3px solid #8c1c1c; }
+        
+        .note-checkbox {
+            margin-right: 6px;
+            cursor: pointer;
+        }
+
+        .task-edit-input {
+            width: 100%;
+            background: rgba(255,255,255,0.4);
+            border: none;
+            border-bottom: 2px solid #8c1c1c;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.875rem;
+            padding: 2px 4px;
+            outline: none;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start md:justify-center p-2 md:p-4 min-h-screen pb-24 md:pb-4">
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-y-auto py-10">
+        <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
+            <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
+            <p class="font-['Courier_Prime'] text-lg sm:text-xl mb-6 tracking-widest border-b border-[#dcd0c0] pb-2">PLANER ROBÓT LOKALNYCH</p>
+            
+            <div id="loading-container">
+                <div class="w-full sm:w-64 h-4 border-2 border-[#dcd0c0] p-1 mx-auto mb-4">
+                    <div id="splash-progress" class="h-full bg-[#8c1c1c] w-0 transition-all duration-[2000ms] ease-linear"></div>
+                </div>
+                <p id="splash-status" class="font-mono text-xs text-gray-500 uppercase tracking-widest h-4">Inicjalizacja biurokracji...</p>
+            </div>
+
+            <div id="start-container" class="hidden flex-col items-center mt-6">
+                <p class="font-['Special_Elite'] text-sm sm:text-lg mb-6 leading-relaxed text-[#dcd0c0] border-t border-b border-[#444] py-4">
+                    „Obywatelu, nie błądź myślami w chmurach, gdy na stanowisku czeka kolejka zadań!”
+                </p>
+                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] hover:scale-105 transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
+                    PRZYSTĄP DO PRACY
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE -->
+    <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeAlert()" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black transition">Zrozumiałem</button></div></div>
+    <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="closeConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button><button onclick="closeConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zatwierdź</button></div></div></div>
+    
+    <div id="event-modal" class="app-modal-overlay">
+        <div class="app-modal-window">
+            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIE / NOTATKA</h3>
+            <p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p>
+            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Treść zgłoszenia:</label>
+            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-4 outline-none text-lg shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="4" placeholder="Np. Urodziny Partii"></textarea>
+            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label>
+            <select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-6 outline-none text-sm shadow-inner cursor-pointer">
+                <option value="none">Nie powtarza się</option>
+                <option value="daily">Codziennie</option>
+                <option value="weekly">Co tydzień</option>
+                <option value="monthly">Co miesiąc</option>
+                <option value="yearly">Co rok</option>
+            </select>
+            <div class="flex gap-2">
+                <button onclick="deleteEvent()" id="btn-delete-event" class="px-3 py-2 border-2 border-[#8c1c1c] text-[#8c1c1c] font-bold uppercase hover:bg-red-100 hidden" title="Usuń"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+                <button onclick="closeEventModal()" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button>
+                <button onclick="saveEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zapisz</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="note-view-modal" class="app-modal-overlay">
+        <div class="app-modal-window">
+            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOTATKA SŁUŻBOWA</h3>
+            <p id="note-view-date" class="text-xs font-bold mb-2 font-mono text-gray-600 border-b border-gray-400 pb-1"></p>
+            <div id="note-view-content" class="text-left font-['Courier_Prime'] text-sm leading-relaxed mb-6 max-h-60 overflow-y-auto overflow-x-hidden break-words custom-scrollbar whitespace-pre-wrap bg-white/50 p-2 border border-gray-400 selectable-text"></div>
+            <div class="flex gap-2">
+                 <button id="btn-edit-note" onclick="editArchivedNote()" class="flex-1 px-4 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 text-xs transition">Edytuj Akt</button>
+                 <button onclick="closeNoteViewModal()" class="flex-1 px-4 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] text-xs transition">Zamknij Akta</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-goal-modal" class="app-modal-overlay">
+        <div class="app-modal-window">
+            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
+            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
+            <input type="text" id="goal-name" class="sc-input bg-white mb-2" placeholder="np. Radio">
+            <div class="flex gap-2">
+                <div class="flex-1">
+                    <label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label>
+                    <input type="number" id="goal-target" class="sc-input bg-white mb-2" placeholder="np. 500">
+                </div>
+                <div class="w-1/3">
+                    <label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label>
+                    <select id="goal-unit" class="sc-input bg-white mb-2 h-8">
+                        <option value="zł">zł</option>
+                        <option value="str.">str.</option>
+                        <option value="min.">min.</option> <!-- NOWA JEDNOSTKA MINUTOWA -->
+                        <option value="%">%</option>
+                        <option value="km">km</option>
+                        <option value="kg">kg</option>
+                        <option value="szt.">szt.</option>
+                        <option value="godz.">godz.</option>
+                        <option value="pkt">pkt</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-4">
+                <button onclick="closeAddGoalModal()" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button>
+                <button onclick="saveNewGoal()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zatwierdź</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GŁÓWNA KARTKA -->
+    <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative rotate-[0.5deg]">
+        <div class="paper-dirt"></div>
+        <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
+
+        <header class="flex flex-col md:flex-row gap-8 mb-6 border-b-2 border-dashed border-[#57534e] pb-4 relative z-10">
+            <div class="relative shrink-0 mx-auto md:mx-0 mt-4">
+                <div class="wire-clip-container">
+                    <div class="wire-clip-part clip-outer"></div>
+                    <div class="wire-clip-part clip-inner"></div>
+                </div>
+                <div class="w-32 h-40 bg-[#d1d5db] border border-gray-600 shadow-md relative rotate-[-2deg] flex items-center justify-center overflow-hidden cursor-pointer group" onclick="document.getElementById('photo-upload').click()">
+                    <img id="user-photo" src="" class="w-full h-full object-cover hidden">
+                    <div id="photo-placeholder" class="text-center p-2 opacity-60 group-hover:opacity-100 transition"><span class="text-xs font-bold block mb-1">FOTOGRAFIA</span><span class="text-[10px] uppercase">(kliknij aby wkleić)</span></div>
+                    <input type="file" id="photo-upload" class="hidden" accept="image/*" onchange="loadPhoto(this)">
+                </div>
+            </div>
+            <div class="flex-1">
+                <div class="flex justify-between items-end border-b border-gray-500 pb-2 mb-4">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1c1917] tracking-tight">P.R.L</h1>
+                    <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
+                </div>
+                <h2 class="text-xl font-bold text-[#292524] mb-6">Planer Robót Lokalnych</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm font-mono">
+                    <div><label class="block text-[10px] uppercase font-bold text-gray-700">Obywatel(ka):</label><input type="text" id="citizen-name" value="Jan Kowalski" class="prl-input w-full font-bold text-lg"></div>
+                    <div><label class="block text-[10px] uppercase font-bold text-gray-700">Data sporządzenia:</label><div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="resetCalendarToToday()" title="Kliknij, aby wrócić do bieżącego miesiąca"></div></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEWA STRONA -->
+            <div class="lg:col-span-7 space-y-6 relative z-10">
+                <!-- ZADANIA -->
+                <div>
+                    <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
+                    <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black">Zatwierdź</button></div>
+                    <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"><div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div></ul>
+                    <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
+                </div>
+
+                <!-- PLAN DŁUGOTERMINOWY -->
+                <div class="border-t-4 double border-gray-500 pt-4 bg-[#fefce840] p-4 shadow-inner">
+                    <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
+                        <div class="flex flex-col w-full sm:w-2/3">
+                            <span class="text-[9px] font-bold uppercase text-gray-800">WARTOŚĆ WSADU (Dodaj/Odejmij):</span>
+                            <div class="flex items-center">
+                                <input type="number" id="global-increment-input" class="w-full h-8 bg-white border border-gray-500 p-1 font-bold text-center font-mono outline-none" value="10">
+                            </div>
+                        </div>
+                        <button onclick="openAddGoalModal()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">
+                            + NOWY CEL
+                        </button>
+                    </div>
+                    <div id="chart-area" class="bg-graph-paper chart-container custom-scrollbar">
+                        <div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div>
+                    </div>
+                    <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu!</p>
+                </div>
+
+                <!-- NOTATNIK ARCHIWALNY -->
+                <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-4">
+                    <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-2 pl-2 border-l-4 border-[#8c1c1c]">Notatnik Archiwalny</h3>
+                    <div class="flex flex-col md:flex-row gap-4 h-auto md:h-64">
+                        <div class="w-full md:w-1/3 border border-gray-500 bg-white/30 flex flex-col shadow-inner h-40 md:h-full">
+                            <div class="bg-[#292524] text-[#e7e5e4] text-[10px] font-bold px-2 py-1 flex justify-between items-center border-b border-gray-600">
+                                <span>ARCHIWUM</span>
+                                <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 transition uppercase" title="Usuń zaznaczone">USUŃ WYBRANE</button>
+                            </div>
+                            <ul id="notes-list" class="flex-1 overflow-y-auto overflow-x-hidden p-1 custom-scrollbar text-xs font-mono space-y-1">
+                                <li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li>
+                            </ul>
+                        </div>
+                        <div class="w-full md:w-2/3 border border-gray-500 bg-[#f3f4f6] relative flex flex-col shadow-[2px_2px_5px_rgba(0,0,0,0.2)] h-60 md:h-full" style="transform: rotate(0.5deg);">
+                             <div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
+                             <textarea id="note-editor" class="flex-1 bg-transparent p-4 resize-none outline-none font-['Courier_Prime'] text-sm leading-[20px] text-[#1a1a1a] z-10 custom-scrollbar selectable-text overflow-x-hidden" placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></textarea>
+                             <div class="border-t border-gray-400 p-2 flex justify-between items-center bg-gray-200/80 z-10">
+                                <span id="note-status" class="text-[9px] text-gray-500 uppercase">Wpisz i Zapisz</span>
+                                <div class="flex gap-1">
+                                    <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden bg-gray-500 text-white border border-[#333] px-2 py-1 text-xs font-bold uppercase hover:bg-gray-600 transition shadow-sm">Anuluj Poprawki</button>
+                                    <button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-4 py-1 text-xs font-bold uppercase hover:bg-[#631212] transition shadow-sm">ZAPISZ DO AKT</button>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROTOKÓŁ SAMOKRYTYKI -->
+                <div class="mt-4">
+                    <h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3>
+                    <div class="border border-gray-500 p-3 bg-white/30">
+                        <label class="sc-label">PRZEDMIOT UCHYBIENIA:</label>
+                        <select id="sc-subject" class="sc-input">
+                            <option value="lenistwo">LENISTWO</option>
+                            <option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option>
+                            <option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option>
+                            <option value="wola">CHWILOWY NIEDOWŁAD WOLI</option>
+                        </select>
+                        <label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?">
+                        <label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?">
+                        <label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro">
+                        <button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] mt-2 font-['Oswald'] tracking-wider">ZŁÓŻ RAPORT</button>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3>
+                    <ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul>
+                </div>
+            </div>
+
+            <!-- PRAWA STRONA -->
+            <div class="lg:col-span-5 space-y-6 relative z-10">
+                <div class="bg-white/30 p-2 border border-gray-500 shadow-sm relative">
+                    <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20" title="Gwóźdź programu"></div>
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2"><button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 transition">&lt;</button><h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3><button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 transition">&gt;</button></div>
+                    <div id="calendar-grid" class="calendar-grid"></div>
+                </div>
+                <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
+                    <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2">
+                        <span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span>
+                        <div class="flex gap-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]">
+                                <span class="text-[10px] font-mono">Inicjatywa Własna</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]">
+                                <span class="text-[10px] font-mono">Przydział Centralny</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-[#292524] text-[#e7e5e4] px-2 py-1 mb-3"><h3 class="text-xs font-bold uppercase">Pieczątki:</h3></div>
+                    <div class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar transition-opacity duration-300" id="stamps-gallery"></div>
+                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2">
+                        <span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="mt-8 text-center border-t border-gray-500 pt-4 opacity-60"><p class="text-[10px] font-mono uppercase">Ministerstwo Administracji Publicznej • Wzór zatwierdzony w 1978r.</p></footer>
+    </div>
+
+    <script>
+        // --- CUSTOM MODAL UTILS ---
+        let confirmCallback = null;
+        function showAlert(text) { document.getElementById('alert-text').innerText = text; document.getElementById('alert-modal').classList.add('active'); }
+        function closeAlert() { document.getElementById('alert-modal').classList.remove('active'); }
+        function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; document.getElementById('confirm-modal').classList.add('active'); }
+        function closeConfirm(result) { document.getElementById('confirm-modal').classList.remove('active'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
+
+        const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Chcesz urlopu? Złóż podanie do wydziału spraw beznadziejnych!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie?", "Twoja wydajność – siłą narodu!", "Zorganizowany Obywatel – fundamentem stabilizacji!", "Nie pytaj, co planer zrobi dla ciebie, pytaj, co ty wpiszesz do planera!", "Jeśli myślisz, że ściana jest nie do przebicia – widocznie słabo bijesz!", "Gdy góra zadania wydaje się zbyt wysoka, zacznij kopać tunel wydajności!", "Jeśli narzędzia są tępe, naostrz je swoim entuzjazmem!", "Poczucie beznadziei? Złóż podanie o natychmiastową zmianę nastawienia!", "Oporna materia ugina się pod ciężarem konsekwentnego planowania!", "Nie szukaj sensu – szukaj sposobu na domkniecie terminu!", "Jeśli plan zawodzi, zmień siebie, a nie plan!", "Gdy wszystko idzie źle, idź w drugą stronę, dopóki nie będzie szło dobrze!", "Obywatelu! Nie patrz w tył, tam są tylko błędy, patrz w harmonogram!", "Nie przejmuj się terminem. Spóźnienie to też tradycja, choć niezbyt chwalebna.", "Pamiętaj: Planer nie służy do planowania marzeń, tylko do ewidencji obowiązków.", "Zegar nie czeka na lenia – wyprzedź czas sumiennością!", "Kto rano wstaje, ten wcześniej postoi w kolejce do sukcesu!", "Zadanie to nie gołąb – nie wyleci przez okno. Zrób je wreszcie!", "Nie myśl – notuj! Papier jest pewniejszy od Twojej pamięci.", "Bądź jak traktor – nie do zdarcia, aż do końca listy zadań!"];
+        
+        const stampDefinitions = [
+            { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 101, text: "", shape: "none", color: "custom", icon: '<img src="ziemniaki.png" alt="Ziemniaki" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 102, text: "", shape: "none", color: "custom", icon: '<img src="Ogórek1.png" alt="Ogórek" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 103, text: "", shape: "none", color: "custom", icon: '<img src="1zł.png" alt="1zł" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 104, text: "", shape: "none", color: "custom", icon: '<img src="karp.png" alt="Karp" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 105, text: "", shape: "none", color: "custom", icon: '<img src="Kaseta.png" alt="Kaseta" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 106, text: "", shape: "none", color: "custom", icon: '<img src="Kawa.png" alt="Kawa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 107, text: "", shape: "none", color: "custom", icon: '<img src="krzyzyk.png" alt="Krzyżyk" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 108, text: "", shape: "none", color: "custom", icon: '<img src="Kupon.png" alt="Kupon" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 109, text: "", shape: "none", color: "custom", icon: '<img src="kura.png" alt="Kura" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 110, text: "", shape: "none", color: "custom", icon: '<img src="Maluch.png" alt="Maluch" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 111, text: "", shape: "none", color: "custom", icon: '<img src="mandarynka.png" alt="Mandarynka" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 112, text: "", shape: "none", color: "custom", icon: '<img src="mis.png" alt="Miś" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 113, text: "", shape: "none", color: "custom", icon: '<img src="Pierog1.png" alt="Pieróg" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 114, text: "", shape: "none", color: "custom", icon: '<img src="TURBOGUMA.png" alt="Turbo Guma" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 115, text: "", shape: "none", color: "custom", icon: '<img src="waga.png" alt="Waga" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 116, text: "", shape: "none", color: "custom", icon: '<img src="Zupa1.png" alt="Zupa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 117, text: "", shape: "none", color: "custom", icon: '<img src="Bilet.png" alt="Bilet" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 118, text: "", shape: "none", color: "custom", icon: '<img src="termometr.png" alt="Termometr" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true }
+        ];
+
+        let state = {
+            tasks: [], plans: [], reports: [], events: {}, credits: 0, 
+            unlockedStamps: [], selectedStampIds: [2], stampSelectionMode: 'manual', 
+            selfCriticism: { subject: 'lenistwo', desc: '', reason: '', fix: '' }, 
+            viewDate: null, currentGoal: null, citizenName: "Jan Kowalski", 
+            notes: [], activeNoteId: null, scratchpad: "" 
+        };
+        let currentEditingDateKey = null, currentQuoteIndex = 0, viewingNoteId = null;
+
+        window.onload = function() { initSplashScreen(); init(); };
+
+        function initSplashScreen() {
+            const bar = document.getElementById('splash-progress');
+            const status = document.getElementById('splash-status');
+            const loadingContainer = document.getElementById('loading-container');
+            const startContainer = document.getElementById('start-container');
+            setTimeout(() => { bar.style.width = '100%'; }, 100);
+            setTimeout(() => { status.innerText = "Weryfikacja tożsamości..."; }, 600);
+            setTimeout(() => { status.innerText = "Pobieranie przydziałów..."; }, 1200);
+            setTimeout(() => { status.innerText = "Zatwierdzanie wniosków..."; }, 1800);
+            setTimeout(() => { loadingContainer.style.display = 'none'; startContainer.classList.remove('hidden'); startContainer.classList.add('flex'); }, 2200);
+        }
+
+        function enterApp() { const screen = document.getElementById('splash-screen'); screen.style.opacity = '0'; setTimeout(() => { screen.style.display = 'none'; }, 1000); }
+
+        function init() {
+            loadState(); state.viewDate = new Date(); initQuote(); renderDate(); setInterval(renderDate, 60000);
+            renderTasks(); renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderNotesList(); 
+            const editor = document.getElementById('note-editor');
+            if(editor && state.scratchpad && !state.activeNoteId) { editor.value = state.scratchpad; }
+            const radioManual = document.querySelector(`input[name="stampMode"][value="manual"]`);
+            const radioRandom = document.querySelector(`input[name="stampMode"][value="random"]`);
+            if (state.stampSelectionMode === 'random') { if (radioRandom) radioRandom.checked = true; } else { if (radioManual) radioManual.checked = true; }
+            const scSubject = document.getElementById('sc-subject');
+            const scDesc = document.getElementById('sc-desc');
+            const scReason = document.getElementById('sc-reason');
+            const scFix = document.getElementById('sc-fix');
+            const citizenNameInput = document.getElementById('citizen-name');
+            if (scSubject) scSubject.value = state.selfCriticism.subject || "lenistwo";
+            if (scDesc) scDesc.value = state.selfCriticism.desc || "";
+            if (scReason) scReason.value = state.selfCriticism.reason || "";
+            if (scFix) scFix.value = state.selfCriticism.fix || "";
+            if (citizenNameInput && state.citizenName) citizenNameInput.value = state.citizenName;
+            ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.addEventListener('input', saveState);
+            });
+            if (citizenNameInput) citizenNameInput.addEventListener('input', saveState);
+            if (editor) {
+                editor.addEventListener('input', saveState);
+                editor.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveCurrentNote(); } });
+            }
+            const taskInput = document.getElementById('task-input');
+            if (taskInput) taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
+        }
+
+        function initQuote() { currentQuoteIndex = Math.floor(Math.random() * quotes.length); renderQuote(); }
+        function renderQuote() { const banner = document.getElementById('quote-banner'); if (banner) banner.innerText = `"${quotes[currentQuoteIndex]}"`; }
+        function cycleQuote() { currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length; renderQuote(); }
+        function renderDate() { const display = document.getElementById('date-display'); if (display) display.innerText = new Date().toLocaleDateString('pl-PL', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase(); }
+        function resetCalendarToToday() { state.viewDate = new Date(); renderCalendar(); }
+        
+        function addTask() { 
+            const input = document.getElementById('task-input'); if (!input || !input.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
+            state.tasks.push({ id: Date.now(), text: input.value.trim(), done: false, stamp: null, stampRotation: 0 }); 
+            input.value = ''; saveState(); renderTasks(); 
+        }
+        
+        function toggleTask(id) { 
+            const task = state.tasks.find(t => t.id === id); 
+            if (task) { 
+                if (!task.done) { 
+                    task.done = true; state.credits += 1; 
+                    let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2);
+                    task.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0];
+                    task.stampRotation = Math.floor(Math.random() * 20) - 10; 
+                } else { task.done = false; task.stamp = null; } 
+                saveState(); renderTasks(); 
+            } 
+        }
+        function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); }
+        
+        function startEditingTask(id, el) {
+            const task = state.tasks.find(t => t.id === id);
+            if (!task || task.done) return;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = task.text;
+            input.className = 'task-edit-input z-10';
+            
+            const finishEdit = () => {
+                const newText = input.value.trim();
+                if (newText && newText !== task.text) {
+                    task.text = newText;
+                    saveState();
+                }
+                renderTasks();
+            };
+
+            input.onblur = finishEdit;
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') finishEdit();
+                if (e.key === 'Escape') renderTasks();
+            };
+
+            el.parentNode.replaceChild(input, el);
+            input.focus();
+        }
+
+        function renderTasks() { 
+            const list = document.getElementById('task-list'); if (!list) return; list.innerHTML = ''; 
+            if (state.tasks.length === 0) list.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div>'; 
+            else state.tasks.forEach(task => { 
+                list.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${task.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${task.id}, this)">${task.text}</span>${task.done && task.stamp ? `<div class="stamp-container" style="transform: rotate(${task.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${task.stamp.shape} col-${task.stamp.color}"></div><div class="stamp-inner col-${task.stamp.color}"><div class="stamp-icon">${task.stamp.icon}</div><div style="margin-top:2px;">${task.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${task.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 uppercase text-xs" title="Usuń zadanie">USUŃ</button></li>`; 
+            }); 
+            updateTaskProgress(); 
+        }
+
+        function updateTaskProgress() { const percent = state.tasks.length === 0 ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = percent + "%"; document.getElementById('task-progress-bar').style.width = percent + "%"; }
+        function openAddGoalModal() { document.getElementById('add-goal-modal').classList.add('active'); }
+        function closeAddGoalModal() { document.getElementById('add-goal-modal').classList.remove('active'); }
+
+        function saveNewGoal() {
+            const name = document.getElementById('goal-name').value.trim();
+            const target = parseFloat(document.getElementById('goal-target').value);
+            const unit = document.getElementById('goal-unit').value.trim();
+            if (!name || isNaN(target) || target <= 0 || !unit) { showAlert("Obywatelu! Formularz niekompletny!"); return; }
+            if(!state.plans) state.plans = []; state.plans.push({ id: Date.now(), text: name, targetValue: target, unit: unit, currentValue: 0 });
+            document.getElementById('goal-name').value = ''; document.getElementById('goal-target').value = ''; saveState(); renderPlans(); closeAddGoalModal();
+        }
+
+        function changeGoalProgress(id, direction) {
+            const goal = state.plans.find(p => p.id === id);
+            const valInput = document.getElementById('global-increment-input');
+            let increment = valInput ? parseFloat(valInput.value) : 10;
+            if (goal) { goal.currentValue = Math.max(0, goal.currentValue + (increment * direction)); saveState(); renderPlans(); }
+        }
+        function deleteGoal(id) { showConfirm("Porzucić cel?", () => { state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); }); }
+
+        function renderPlans() { 
+            const chartContainer = document.getElementById('chart-area'); if (!chartContainer) return; chartContainer.innerHTML = '';
+            if (!state.plans || state.plans.length === 0) { chartContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div>'; }
+            else {
+                state.plans.forEach(p => {
+                    let percent = p.targetValue > 0 ? (p.currentValue / p.targetValue) * 100 : 0;
+                    const col = document.createElement('div'); col.className = 'chart-col';
+                    const track = document.createElement('div'); track.className = 'bar-track';
+                    const fill = document.createElement('div'); fill.className = `bar-fill ${percent >= 100 ? 'complete' : ''}`; fill.style.height = `${Math.min(100, Math.max(5, percent))}%`;
+                    const label = document.createElement('div'); label.className = 'bar-label-vertical'; label.innerText = p.text;
+                    fill.appendChild(label); track.appendChild(fill);
+                    const val = document.createElement('div'); val.className = 'bar-value'; val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
+                    track.appendChild(val); col.appendChild(track);
+                    const controls = document.createElement('div'); controls.className = 'chart-controls';
+                    const btnPlus = document.createElement('div'); btnPlus.className = 'chart-btn btn-plus'; btnPlus.innerText = '+'; btnPlus.onclick = () => changeGoalProgress(p.id, 1);
+                    const btnMinus = document.createElement('div'); btnMinus.className = 'chart-btn btn-minus'; btnMinus.innerText = '-'; btnMinus.onclick = () => changeGoalProgress(p.id, -1);
+                    const btnDel = document.createElement('div'); btnDel.className = 'chart-btn btn-del'; btnDel.innerText = 'x'; btnDel.onclick = () => deleteGoal(p.id);
+                    controls.appendChild(btnPlus); controls.appendChild(btnMinus); controls.appendChild(btnDel);
+                    col.appendChild(controls); chartContainer.appendChild(col);
+                });
+            }
+        }
+        
+        function setStampMode(mode) { state.stampSelectionMode = mode; saveState(); renderStampsGallery(); }
+        function selectStamp(id) { if (state.stampSelectionMode === 'random') return; const idx = state.selectedStampIds.indexOf(id); if (idx > -1) state.selectedStampIds.splice(idx, 1); else state.selectedStampIds.push(id); renderStampsGallery(); saveState(); }
+        
+        function renderStampsGallery() { 
+            const el = document.getElementById('stamps-gallery'); if (!el) return; el.innerHTML = ''; 
+            stampDefinitions.forEach(s => { 
+                const selected = state.selectedStampIds.includes(s.id); 
+                el.innerHTML += `<div class="stamp-item ${selected ? 'selected' : ''}" onclick="selectStamp(${s.id})"><div class="stamp-container" style="position: relative; transform: scale(0.6);"><div class="stamp-border shape-${s.shape} col-${s.color}"></div><div class="stamp-inner col-${s.color}"><div class="stamp-icon">${s.icon}</div><div style="margin-top:2px;">${s.text}</div></div></div>${selected ? `<div style="position: absolute; top: 0; right: 0; font-weight: bold; padding: 2px;">✓</div>` : ''}</div>`; 
+            }); 
+        }
+        
+        function changeMonth(dir) { const d = state.viewDate || new Date(); d.setMonth(d.getMonth() + dir); state.viewDate = d; renderCalendar(); }
+        
+        function getEventForDate(day, month, year) {
+            const current = new Date(year, month - 1, day);
+            for (let anchorKey in state.events) {
+                const event = state.events[anchorKey]; const [aD, aM, aY] = anchorKey.split('-').map(Number); const anchor = new Date(aY, aM - 1, aD);
+                if (current < anchor) continue;
+                const rec = event.recurrence || 'none';
+                if (rec === 'none' && day === aD && month === aM && year === aY) return { text: event.text, sourceKey: anchorKey };
+                if (rec === 'daily') return { text: event.text, sourceKey: anchorKey };
+                if (rec === 'weekly' && current.getDay() === anchor.getDay()) return { text: event.text, sourceKey: anchorKey };
+                if (rec === 'monthly' && current.getDate() === anchor.getDate()) return { text: event.text, sourceKey: anchorKey };
+                if (rec === 'yearly' && current.getDate() === anchor.getDate() && current.getMonth() === anchor.getMonth()) return { text: event.text, sourceKey: anchorKey };
+            }
+            return null;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid'); if (!grid) return; grid.innerHTML = '';
+            const d = state.viewDate || new Date(); const year = d.getFullYear(), month = d.getMonth();
+            const months = ["STYCZEŃ", "LUTY", "MARZEC", "KWIECIEŃ", "MAJ", "CZERWIEC", "LIPIEC", "SIERPIEŃ", "WRZESIEŃ", "PAŹDZIERNIK", "LISTOPAD", "GRUDZIEŃ"];
+            document.getElementById('calendar-month-year').innerText = `${months[month]} ${year}`;
+            ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; grid.appendChild(el); });
+            const firstDay = new Date(year, month, 1).getDay(); const offset = firstDay === 0 ? 6 : firstDay - 1;
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); const today = new Date();
+            for(let i=0; i<offset; i++) grid.appendChild(Object.assign(document.createElement('div'), {className: "calendar-cell empty"}));
+            for(let i=1; i<=daysInMonth; i++) {
+                const eventData = getEventForDate(i, month + 1, year);
+                const isToday = (i === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                const c = document.createElement('div'); c.className = `calendar-cell ${isToday ? 'today' : ''}`;
+                let html = `<span style="font-weight: bold; margin-left: 2px;">${i}</span>`;
+                if(eventData) { c.classList.add('active'); html += `<div class="event-marker"></div><div class="cal-event-text selectable-text">${eventData.text}</div>`; }
+                c.innerHTML = html; c.onclick = () => openEventModal(eventData ? eventData.sourceKey : `${i}-${month+1}-${year}`); grid.appendChild(c);
+            }
+        }
+
+        function openEventModal(key) {
+            currentEditingDateKey = key; const parts = key.split('-'); const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+            const existingEvent = state.events[key];
+            document.getElementById('event-date-display').innerText = `${parts[0]} ${months[parseInt(parts[1])-1]} ${parts[2]}`;
+            document.getElementById('event-input').value = existingEvent ? (existingEvent.text || "") : "";
+            document.getElementById('event-recurrence').value = existingEvent ? (existingEvent.recurrence || "none") : "none";
+            document.getElementById('btn-delete-event').classList.toggle('hidden', !existingEvent);
+            const m = document.getElementById('event-modal'); m.classList.add('active'); m.style.display = 'flex';
+        }
+        function closeEventModal() { document.getElementById('event-modal').classList.remove('active'); document.getElementById('event-modal').style.display = 'none'; currentEditingDateKey = null; }
+        function saveEvent() { 
+            if(!currentEditingDateKey) return; const val = document.getElementById('event-input').value.trim(); const rec = document.getElementById('event-recurrence').value;
+            if(val) state.events[currentEditingDateKey] = { text: val, recurrence: rec }; else delete state.events[currentEditingDateKey];
+            saveState(); renderCalendar(); closeEventModal(); 
+        }
+        function deleteEvent() { if(!currentEditingDateKey) return; showConfirm("Usunąć całą serię wydarzeń?", () => { delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }); }
+
+        function loadPhoto(input) { 
+            if(input.files && input.files[0]) { 
+                const reader = new FileReader(); 
+                reader.onload = (e) => { 
+                    const img = new Image(); img.onload = function() {
+                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                        const MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height;
+                        if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
+                        canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                        state.photo = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('user-photo').src = state.photo; document.getElementById('user-photo').classList.remove('hidden'); document.getElementById('photo-placeholder').classList.add('hidden'); saveState();
+                    }; img.src = e.target.result;
+                }; reader.readAsDataURL(input.files[0]); 
+            } 
+        }
+
+        function saveState() { 
+            const subject = document.getElementById('sc-subject'), desc = document.getElementById('sc-desc'), reason = document.getElementById('sc-reason'), fix = document.getElementById('sc-fix'), citizen = document.getElementById('citizen-name'), editor = document.getElementById('note-editor');
+            if (subject && desc && reason && fix) state.selfCriticism = { subject: subject.value, desc: desc.value, reason: reason.value, fix: fix.value };
+            if (citizen) state.citizenName = citizen.value; if (editor && !state.activeNoteId) state.scratchpad = editor.value; 
+            localStorage.setItem('prl_planer_v10', JSON.stringify(state)); 
+        }
+
+        function loadState() { 
+            const s = localStorage.getItem('prl_planer_v10'); 
+            if(s) { const p = JSON.parse(s); state = { ...state, ...p }; if(state.photo) { document.getElementById('user-photo').src = state.photo; document.getElementById('user-photo').classList.remove('hidden'); document.getElementById('photo-placeholder').classList.add('hidden'); } } 
+        }
+
+        function renderNotesList() {
+            const list = document.getElementById('notes-list'); if (!list) return; list.innerHTML = '';
+            if (!state.notes || state.notes.length === 0) list.innerHTML = '<li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li>';
+            else state.notes.forEach(n => {
+                const li = document.createElement('li'); li.className = `archive-item flex items-center gap-2 ${state.activeNoteId === n.id ? 'active' : ''}`;
+                li.innerHTML = `<input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c]" value="${n.id}" onclick="event.stopPropagation()"><span class="truncate flex-1" onclick="selectNote(${n.id})">${n.date} - ${n.title || 'Bez tytułu'}</span>`;
+                list.appendChild(li);
+            });
+            document.getElementById('note-status').innerText = state.activeNoteId ? "POPRAWIANIE AKT" : "Wpisz i Zapisz";
+            document.getElementById('btn-cancel-edit').classList.toggle('hidden', !state.activeNoteId);
+        }
+        
+        function clearEditor() { state.activeNoteId = null; const e = document.getElementById('note-editor'); if(e) e.value = state.scratchpad || ''; saveState(); renderNotesList(); }
+
+        function saveCurrentNote() {
+            const e = document.getElementById('note-editor'); if (!e) return; const c = e.value.trim(); if (!c) { showAlert("Obywatelu! Pustych akt nie archiwizujemy."); return; }
+            const t = c.split('\n')[0].substring(0, 20) + (c.length > 20 ? '...' : ''); const d = new Date().toLocaleDateString('pl-PL');
+            if (state.activeNoteId) { const i = state.notes.findIndex(n => n.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; } showAlert("Aktualizacja akt zakończona pomyślnie."); }
+            else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: d }); showAlert("Notatka przekazana do archiwum."); }
+            e.value = ''; state.scratchpad = ""; state.activeNoteId = null; saveState(); renderNotesList();
+        }
+
+        function selectNote(id) {
+            const n = state.notes.find(x => x.id === id); if (!n) return; viewingNoteId = id;
+            document.getElementById('note-view-date').innerText = `${n.date} - ${n.title || 'Dokument'}`;
+            document.getElementById('note-view-content').innerText = n.content;
+            const m = document.getElementById('note-view-modal'); m.classList.add('active'); m.style.display = 'flex';
+        }
+
+        function editArchivedNote() {
+            if (!viewingNoteId) return; const n = state.notes.find(x => x.id === viewingNoteId);
+            if (n) { const e = document.getElementById('note-editor'); if (e) { e.value = n.content; state.activeNoteId = n.id; state.scratchpad = ""; closeNoteViewModal(); renderNotesList(); e.focus(); } }
+        }
+
+        function closeNoteViewModal() { const m = document.getElementById('note-view-modal'); if (m) { m.classList.remove('active'); m.style.display = 'none'; } viewingNoteId = null; }
+
+        function deleteMarkedNotes() {
+            const boxes = document.querySelectorAll('.note-checkbox:checked'); if (boxes.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
+            showConfirm(`Zniszczyć ${boxes.length} teczek?`, () => {
+                const ids = Array.from(boxes).map(cb => parseInt(cb.value));
+                state.notes = state.notes.filter(n => !ids.includes(n.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderNotesList();
+            });
+        }
+
+        function submitSelfCriticism() {
+            const d = document.getElementById('sc-desc'); const r = document.getElementById('sc-reason'); const f = document.getElementById('sc-fix');
+            if (!d || !d.value.trim()) return showAlert("Raport bez opisu czynu jest nieważny!");
+            state.reports.unshift({ 
+                id: Date.now(), 
+                date: new Date().toLocaleDateString('pl-PL'), 
+                subject: document.getElementById('sc-subject').options[document.getElementById('sc-subject').selectedIndex].text, 
+                desc: d.value, 
+                reason: r.value, 
+                fix: f.value 
+            });
+            d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); showAlert("Raport przyjęty.");
+        }
+        function deleteReport(id) { state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); }
+        
+        function renderSelfCriticismHistory() {
+            const list = document.getElementById('sc-history-list'); if (!list) return; list.innerHTML = '';
+            if (!state.reports || state.reports.length === 0) { list.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>'; return; }
+            state.reports.forEach(r => {
+                const item = document.createElement('li'); item.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text";
+                item.innerHTML = `
+                    <div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div>
+                    <div><span class="font-bold">Czyn:</span> ${r.desc}</div>
+                    ${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} 
+                    <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div>
+                    <button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`;
+                list.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>            box-sizing: border-box; 
+            touch-action: manipulation; 
+        }
+        
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
+        }
+
+        body {
+            background-color: #262626;
+            background-image: radial-gradient(#333 15%, transparent 16%), radial-gradient(#333 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            font-family: 'Courier Prime', monospace;
+            color: var(--ink-color);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .selectable-text {
+            user-select: text !important;
+            -webkit-user-select: text !important;
             -moz-user-select: text !important;
             -ms-user-select: text !important;
         }
