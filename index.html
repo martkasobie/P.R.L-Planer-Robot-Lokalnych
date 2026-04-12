@@ -223,7 +223,7 @@
         }
         .app-modal-overlay.active { display: flex !important; }
         
-        #alert-modal, #confirm-modal, #note-view-modal { z-index: 20000; }
+        #alert-modal, #confirm-modal { z-index: 20000; }
         
         .app-modal-window {
             background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px;
@@ -406,6 +406,91 @@
             pointer-events: none;
             display: block;
         }
+
+        /* --- STABILNA STYLISTYKA FORMATOWANIA --- */
+        [contenteditable] {
+            caret-color: #1a1a1a !important; /* KURSOR ZAWSZE CZARNY */
+            outline: none;
+        }
+        .marked {
+            background-color: #ffcccc !important; /* DELIKATNY CZERWONY */
+            color: black !important; /* TEKST ZAWSZE CZARNY */
+            border-radius: 2px;
+            padding: 0 2px;
+            font-weight: bold;
+        }
+
+        /* --- NAPRAWIONA RESPORSYWNOŚĆ PODGLĄDU DOKUMENTU --- */
+        #note-viewer-overlay {
+            position: fixed; inset: 0; z-index: 99998;
+            background-color: #262626;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        #note-viewer-overlay.active { display: flex; }
+        
+        .viewer-paper {
+            width: 100%;
+            max-width: 800px;
+            min-height: calc(100vh - 100px); 
+            height: auto;
+            background-color: var(--paper-bg);
+            padding: 2rem;
+            box-shadow: 10px 10px 40px rgba(0,0,0,0.8);
+            position: relative;
+            border: 1px solid #8c8680;
+            margin-bottom: 4rem; 
+            flex-shrink: 0;
+        }
+        @media (min-width: 768px) {
+            .viewer-paper { padding: 4rem; }
+        }
+        
+        .viewer-paper::before {
+            content: ""; position: absolute; inset: 0;
+            background-image: var(--paper-texture);
+            pointer-events: none; mix-blend-mode: multiply;
+        }
+        .viewer-header {
+            border-bottom: 3px double #1a1a1a;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            position: relative; z-index: 2;
+        }
+        .viewer-meta { font-size: 0.75rem; font-weight: bold; color: #444; margin-bottom: 0.5rem; }
+        .viewer-title { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #8c1c1c; text-transform: uppercase; margin: 0; line-height: 1.1; }
+        @media (min-width: 768px) {
+            .viewer-title { font-size: 3rem; }
+        }
+        .viewer-tags { font-size: 0.875rem; color: #103090; margin-top: 0.5rem; font-weight: bold; }
+        .viewer-content { 
+            font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; 
+            white-space: pre-wrap; word-break: break-word; 
+            position: relative; z-index: 2;
+        }
+        .viewer-footer { 
+            margin-top: 5rem; text-align: right; 
+            font-family: 'Special Elite', cursive; color: #8c1c1c; 
+            opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; 
+            text-transform: uppercase; position: relative; z-index: 2;
+        }
+        
+        .close-viewer-btn {
+            background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0;
+            font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem;
+            margin-bottom: 1rem; cursor: pointer; text-transform: uppercase;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s;
+            flex-shrink: 0; z-index: 99999;
+        }
+        @media (min-width: 768px) {
+            .close-viewer-btn { font-size: 1.25rem; margin-bottom: 1.5rem; }
+        }
+        .close-viewer-btn:hover { background-color: #631212; transform: scale(1.05); }
+        .close-viewer-btn:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="flex flex-col items-center justify-start md:justify-center p-2 md:p-4 min-h-screen pb-24 md:pb-4">
@@ -430,6 +515,23 @@
                 <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] hover:scale-105 transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
                     PRZYSTĄP DO PRACY
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRZEGLĄDARKA NOTATEK (FULLSCREEN) -->
+    <div id="note-viewer-overlay">
+        <button class="close-viewer-btn" onclick="closeNoteViewer()">ZAMKNIJ I WRÓĆ DO PLANERA</button>
+        <div class="viewer-paper">
+            <div class="viewer-header">
+                <div id="viewer-date" class="viewer-meta"></div>
+                <h1 id="viewer-title" class="viewer-title"></h1>
+                <div id="viewer-tags" class="viewer-tags"></div>
+            </div>
+            <div id="viewer-content" class="viewer-content selectable-text"></div>
+            <div class="viewer-footer">
+                ZARCHIWIZOWANO<br>
+                PRZEZ: <span id="viewer-citizen"></span>
             </div>
         </div>
     </div>
@@ -459,18 +561,6 @@
             </div>
         </div>
     </div>
-    
-    <div id="note-view-modal" class="app-modal-overlay">
-        <div class="app-modal-window">
-            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOTATKA SŁUŻBOWA</h3>
-            <p id="note-view-date" class="text-xs font-bold mb-2 font-mono text-gray-600 border-b border-gray-400 pb-1"></p>
-            <div id="note-view-content" class="text-left font-['Courier_Prime'] text-sm leading-relaxed mb-6 max-h-60 overflow-y-auto overflow-x-hidden break-words custom-scrollbar whitespace-pre-wrap bg-white/50 p-2 border border-gray-400 selectable-text"></div>
-            <div class="flex gap-2">
-                 <button id="btn-edit-note" onclick="editArchivedNote()" class="flex-1 px-4 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 text-xs transition">Edytuj Akt</button>
-                 <button onclick="closeNoteViewModal()" class="flex-1 px-4 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] text-xs transition">Zamknij Akta</button>
-            </div>
-        </div>
-    </div>
 
     <div id="add-goal-modal" class="app-modal-overlay">
         <div class="app-modal-window">
@@ -487,7 +577,8 @@
                     <select id="goal-unit" class="sc-input bg-white mb-2 h-8">
                         <option value="zł">zł</option>
                         <option value="str.">str.</option>
-                        <option value="min.">min.</option> <!-- NOWA JEDNOSTKA MINUTOWA -->
+                        <option value="min.">min.</option>
+                        <option value="ml">ml</option>
                         <option value="%">%</option>
                         <option value="km">km</option>
                         <option value="kg">kg</option>
@@ -587,12 +678,16 @@
                                 <input type="text" id="note-title-input" placeholder="NAGŁÓWEK" class="bg-transparent border-b border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-sm text-[#8c1c1c] placeholder-gray-500">
                                 <input type="text" id="note-tags-input" placeholder="TAGI (np. #plan #ważne)..." class="bg-transparent border-none outline-none font-['Courier_Prime'] text-xs text-[#103090] placeholder-gray-500">
                              </div>
-                             <div id="note-editor" contenteditable="true" oninput="saveState();" class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-sm leading-[20px] text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto" placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
+                             <div id="note-editor" contenteditable="true" 
+                                  oninput="saveState();" 
+                                  onkeyup="sanitizeEditor(this);"
+                                  class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-sm leading-[20px] text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto" 
+                                  placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
                              <div class="border-t border-gray-400 p-2 flex flex-wrap justify-end items-center bg-gray-200/80 z-10 gap-2">
                                 <div class="flex flex-wrap items-center gap-2 justify-end flex-grow">
                                     <div class="flex items-center shadow-[1px_1px_0px_#444]">
-                                        <button onclick="markRed()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 transition hover:bg-[#631212] active:translate-y-[1px] text-center" title="Zaznacz wybrany tekst na czerwono">ZAZNACZ</button>
-                                        <button onclick="unmarkRed()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] transition hover:bg-gray-200 active:translate-y-[1px] text-center" title="Usuń czerwone zaznaczenie z tekstu">ODZNACZ</button>
+                                        <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 transition hover:bg-[#631212] active:translate-y-[1px] text-center" title="Zakreśl zaznaczony tekst na delikatny czerwony">ZAZNACZ</button>
+                                        <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] transition hover:bg-gray-200 active:translate-y-[1px] text-center" title="Wyczyść wszystko - usuwa formatowanie">ODZNACZ</button>
                                     </div>
                                     <div class="flex gap-1">
                                         <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden bg-gray-500 text-white border border-[#333] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-gray-600 transition shadow-sm whitespace-nowrap text-center">Anuluj</button>
@@ -699,7 +794,7 @@
             viewDate: null, currentGoal: null, citizenName: "Jan Kowalski", 
             notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "" 
         };
-        let currentEditingDateKey = null, currentQuoteIndex = 0, viewingNoteId = null;
+        let currentEditingDateKey = null, currentQuoteIndex = 0;
 
         window.onload = function() { initSplashScreen(); init(); };
 
@@ -708,11 +803,11 @@
             const status = document.getElementById('splash-status');
             const loadingContainer = document.getElementById('loading-container');
             const startContainer = document.getElementById('start-container');
-            setTimeout(() => { bar.style.width = '100%'; }, 100);
-            setTimeout(() => { status.innerText = "Weryfikacja tożsamości..."; }, 600);
-            setTimeout(() => { status.innerText = "Pobieranie przydziałów..."; }, 1200);
-            setTimeout(() => { status.innerText = "Zatwierdzanie wniosków..."; }, 1800);
-            setTimeout(() => { loadingContainer.style.display = 'none'; startContainer.classList.remove('hidden'); startContainer.classList.add('flex'); }, 2200);
+            setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100);
+            setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600);
+            setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów..."; }, 1200);
+            setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800);
+            setTimeout(() => { if(loadingContainer) loadingContainer.style.display = 'none'; if(startContainer) { startContainer.classList.remove('hidden'); startContainer.classList.add('flex'); } }, 2200);
         }
 
         function enterApp() { const screen = document.getElementById('splash-screen'); screen.style.opacity = '0'; setTimeout(() => { screen.style.display = 'none'; }, 1000); }
@@ -724,35 +819,134 @@
             const titleInput = document.getElementById('note-title-input');
             const tagsInput = document.getElementById('note-tags-input');
             if(editor && !state.activeNoteId) { 
-                editor.innerHTML = state.scratchpad || ""; 
+                editor.innerHTML = state.scratchpad || "<div><br></div>"; 
                 if (titleInput) titleInput.value = state.scratchpadTitle || "";
                 if (tagsInput) tagsInput.value = state.scratchpadTags || "";
             }
             const radioManual = document.querySelector(`input[name="stampMode"][value="manual"]`);
             const radioRandom = document.querySelector(`input[name="stampMode"][value="random"]`);
             if (state.stampSelectionMode === 'random') { if (radioRandom) radioRandom.checked = true; } else { if (radioManual) radioManual.checked = true; }
-            const scSubject = document.getElementById('sc-subject');
-            const scDesc = document.getElementById('sc-desc');
-            const scReason = document.getElementById('sc-reason');
-            const scFix = document.getElementById('sc-fix');
             const citizenNameInput = document.getElementById('citizen-name');
-            if (scSubject) scSubject.value = state.selfCriticism.subject || "lenistwo";
-            if (scDesc) scDesc.value = state.selfCriticism.desc || "";
-            if (scReason) scReason.value = state.selfCriticism.reason || "";
-            if (scFix) scFix.value = state.selfCriticism.fix || "";
             if (citizenNameInput && state.citizenName) citizenNameInput.value = state.citizenName;
+            
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => {
                 const el = document.getElementById(id); if (el) el.addEventListener('input', saveState);
             });
             if (citizenNameInput) citizenNameInput.addEventListener('input', saveState);
             if (editor) {
                 editor.addEventListener('input', saveState);
-                editor.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveCurrentNote(); } });
+                editor.addEventListener('keydown', (e) => { 
+                    if (e.key === 'Enter' && !e.shiftKey) { 
+                        e.preventDefault(); 
+                        saveCurrentNote(); 
+                    } 
+                });
             }
             if (titleInput) titleInput.addEventListener('input', saveState);
             if (tagsInput) tagsInput.addEventListener('input', saveState);
             const taskInput = document.getElementById('task-input');
             if (taskInput) taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
+        }
+
+        /* --- STABILNA LOGIKA ZAKREŚLACZA (BRUTE FORCE CLEANING) --- */
+        function sanitizeEditor(editor) {
+            if (editor.innerText.trim() === "" && editor.querySelectorAll('img').length === 0) {
+                editor.innerHTML = '<div><br></div>';
+            }
+            const emptySpans = editor.querySelectorAll('span:empty');
+            emptySpans.forEach(s => s.remove());
+        }
+
+        function applyZakreslacz() {
+            const editor = document.getElementById('note-editor');
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) {
+                return showAlert("Obywatelu! Najpierw zaznacz tekst myszką.");
+            }
+            const range = selection.getRangeAt(0);
+            if (!editor.contains(range.commonAncestorContainer)) return;
+
+            const span = document.createElement('span');
+            span.className = 'marked';
+            
+            try {
+                span.appendChild(range.extractContents());
+                range.insertNode(span);
+                const zwsp = document.createTextNode('\u200B');
+                span.after(zwsp);
+                const newRange = document.createRange();
+                newRange.setStartAfter(zwsp);
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+                editor.focus();
+                saveState();
+            } catch (e) {
+                console.error("Błąd Selection API:", e);
+            }
+        }
+
+        function forceCleanEditor() {
+            const editor = document.getElementById('note-editor');
+            const pureText = editor.innerText;
+            editor.innerHTML = '';
+            if (pureText.trim() === '') {
+                editor.innerHTML = '<div><br></div>';
+            } else {
+                editor.innerText = pureText;
+            }
+            saveState();
+        }
+
+        /* --- NOWY WEWNĘTRZNY PODGLĄD NOTATEK (INTERNAL VIEWER) --- */
+        function viewNoteInternal(id) {
+            const n = state.notes.find(x => x.id === id);
+            if (!n) return;
+
+            document.getElementById('viewer-date').innerText = n.date;
+            document.getElementById('viewer-title').innerText = n.title || 'NOTATKA SŁUŻBOWA';
+            document.getElementById('viewer-tags').innerText = n.tags || '';
+            document.getElementById('viewer-content').innerHTML = n.content;
+            document.getElementById('viewer-citizen').innerText = state.citizenName || "OBYWATEL(KA)";
+            
+            const overlay = document.getElementById('note-viewer-overlay');
+            overlay.classList.add('active');
+            overlay.scrollTop = 0; 
+        }
+
+        function closeNoteViewer() {
+            document.getElementById('note-viewer-overlay').classList.remove('active');
+        }
+
+        /* --- LOGIKA ŁADOWANIA NOTATKI DO EDYCJI --- */
+        function loadNoteForEdit(id) {
+            const n = state.notes.find(x => x.id === id);
+            if (!n) return;
+            
+            const editor = document.getElementById('note-editor');
+            const titleInput = document.getElementById('note-title-input');
+            const tagsInput = document.getElementById('note-tags-input');
+            
+            const currentContent = editor.innerText.trim();
+            if (currentContent !== "" && state.activeNoteId !== id) {
+                showConfirm("Obecna treść edytora zostanie zastąpiona. Kontynuować?", () => {
+                    executeLoad(n);
+                });
+            } else {
+                executeLoad(n);
+            }
+
+            function executeLoad(note) {
+                editor.innerHTML = note.content;
+                titleInput.value = note.title || "";
+                tagsInput.value = note.tags || "";
+                state.activeNoteId = note.id;
+                state.scratchpad = ""; 
+                state.scratchpadTitle = ""; 
+                state.scratchpadTags = "";
+                renderNotesList(); 
+                editor.focus();
+            }
         }
 
         function initQuote() { currentQuoteIndex = Math.floor(Math.random() * quotes.length); renderQuote(); }
@@ -784,27 +978,17 @@
         function startEditingTask(id, el) {
             const task = state.tasks.find(t => t.id === id);
             if (!task || task.done) return;
-
             const input = document.createElement('input');
             input.type = 'text';
             input.value = task.text;
             input.className = 'task-edit-input z-10';
-            
             const finishEdit = () => {
                 const newText = input.value.trim();
-                if (newText && newText !== task.text) {
-                    task.text = newText;
-                    saveState();
-                }
+                if (newText && newText !== task.text) { task.text = newText; saveState(); }
                 renderTasks();
             };
-
             input.onblur = finishEdit;
-            input.onkeydown = (e) => {
-                if (e.key === 'Enter') finishEdit();
-                if (e.key === 'Escape') renderTasks();
-            };
-
+            input.onkeydown = (e) => { if (e.key === 'Enter') finishEdit(); if (e.key === 'Escape') renderTasks(); };
             el.parentNode.replaceChild(input, el);
             input.focus();
         }
@@ -894,7 +1078,8 @@
             const grid = document.getElementById('calendar-grid'); if (!grid) return; grid.innerHTML = '';
             const d = state.viewDate || new Date(); const year = d.getFullYear(), month = d.getMonth();
             const months = ["STYCZEŃ", "LUTY", "MARZEC", "KWIECIEŃ", "MAJ", "CZERWIEC", "LIPIEC", "SIERPIEŃ", "WRZESIEŃ", "PAŹDZIERNIK", "LISTOPAD", "GRUDZIEŃ"];
-            document.getElementById('calendar-month-year').innerText = `${months[month]} ${year}`;
+            const monthHeader = document.getElementById('calendar-month-year');
+            if(monthHeader) monthHeader.innerText = `${months[month]} ${year}`;
             ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; grid.appendChild(el); });
             const firstDay = new Date(year, month, 1).getDay(); const offset = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(year, month + 1, 0).getDate(); const today = new Date();
@@ -912,11 +1097,16 @@
         function openEventModal(key) {
             currentEditingDateKey = key; const parts = key.split('-'); const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
             const existingEvent = state.events[key];
-            document.getElementById('event-date-display').innerText = `${parts[0]} ${months[parseInt(parts[1])-1]} ${parts[2]}`;
-            document.getElementById('event-input').value = existingEvent ? (existingEvent.text || "") : "";
-            document.getElementById('event-recurrence').value = existingEvent ? (existingEvent.recurrence || "none") : "none";
-            document.getElementById('btn-delete-event').classList.toggle('hidden', !existingEvent);
-            const m = document.getElementById('event-modal'); m.classList.add('active'); m.style.display = 'flex';
+            const displayDate = document.getElementById('event-date-display');
+            if(displayDate) displayDate.innerText = `${parts[0]} ${months[parseInt(parts[1])-1]} ${parts[2]}`;
+            const eventInput = document.getElementById('event-input');
+            if(eventInput) eventInput.value = existingEvent ? (existingEvent.text || "") : "";
+            const eventRec = document.getElementById('event-recurrence');
+            if(eventRec) eventRec.value = existingEvent ? (existingEvent.recurrence || "none") : "none";
+            const deleteBtn = document.getElementById('btn-delete-event');
+            if(deleteBtn) deleteBtn.classList.toggle('hidden', !existingEvent);
+            const m = document.getElementById('event-modal'); 
+            if(m) { m.classList.add('active'); m.style.display = 'flex'; }
         }
         function closeEventModal() { document.getElementById('event-modal').classList.remove('active'); document.getElementById('event-modal').style.display = 'none'; currentEditingDateKey = null; }
         function saveEvent() { 
@@ -936,7 +1126,11 @@
                         if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
                         canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
                         state.photo = canvas.toDataURL('image/jpeg', 0.7);
-                        document.getElementById('user-photo').src = state.photo; document.getElementById('user-photo').classList.remove('hidden'); document.getElementById('photo-placeholder').classList.add('hidden'); saveState();
+                        const photoImg = document.getElementById('user-photo');
+                        const photoPlaceholder = document.getElementById('photo-placeholder');
+                        if(photoImg) { photoImg.src = state.photo; photoImg.classList.remove('hidden'); }
+                        if(photoPlaceholder) photoPlaceholder.classList.add('hidden'); 
+                        saveState();
                     }; img.src = e.target.result;
                 }; reader.readAsDataURL(input.files[0]); 
             } 
@@ -956,35 +1150,40 @@
 
         function loadState() { 
             const s = localStorage.getItem('prl_planer_v10'); 
-            if(s) { const p = JSON.parse(s); state = { ...state, ...p }; if(state.photo) { document.getElementById('user-photo').src = state.photo; document.getElementById('user-photo').classList.remove('hidden'); document.getElementById('photo-placeholder').classList.add('hidden'); } } 
+            if(s) { 
+                const p = JSON.parse(s); state = { ...state, ...p }; 
+                if(state.photo) { 
+                    const photoImg = document.getElementById('user-photo');
+                    const photoPlaceholder = document.getElementById('photo-placeholder');
+                    if(photoImg) { photoImg.src = state.photo; photoImg.classList.remove('hidden'); }
+                    if(photoPlaceholder) photoPlaceholder.classList.add('hidden'); 
+                } 
+            } 
         }
 
         function renderNotesList() {
             const list = document.getElementById('notes-list'); if (!list) return; list.innerHTML = '';
             const searchInput = document.getElementById('note-search');
             const term = searchInput ? searchInput.value.toLowerCase().trim() : "";
-            
             let filteredNotes = state.notes;
-            if (term) {
-                filteredNotes = state.notes.filter(n => 
-                    (n.title && n.title.toLowerCase().includes(term)) || 
-                    (n.content && n.content.toLowerCase().includes(term)) || 
-                    (n.tags && n.tags.toLowerCase().includes(term)) || 
-                    (n.date && n.date.toLowerCase().includes(term))
-                );
-            }
-
+            if (term) { filteredNotes = state.notes.filter(n => (n.title && n.title.toLowerCase().includes(term)) || (n.content && n.content.toLowerCase().includes(term)) || (n.tags && n.tags.toLowerCase().includes(term)) || (n.date && n.date.toLowerCase().includes(term))); }
             if (!filteredNotes || filteredNotes.length === 0) list.innerHTML = '<li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li>';
             else filteredNotes.forEach(n => {
                 const li = document.createElement('li'); li.className = `archive-item flex items-center gap-2 ${state.activeNoteId === n.id ? 'active' : ''}`;
-                li.innerHTML = `<input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c]" value="${n.id}" onclick="event.stopPropagation()">
-                                <div class="truncate flex-1 cursor-pointer" onclick="selectNote(${n.id})">
-                                    <div class="font-bold text-[#8c1c1c]">${n.title || 'Bez tytułu'}</div>
-                                    <div class="text-[9px] text-gray-600 mt-0.5">${n.date} ${n.tags ? `<span class="text-[#103090] font-bold ml-1">${n.tags}</span>` : ''}</div>
-                                </div>`;
+                li.innerHTML = `
+                    <input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c]" value="${n.id}" onclick="event.stopPropagation()">
+                    <div class="truncate flex-1 cursor-pointer" onclick="viewNoteInternal(${n.id})">
+                        <div class="font-bold text-[#8c1c1c]">${n.title || 'Bez tytułu'}</div>
+                        <div class="text-[9px] text-gray-600 mt-0.5">${n.date} ${n.tags ? `<span class="text-[#103090] font-bold ml-1">${n.tags}</span>` : ''}</div>
+                    </div>
+                    <button onclick="event.stopPropagation(); loadNoteForEdit(${n.id})" 
+                            class="text-[9px] bg-[#292524] text-white px-2 py-1 hover:bg-black font-bold border border-gray-600 uppercase"
+                            title="Wczytaj dokument do edytora">EDYTUJ</button>
+                `;
                 list.appendChild(li);
             });
-            document.getElementById('btn-cancel-edit').classList.toggle('hidden', !state.activeNoteId);
+            const cancelBtn = document.getElementById('btn-cancel-edit');
+            if(cancelBtn) cancelBtn.classList.toggle('hidden', !state.activeNoteId);
         }
         
         function clearEditor() { 
@@ -992,7 +1191,7 @@
             const e = document.getElementById('note-editor'); 
             const titleInput = document.getElementById('note-title-input');
             const tagsInput = document.getElementById('note-tags-input');
-            if(e) { e.innerHTML = state.scratchpad || ''; } 
+            if(e) { e.innerHTML = state.scratchpad || '<div><br></div>'; } 
             if(titleInput) titleInput.value = state.scratchpadTitle || ''; 
             if(tagsInput) tagsInput.value = state.scratchpadTags || ''; 
             saveState(); renderNotesList(); 
@@ -1007,141 +1206,20 @@
             const plainText = e.innerText.trim();
             const customTitle = titleInput ? titleInput.value.trim() : "";
             const tags = tagsInput ? tagsInput.value.trim() : "";
-
             if (!plainText && !customTitle) { showAlert("Obywatelu! Pustych akt nie archiwizujemy."); return; }
-            
             const t = customTitle || plainText.split('\n')[0].substring(0, 20) + (plainText.length > 20 ? '...' : ''); 
-            
             const dObj = new Date();
             const days = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
             const d = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')} | [${days[dObj.getDay()]}]`;
-
             if (state.activeNoteId) { 
                 const i = state.notes.findIndex(n => n.id === state.activeNoteId); 
                 if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tags; } 
                 showAlert("Aktualizacja akt zakończona pomyślnie."); 
-            }
-            else { 
-                state.notes.unshift({ id: Date.now(), title: t, content: c, date: d, tags: tags }); 
-                showAlert("Notatka przekazana do archiwum."); 
-            }
-            e.innerHTML = ''; if(titleInput) titleInput.value = ''; if(tagsInput) tagsInput.value = '';
+            } else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: d, tags: tags }); showAlert("Notatka przekazana do archiwum."); }
+            e.innerHTML = '<div><br></div>'; if(titleInput) titleInput.value = ''; if(tagsInput) tagsInput.value = '';
             state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = "";
             state.activeNoteId = null; saveState(); renderNotesList();
         }
-
-        function selectNote(id) {
-            const n = state.notes.find(x => x.id === id); if (!n) return; viewingNoteId = id;
-            document.getElementById('note-view-date').innerHTML = `${n.date} <br><span class="text-[#8c1c1c] uppercase">${n.title || 'Dokument'}</span> ${n.tags ? `<span class="text-[#103090] ml-2 font-normal">${n.tags}</span>` : ''}`;
-            document.getElementById('note-view-content').innerHTML = n.content;
-            const m = document.getElementById('note-view-modal'); m.classList.add('active'); m.style.display = 'flex';
-        }
-
-        function editArchivedNote() {
-            if (!viewingNoteId) return; const n = state.notes.find(x => x.id === viewingNoteId);
-            if (n) { 
-                const e = document.getElementById('note-editor'); 
-                const titleInput = document.getElementById('note-title-input');
-                const tagsInput = document.getElementById('note-tags-input');
-                if (e) { 
-                    e.innerHTML = n.content; 
-                    if(titleInput) titleInput.value = n.title || "";
-                    if(tagsInput) tagsInput.value = n.tags || "";
-                    state.activeNoteId = n.id; 
-                    state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = "";
-                    closeNoteViewModal(); renderNotesList(); e.focus(); 
-                } 
-            }
-        }
-
-        function markRed() {
-            const editor = document.getElementById('note-editor');
-            if (!editor) return;
-            editor.focus();
-            
-            const selection = window.getSelection();
-            if (!selection.rangeCount || selection.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst do podkreślenia.");
-
-            const range = selection.getRangeAt(0);
-            let node = range.commonAncestorContainer;
-            if (node.nodeType === 3) node = node.parentNode;
-
-            // Blokada przed podwójnym zaznaczaniem tego samego fragmentu
-            let curr = node;
-            while (curr && curr.id !== 'note-editor' && curr !== document.body) {
-                if (curr.classList && (curr.classList.contains('marker-red') || curr.classList.contains('bg-[#fca5a5]'))) {
-                    return; // Już jest zaznaczone
-                }
-                curr = curr.parentNode;
-            }
-
-            const container = document.createElement('div');
-            container.appendChild(range.cloneContents());
-            const innerMarkers = container.querySelectorAll('.marker-red, span.bg-\\[\\#fca5a5\\]');
-
-            // Usuwamy tagi ze środka zaznaczenia by zapobiec psuciu się kodu
-            if (innerMarkers.length > 0) {
-                innerMarkers.forEach(m => {
-                    const frag = document.createDocumentFragment();
-                    while (m.firstChild) frag.appendChild(m.firstChild);
-                    m.parentNode.replaceChild(frag, m);
-                });
-            }
-
-            const newHtml = `<span class="marker-red bg-[#fca5a5] text-[#8c1c1c] font-bold rounded-sm px-1">${container.innerHTML}</span>&#8203;`;
-            document.execCommand('insertHTML', false, newHtml);
-            document.execCommand('removeFormat', false, null);
-            saveState();
-        }
-
-        function unmarkRed() {
-            const editor = document.getElementById('note-editor');
-            if (!editor) return;
-            editor.focus();
-            
-            const selection = window.getSelection();
-            if (!selection.rangeCount || selection.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst do odznaczenia.");
-
-            const range = selection.getRangeAt(0);
-            let node = range.commonAncestorContainer;
-            if (node.nodeType === 3) node = node.parentNode;
-
-            // Cofanie jeśli kliknięto wewnątrz już istniejącego markera
-            let curr = node;
-            let parentMarker = null;
-            while (curr && curr.id !== 'note-editor' && curr !== document.body) {
-                if (curr.classList && (curr.classList.contains('marker-red') || curr.classList.contains('bg-[#fca5a5]'))) {
-                    parentMarker = curr;
-                    break;
-                }
-                curr = curr.parentNode;
-            }
-
-            if (parentMarker) {
-                const frag = document.createDocumentFragment();
-                while (parentMarker.firstChild) frag.appendChild(parentMarker.firstChild);
-                parentMarker.parentNode.replaceChild(frag, parentMarker);
-                saveState();
-                return;
-            }
-
-            // Cofanie z szerokiego obszaru obejmującego markery
-            const container = document.createElement('div');
-            container.appendChild(range.cloneContents());
-            const innerMarkers = container.querySelectorAll('.marker-red, span.bg-\\[\\#fca5a5\\]');
-
-            if (innerMarkers.length > 0) {
-                innerMarkers.forEach(m => {
-                    const frag = document.createDocumentFragment();
-                    while (m.firstChild) frag.appendChild(m.firstChild);
-                    m.parentNode.replaceChild(frag, m);
-                });
-                document.execCommand('insertHTML', false, container.innerHTML);
-                saveState();
-            }
-        }
-
-        function closeNoteViewModal() { const m = document.getElementById('note-view-modal'); if (m) { m.classList.remove('active'); m.style.display = 'none'; } viewingNoteId = null; }
 
         function deleteMarkedNotes() {
             const boxes = document.querySelectorAll('.note-checkbox:checked'); if (boxes.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
@@ -1154,14 +1232,7 @@
         function submitSelfCriticism() {
             const d = document.getElementById('sc-desc'); const r = document.getElementById('sc-reason'); const f = document.getElementById('sc-fix');
             if (!d || !d.value.trim()) return showAlert("Raport bez opisu czynu jest nieważny!");
-            state.reports.unshift({ 
-                id: Date.now(), 
-                date: new Date().toLocaleDateString('pl-PL'), 
-                subject: document.getElementById('sc-subject').options[document.getElementById('sc-subject').selectedIndex].text, 
-                desc: d.value, 
-                reason: r.value, 
-                fix: f.value 
-            });
+            state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: document.getElementById('sc-subject').options[document.getElementById('sc-subject').selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
             d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); showAlert("Raport przyjęty.");
         }
         function deleteReport(id) { state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); }
@@ -1171,12 +1242,7 @@
             if (!state.reports || state.reports.length === 0) { list.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>'; return; }
             state.reports.forEach(r => {
                 const item = document.createElement('li'); item.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text";
-                item.innerHTML = `
-                    <div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div>
-                    <div><span class="font-bold">Czyn:</span> ${r.desc}</div>
-                    ${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} 
-                    <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div>
-                    <button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`;
+                item.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`;
                 list.appendChild(item);
             });
         }
