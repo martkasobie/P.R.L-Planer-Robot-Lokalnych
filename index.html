@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#262626">
 
-    <!-- MANIFEST PWA (Wersja Inlined dla jednego pliku) -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlAuUi5MIFBsYW5lciIsCiAgInNob3J0X25hbWUiOiAiUC5SLkwiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzI2MjYyNiIsCiAgInRoZW1lX2NvbG9yIjogIiMyNjI2MjYiCn0=">
+    <!-- DYNAMICZNY MANIFEST PWA -->
+    <link rel="manifest" id="pwa-manifest">
     
     <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,26 +27,15 @@
             --paper-bg: #dcd0c0;
             --paper-texture: repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 2px, transparent 2px, transparent 4px);
             --ink-color: #1a1a1a;
-            
             --stamp-red: #8c1c1c; 
             --stamp-blue: #103090; 
             --stamp-violet: #6020a0;
             --stamp-green: #15803d;
-            
             --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        * { 
-            box-sizing: border-box; 
-            touch-action: manipulation; 
-        }
-        
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
-            max-width: 100%;
-            min-height: 100vh;
-        }
+        * { box-sizing: border-box; touch-action: manipulation; }
+        html, body { overflow-x: hidden; width: 100%; max-width: 100%; min-height: 100vh; }
 
         body {
             background-color: #262626;
@@ -59,41 +48,18 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        .selectable-text {
-            user-select: text !important;
-            -webkit-user-select: text !important;
-        }
-
-        img, video, svg {
-            max-width: 100%;
-            height: auto;
-        }
-        
+        .selectable-text { user-select: text !important; -webkit-user-select: text !important; }
+        img, video, svg { max-width: 100%; height: auto; }
         input, textarea, select { user-select: text; }
 
         input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #8c1c1c;
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #631212;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8c1c1c; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
 
         .paper-sheet {
             background-color: var(--paper-bg);
@@ -107,17 +73,11 @@
         }
         
         .paper-dirt {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            opacity: 0.4;
-            mix-blend-mode: multiply;
+            position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.4; mix-blend-mode: multiply;
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 0%, transparent 20%),
                 radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 25%),
-                repeating-conic-gradient(#0000 0% 25%, rgba(0,0,0,0.05) 0% 50%) 
-                50% / 20px 20px;
+                repeating-conic-gradient(#0000 0% 25%, rgba(0,0,0,0.05) 0% 50%) 50% / 20px 20px;
         }
 
         h1, h2, h3, .propaganda-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
@@ -125,10 +85,12 @@
         .stamp-container { position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 20; }
         .stamp-border { position: absolute; inset: 0; border: 4px solid currentColor; opacity: 0.8; mix-blend-mode: multiply; border-style: dashed; }
         .stamp-inner { position: relative; z-index: 2; font-family: 'Special Elite', cursive; font-weight: 900; text-transform: uppercase; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.9; text-shadow: 0 0 1px currentColor; }
-        .shape-rect { border-radius: 2px; } .shape-round { border-radius: 50%; } .shape-oval { border-radius: 50%; } .shape-tri { border: 4px solid currentColor; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .shape-rect { border-radius: 2px; } .shape-round { border-radius: 50%; } .shape-oval { border-radius: 50%; } 
+        .shape-tri { border: 4px solid currentColor; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .shape-none { border: none; clip-path: none; }
         
-        .col-red { color: var(--stamp-red); } .col-blue { color: var(--stamp-blue); } .col-violet { color: var(--stamp-violet); } .col-green { color: var(--stamp-green); }
+        .col-red { color: var(--stamp-red); } .col-blue { color: var(--stamp-blue); } 
+        .col-violet { color: var(--stamp-violet); } .col-green { color: var(--stamp-green); }
         
         .stamp-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; } 
         .stamp-icon svg { width: 32px; height: 32px; fill: currentColor; }
@@ -141,104 +103,42 @@
         .prl-input:focus { border-bottom-style: solid; border-color: #000; background-color: rgba(255,255,255,0.1); }
         
         .quote-banner {
-            background-color: #8c1c1c; 
-            color: #e5e5e5; padding: 8px;
+            background-color: #8c1c1c; color: #e5e5e5; padding: 8px;
             font-family: 'Oswald', sans-serif; text-transform: uppercase;
             letter-spacing: 1px; text-align: center; font-size: 0.9rem;
             margin-bottom: 20px; border: 2px solid #2b2b2b; transform: rotate(0.5deg);
-            box-shadow: 3px 3px 5px rgba(0,0,0,0.3); cursor: pointer;
-            transition: transform 0.1s;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s;
         }
         .quote-banner:active { transform: scale(0.99); }
 
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; 
-            font-family: 'Courier Prime', monospace; font-size: 0.6rem; 
-        }
-        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; }
         .calendar-cell {
             aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2);
-            position: relative; cursor: pointer; display: flex; flex-direction: column; 
-            padding: 1px; overflow: hidden;
+            position: relative; cursor: pointer; display: flex; flex-direction: column; padding: 1px; overflow: hidden;
         }
         .calendar-cell:hover { background-color: rgba(255,255,255,0.5); }
         .calendar-cell.today { background-color: #fca5a5; border: 2px solid #8c1c1c; }
         .calendar-cell.active { background-color: #bfdbfe; }
         .calendar-cell.empty { background-color: transparent; border: none; cursor: default; pointer-events: none; }
         
-        .cal-header {
-            text-align: center; font-weight: bold; background-color: #a8a29e; padding: 1px;
-            font-family: 'Courier Prime', monospace; font-size: 0.6rem; color: #1c1917;
-        }
+        .cal-header { text-align: center; font-weight: bold; background-color: #a8a29e; padding: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; color: #1c1917; }
 
-        .cal-event-text {
-            font-size: 0.6rem; 
-            line-height: 1;
-            word-break: break-word; 
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #1e3a8a;
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.7);
-            margin-top: 1px;
-            padding: 1px;
-        }
+        .cal-event-text { font-size: 0.6rem; line-height: 1; word-break: break-word; flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: #1e3a8a; font-weight: bold; background-color: rgba(255, 255, 255, 0.7); margin-top: 1px; padding: 1px; }
 
-        .event-marker { 
-            width: 6px; height: 6px; background-color: #8c1c1c; border-radius: 50%; 
-            position: absolute; top: 2px; right: 2px; z-index: 5;
-            box-shadow: 0 0 2px rgba(0,0,0,0.3);
-        }
+        .event-marker { width: 6px; height: 6px; background-color: #8c1c1c; border-radius: 50%; position: absolute; top: 2px; right: 2px; z-index: 5; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
 
-        .wire-clip-container { 
-            position: absolute; 
-            top: -20px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 60px; 
-            height: 80px; 
-            z-index: 20; 
-            pointer-events: none; 
-        }
-        .wire-clip-part { 
-            position: absolute; 
-            border: 3px solid #555; 
-            border-radius: 20px; 
-            box-shadow: 1px 1px 2px rgba(0,0,0,0.4); 
-        }
-        .clip-outer { 
-            top: 0; left: 10px; right: 10px; bottom: 30px; 
-            border-bottom: none; border-radius: 20px 20px 0 0; 
-        }
-        .clip-inner { 
-            top: 20px; left: 20px; right: 20px; bottom: 10px; 
-            border-top: none; border-radius: 0 0 20px 20px; z-index: 2; 
-        }
+        .wire-clip-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 60px; height: 80px; z-index: 20; pointer-events: none; }
+        .wire-clip-part { position: absolute; border: 3px solid #555; border-radius: 20px; box-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+        .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
+        .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        .app-modal-overlay {
-            position: fixed; inset: 0; z-index: 9999; display: none;
-            align-items: center; justify-content: center; 
-            background: rgba(0,0,0,0.4); 
-            backdrop-filter: blur(2px); 
-        }
+        .app-modal-overlay { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
         .app-modal-overlay.active { display: flex !important; }
-        
         #alert-modal, #confirm-modal { z-index: 20000; }
         
-        .app-modal-window {
-            background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px;
-            width: 85%; max-width: 320px; text-align: center; position: relative;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg);
-        }
+        .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg); }
 
-        .stamp-item {
-            height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; transition: background 0.2s;
-        }
+        .stamp-item { height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.2s; }
         .stamp-item:hover { background-color: rgba(255,255,255,0.8); }
         .stamp-item.selected { border: 2px solid #1f2937; background-color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
         
@@ -248,269 +148,53 @@
 
         .bg-graph-paper {
             background-color: #f5eedc;
-            background-image: 
-                linear-gradient(rgba(180, 110, 50, 0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(180, 110, 50, 0.2) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(180, 110, 50, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(180, 110, 50, 0.2) 1px, transparent 1px);
             background-size: 20px 20px;
             box-shadow: inset 0 0 10px rgba(80, 40, 0, 0.1);
         }
         
-        .chart-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px; 
-            height: 280px; 
-            padding: 10px;
-            padding-top: 40px; 
-            padding-bottom: 90px; 
-            overflow-x: auto; 
-            border: 2px solid #333;
-        }
-        
-        .chart-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 90px; 
-            flex-shrink: 0;
-            position: relative;
-            height: 100%;
-            justify-content: flex-end;
-        }
-        
-        .bar-track {
-            width: 100%;
-            height: 100%; 
-            background: rgba(255,255,255,0.2);
-            border: 2px solid #444;
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            cursor: pointer;
-        }
-        
-        .bar-fill {
-            width: 100%;
-            background-color: #8c1c1c;
-            transition: height 0.5s ease-out;
-            position: relative;
-            border-top: 2px solid #000;
-            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px);
-        }
-        
-        .bar-fill.complete {
-            background-color: #15803d;
-        }
-        
-        .bar-label-vertical {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            white-space: nowrap;
-            font-size: 10px; 
-            font-weight: 900;
-            color: #1f1f1f;
-            background-color: rgba(255,255,255,0.6); 
-            padding: 4px 2px;
-            border-radius: 4px;
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%) rotate(180deg);
-            max-height: 160px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            z-index: 10;
-            pointer-events: none;
-            letter-spacing: 0.5px;
-        }
-        
-        .bar-value {
-            position: absolute;
-            top: -24px; 
-            width: 140%; 
-            left: -20%;
-            text-align: center;
-            font-size: 9px;
-            font-weight: bold;
-            font-family: monospace;
-            color: #1c1917;
-            background: rgba(255,255,255,0.5);
-            border-radius: 4px;
-            padding: 1px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            z-index: 20;
-        }
-        
-        .chart-controls {
-            position: absolute;
-            bottom: -70px; 
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            gap: 2px;
-        }
-        
-        .chart-btn {
-            flex: 1;
-            height: 50px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px; 
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            border: 2px solid rgba(0,0,0,0.3);
-            user-select: none;
-            font-family: monospace;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
-            border-radius: 4px;
-        }
+        .chart-container { display: flex; align-items: flex-end; gap: 20px; height: 280px; padding: 10px; padding-top: 40px; padding-bottom: 90px; overflow-x: auto; border: 2px solid #333; }
+        .chart-col { display: flex; flex-direction: column; align-items: center; width: 90px; flex-shrink: 0; position: relative; height: 100%; justify-content: flex-end; }
+        .bar-track { width: 100%; height: 100%; background: rgba(255,255,255,0.2); border: 2px solid #444; position: relative; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; }
+        .bar-fill { width: 100%; background-color: #8c1c1c; transition: height 0.5s ease-out; position: relative; border-top: 2px solid #000; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px); }
+        .bar-fill.complete { background-color: #15803d; }
+        .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 10px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 4px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: 160px; overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
+        .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; }
+        .chart-controls { position: absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; }
+        .chart-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; cursor: pointer; border: 2px solid rgba(0,0,0,0.3); user-select: none; font-family: monospace; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); border-radius: 4px; }
         .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
-        .btn-plus { background: #15803d; }
-        .btn-minus { background: #8c1c1c; }
-        .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
+        .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
 
-        .archive-item {
-            cursor: pointer;
-            padding: 4px;
-            border-bottom: 1px dashed #a8a29e;
-            transition: background 0.2s;
-        }
+        .archive-item { cursor: pointer; padding: 4px; border-bottom: 1px dashed #a8a29e; transition: background 0.2s; }
         .archive-item:hover { background-color: rgba(255,255,255,0.5); }
         .archive-item.active { background-color: #e7e5e4; font-weight: bold; border-left: 3px solid #8c1c1c; }
-        
-        .note-checkbox {
-            margin-right: 6px;
-            cursor: pointer;
-        }
+        .note-checkbox { margin-right: 6px; cursor: pointer; }
+        .task-edit-input { width: 100%; background: rgba(255,255,255,0.4); border: none; border-bottom: 2px solid #8c1c1c; font-family: 'Courier Prime', monospace; font-size: 0.875rem; padding: 2px 4px; outline: none; color: #1a1a1a; font-weight: bold; }
+        .prl-editor:empty:before { content: attr(placeholder); color: #6b7280; pointer-events: none; display: block; }
 
-        .task-edit-input {
-            width: 100%;
-            background: rgba(255,255,255,0.4);
-            border: none;
-            border-bottom: 2px solid #8c1c1c;
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.875rem;
-            padding: 2px 4px;
-            outline: none;
-            color: #1a1a1a;
-            font-weight: bold;
-        }
+        [contenteditable] { caret-color: #1a1a1a !important; outline: none; }
+        .marked { background-color: #ffcccc !important; color: black !important; border-radius: 2px; padding: 0 2px; font-weight: bold; }
 
-        .prl-editor:empty:before {
-            content: attr(placeholder);
-            color: #6b7280;
-            pointer-events: none;
-            display: block;
-        }
-
-        /* --- STABILNA STYLISTYKA FORMATOWANIA --- */
-        [contenteditable] {
-            caret-color: #1a1a1a !important; 
-            outline: none;
-        }
-        .marked {
-            background-color: #ffcccc !important; 
-            color: black !important; 
-            border-radius: 2px;
-            padding: 0 2px;
-            font-weight: bold;
-        }
-
-        /* --- OPTYMALIZACJA PODGLĄDU DOKUMENTU --- */
-        #note-viewer-overlay {
-            position: fixed; inset: 0; z-index: 99998;
-            background-color: #262626;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow-y: auto;
-            padding: 1rem;
-            transform: translate3d(0,0,0);
-            backface-visibility: hidden;
-            perspective: 1000px;
-        }
+        #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; padding: 1rem; transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; }
         #note-viewer-overlay.active { display: flex; }
-        
-        .viewer-paper {
-            width: 100%;
-            max-width: 800px;
-            min-height: calc(100vh - 120px); 
-            height: auto;
-            background-color: var(--paper-bg);
-            padding: 2rem;
-            box-shadow: 10px 10px 40px rgba(0,0,0,0.8);
-            position: relative;
-            border: 1px solid #8c8680;
-            margin-bottom: 2rem; 
-            flex-shrink: 0;
-            transform: translate3d(0,0,0);
-        }
-        @media (min-width: 768px) {
-            .viewer-paper { padding: 4rem; }
-        }
-        
-        .viewer-paper::before {
-            content: ""; position: absolute; inset: 0;
-            background-image: var(--paper-texture);
-            pointer-events: none; mix-blend-mode: multiply;
-            z-index: 1;
-        }
-        
-        .viewer-header {
-            border-bottom: 3px double #1a1a1a;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            position: relative; z-index: 2;
-        }
+        .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 2rem; flex-shrink: 0; transform: translate3d(0,0,0); }
+        @media (min-width: 768px) { .viewer-paper { padding: 4rem; } }
+        .viewer-paper::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-texture); pointer-events: none; mix-blend-mode: multiply; z-index: 1; }
+        .viewer-header { border-bottom: 3px double #1a1a1a; margin-bottom: 2rem; padding-bottom: 1rem; position: relative; z-index: 2; }
         .viewer-meta { font-size: 0.75rem; font-weight: bold; color: #444; margin-bottom: 0.5rem; }
         .viewer-title { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #8c1c1c; text-transform: uppercase; margin: 0; line-height: 1.1; }
-        @media (min-width: 768px) {
-            .viewer-title { font-size: 3rem; }
-        }
+        @media (min-width: 768px) { .viewer-title { font-size: 3rem; } }
         .viewer-tags { font-size: 0.875rem; color: #103090; margin-top: 0.5rem; font-weight: bold; }
-        .viewer-content { 
-            font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; 
-            white-space: pre-wrap; word-break: break-word; 
-            position: relative; z-index: 2;
-        }
-        .viewer-footer { 
-            margin-top: 5rem; text-align: right; 
-            font-family: 'Special Elite', cursive; color: #8c1c1c; 
-            opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; 
-            text-transform: uppercase; position: relative; z-index: 2;
-        }
-
-        .viewer-close-x {
-            position: absolute; top: 1.5rem; right: 1.5rem;
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #1a1a1a;
-            font-family: Arial, sans-serif; font-weight: bold;
-            color: #1a1a1a; cursor: pointer; background: transparent;
-            z-index: 10; transition: transform 0.1s;
-        }
+        .viewer-content { font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; white-space: pre-wrap; word-break: break-word; position: relative; z-index: 2; }
+        .viewer-footer { margin-top: 5rem; text-align: right; font-family: 'Special Elite', cursive; color: #8c1c1c; opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; text-transform: uppercase; position: relative; z-index: 2; }
+        .viewer-close-x { position: absolute; top: 1.5rem; right: 1.5rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 2px solid #1a1a1a; font-family: Arial, sans-serif; font-weight: bold; color: #1a1a1a; cursor: pointer; background: transparent; z-index: 10; transition: transform 0.1s; }
         .viewer-close-x:hover { transform: scale(1.1); background: rgba(0,0,0,0.05); }
-        
-        .close-viewer-btn {
-            background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0;
-            font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem;
-            margin-bottom: 4rem; cursor: pointer; text-transform: uppercase;
-            box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s;
-            flex-shrink: 0; z-index: 99999;
-        }
-        @media (min-width: 768px) {
-            .close-viewer-btn { font-size: 1.25rem; }
-        }
+        .close-viewer-btn { background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 4rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s; flex-shrink: 0; z-index: 99999; }
+        @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; } }
         .close-viewer-btn:hover { background-color: #631212; transform: scale(1.05); }
         .close-viewer-btn:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
+
+        #install-button { display: none; }
     </style>
 </head>
 <body class="flex flex-col items-center justify-start md:justify-center p-2 md:p-4 min-h-screen pb-24 md:pb-4">
@@ -539,7 +223,7 @@
         </div>
     </div>
 
-    <!-- PRZEGLĄDARKA NOTATEK (FULLSCREEN) -->
+    <!-- PRZEGLĄDARKA NOTATEK -->
     <div id="note-viewer-overlay">
         <div class="viewer-paper">
             <button class="viewer-close-x" onclick="closeNoteViewer()" title="Zamknij podgląd">X</button>
@@ -549,10 +233,7 @@
                 <div id="viewer-tags" class="viewer-tags"></div>
             </div>
             <div id="viewer-content" class="viewer-content selectable-text"></div>
-            <div class="viewer-footer">
-                ZARCHIWIZOWANO<br>
-                PRZEZ: <span id="viewer-citizen"></span>
-            </div>
+            <div class="viewer-footer">ZARCHIWIZOWANO<br>PRZEZ: <span id="viewer-citizen"></span></div>
         </div>
         <button class="close-viewer-btn" onclick="closeNoteViewer()">ZAMKNIJ I WRÓĆ DO PLANERA</button>
     </div>
@@ -596,16 +277,7 @@
                 <div class="w-1/3">
                     <label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label>
                     <select id="goal-unit" class="sc-input bg-white mb-2 h-8">
-                        <option value="zł">zł</option>
-                        <option value="str.">str.</option>
-                        <option value="min.">min.</option>
-                        <option value="ml">ml</option>
-                        <option value="%">%</option>
-                        <option value="km">km</option>
-                        <option value="kg">kg</option>
-                        <option value="szt.">szt.</option>
-                        <option value="godz.">godz.</option>
-                        <option value="pkt">pkt</option>
+                        <option value="zł">zł</option><option value="str.">str.</option><option value="min.">min.</option><option value="ml">ml</option><option value="%">%</option><option value="km">km</option><option value="kg">kg</option><option value="szt.">szt.</option><option value="godz.">godz.</option><option value="pkt">pkt</option>
                     </select>
                 </div>
             </div>
@@ -636,7 +308,10 @@
             <div class="flex-1">
                 <div class="flex justify-between items-end border-b border-gray-500 pb-2 mb-4">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1c1917] tracking-tight">P.R.L</h1>
-                    <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
+                    <div class="flex flex-col items-end">
+                        <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
+                        <button id="install-button" onclick="installPWA()" class="mt-2 bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
+                    </div>
                 </div>
                 <h2 class="text-xl font-bold text-[#292524] mb-6">Planer Robót Lokalnych</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm font-mono">
@@ -647,51 +322,29 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- LEWA STRONA -->
             <div class="lg:col-span-7 space-y-6 relative z-10">
-                <!-- ZADANIA -->
                 <div>
                     <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
                     <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black">Zatwierdź</button></div>
                     <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"><div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div></ul>
                     <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
                 </div>
-
-                <!-- PLAN DŁUGOTERMINOWY -->
                 <div class="border-t-4 double border-gray-500 pt-4 bg-[#fefce840] p-4 shadow-inner">
                     <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
-                        <div class="flex flex-col w-full sm:w-2/3">
-                            <span class="text-[9px] font-bold uppercase text-gray-800">WARTOŚĆ WSADU (Dodaj/Odejmij):</span>
-                            <div class="flex items-center">
-                                <input type="number" id="global-increment-input" class="w-full h-8 bg-white border border-gray-500 p-1 font-bold text-center font-mono outline-none" value="10">
-                            </div>
-                        </div>
-                        <button onclick="openAddGoalModal()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">
-                            + NOWY CEL
-                        </button>
+                        <div class="flex flex-col w-full sm:w-2/3"><span class="text-[9px] font-bold uppercase text-gray-800">WARTOŚĆ WSADU (Dodaj/Odejmij):</span><div class="flex items-center"><input type="number" id="global-increment-input" class="w-full h-8 bg-white border border-gray-500 p-1 font-bold text-center font-mono outline-none" value="10"></div></div>
+                        <button onclick="openAddGoalModal()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">+ NOWY CEL</button>
                     </div>
-                    <div id="chart-area" class="bg-graph-paper chart-container custom-scrollbar">
-                        <div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div>
-                    </div>
+                    <div id="chart-area" class="bg-graph-paper chart-container custom-scrollbar"><div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div></div>
                     <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu!</p>
                 </div>
-
-                <!-- NOTATNIK ARCHIWALNY -->
                 <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-4">
                     <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-2 pl-2 border-l-4 border-[#8c1c1c]">Notatnik Archiwalny</h3>
                     <div class="flex flex-col md:flex-row gap-4 h-auto md:h-64">
                         <div class="w-full md:w-1/3 border border-gray-500 bg-white/30 flex flex-col shadow-inner h-40 md:h-full">
-                            <div class="bg-[#292524] text-[#e7e5e4] text-[10px] font-bold px-2 py-1 flex justify-between items-center border-b border-gray-600">
-                                <span>ARCHIWUM</span>
-                                <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 transition uppercase" title="Usuń zaznaczone">USUŃ WYBRANE</button>
-                            </div>
-                            <div class="p-1 border-b border-gray-500 bg-gray-200">
-                                <input type="text" id="note-search" oninput="renderNotesList()" placeholder="Szukaj (tytuł, data, #tag)..." class="w-full bg-white border border-gray-400 p-1 text-xs font-mono outline-none">
-                            </div>
-                            <ul id="notes-list" class="flex-1 overflow-y-auto overflow-x-hidden p-1 custom-scrollbar text-xs font-mono space-y-1">
-                                <li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li>
-                            </ul>
+                            <div class="bg-[#292524] text-[#e7e5e4] text-[10px] font-bold px-2 py-1 flex justify-between items-center border-b border-gray-600"><span>ARCHIWUM</span><button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 transition uppercase">USUŃ WYBRANE</button></div>
+                            <div class="p-1 border-b border-gray-500 bg-gray-200"><input type="text" id="note-search" oninput="renderNotesList()" placeholder="Szukaj (tytuł, data, #tag)..." class="w-full bg-white border border-gray-400 p-1 text-xs font-mono outline-none"></div>
+                            <ul id="notes-list" class="flex-1 overflow-y-auto overflow-x-hidden p-1 custom-scrollbar text-xs font-mono space-y-1"><li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li></ul>
                         </div>
                         <div class="w-full md:w-2/3 border border-gray-500 bg-[#f3f4f6] relative flex flex-col shadow-[2px_2px_5px_rgba(0,0,0,0.2)] h-60 md:h-full" style="transform: rotate(0.5deg);">
                              <div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
@@ -699,76 +352,31 @@
                                 <input type="text" id="note-title-input" placeholder="NAGŁÓWEK" class="bg-transparent border-b border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-sm text-[#8c1c1c] placeholder-gray-500">
                                 <input type="text" id="note-tags-input" placeholder="TAGI (np. #plan #ważne)..." class="bg-transparent border-none outline-none font-['Courier_Prime'] text-xs text-[#103090] placeholder-gray-500">
                              </div>
-                             <div id="note-editor" contenteditable="true" 
-                                  oninput="saveState();" 
-                                  onkeyup="sanitizeEditor(this);"
-                                  class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-sm leading-[20px] text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto" 
-                                  placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
+                             <div id="note-editor" contenteditable="true" oninput="saveState();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-sm leading-[20px] text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto" placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
                              <div class="border-t border-gray-400 p-2 flex flex-wrap justify-end items-center bg-gray-200/80 z-10 gap-2">
                                 <div class="flex flex-wrap items-center gap-2 justify-end flex-grow">
-                                    <div class="flex items-center shadow-[1px_1px_0px_#444]">
-                                        <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 transition hover:bg-[#631212] active:translate-y-[1px] text-center" title="Zakreśl zaznaczony tekst na delikatny czerwony">ZAZNACZ</button>
-                                        <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] transition hover:bg-gray-200 active:translate-y-[1px] text-center" title="Wyczyść wszystko - usuwa formatowanie">ODZNACZ</button>
-                                    </div>
-                                    <div class="flex gap-1">
-                                        <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden bg-gray-500 text-white border border-[#333] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-gray-600 transition shadow-sm whitespace-nowrap text-center">Anuluj</button>
-                                        <button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-[#631212] transition shadow-sm whitespace-nowrap text-center">ZAPISZ DO AKT</button>
-                                    </div>
+                                    <div class="flex items-center shadow-[1px_1px_0px_#444]"><button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 hover:bg-[#631212] transition uppercase">Zaznacz</button><button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-gray-200 transition uppercase">Odznacz</button></div>
+                                    <div class="flex gap-1"><button id="btn-cancel-edit" onclick="clearEditor()" class="hidden bg-gray-500 text-white border border-[#333] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-gray-600 transition">Anuluj</button><button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-[#631212] transition">ZAPISZ DO AKT</button></div>
                                 </div>
                              </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- PROTOKÓŁ SAMOKRYTYKI -->
-                <div class="mt-4">
-                    <h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3>
-                    <div class="border border-gray-500 p-3 bg-white/30">
-                        <label class="sc-label">PRZEDMIOT UCHYBIENIA:</label>
-                        <select id="sc-subject" class="sc-input">
-                            <option value="lenistwo">LENISTWO</option>
-                            <option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option>
-                            <option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option>
-                            <option value="wola">CHWILOWY NIEDOWŁAD WOLI</option>
-                        </select>
-                        <label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?">
-                        <label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?">
-                        <label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro">
-                        <button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] mt-2 font-['Oswald'] tracking-wider">ZŁÓŻ RAPORT</button>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3>
-                    <ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul>
-                </div>
+                <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
+                <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
             </div>
 
-            <!-- PRAWA STRONA -->
             <div class="lg:col-span-5 space-y-6 relative z-10">
                 <div class="bg-white/30 p-2 border border-gray-500 shadow-sm relative">
-                    <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20" title="Gwóźdź programu"></div>
+                    <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
                     <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2"><button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 transition">&lt;</button><h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3><button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 transition">&gt;</button></div>
                     <div id="calendar-grid" class="calendar-grid"></div>
                 </div>
                 <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
-                    <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2">
-                        <span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span>
-                        <div class="flex gap-2">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]">
-                                <span class="text-[10px] font-mono">Inicjatywa Własna</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]">
-                                <span class="text-[10px] font-mono">Przydział Centralny</span>
-                            </label>
-                        </div>
-                    </div>
+                    <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2"><span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span><div class="flex gap-2"><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Inicjatywa Własna</span></label><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Przydział Centralny</span></label></div></div>
                     <div class="flex justify-between items-center bg-[#292524] text-[#e7e5e4] px-2 py-1 mb-3"><h3 class="text-xs font-bold uppercase">Pieczątki:</h3></div>
                     <div class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar transition-opacity duration-300" id="stamps-gallery"></div>
-                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2">
-                        <span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.
-                    </p>
+                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.</p>
                 </div>
             </div>
         </div>
@@ -776,38 +384,42 @@
     </div>
 
     <script>
-        // --- OFFLINE PWA / SERVICE WORKER MAGIC ---
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'prl-planer-v1';
-                const ASSETS = [
-                    location.href,
-                    'https://cdn.tailwindcss.com',
-                    'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Oswald:wght@500;700&family=Special+Elite&family=Rye&family=VT323&display=swap'
-                ];
+        // --- PWA MANIFEST ---
+        const manifest = {
+            name: "P.R.L - Planer Robót Lokalnych",
+            short_name: "P.R.L",
+            start_url: location.href,
+            display: "standalone",
+            background_color: "#262626",
+            theme_color: "#8c1c1c",
+            icons: [{ src: "https://cdn-icons-png.flaticon.com/512/2666/2666505.png", sizes: "512x512", type: "image/png" }]
+        };
+        document.getElementById('pwa-manifest').setAttribute('href', 'data:application/json,' + JSON.stringify(manifest));
 
-                self.addEventListener('install', (e) => {
-                    e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
-                });
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-button').style.display = 'block';
+        });
 
-                self.addEventListener('fetch', (e) => {
-                    e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed', err));
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') document.getElementById('install-button').style.display = 'none';
+                deferredPrompt = null;
+            }
         }
 
-        // --- CUSTOM MODAL UTILS ---
+        // --- APLIKACJA ---
         let confirmCallback = null;
         function showAlert(text) { document.getElementById('alert-text').innerText = text; document.getElementById('alert-modal').classList.add('active'); }
         function closeAlert() { document.getElementById('alert-modal').classList.remove('active'); }
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; document.getElementById('confirm-modal').classList.add('active'); }
         function closeConfirm(result) { document.getElementById('confirm-modal').classList.remove('active'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
-        const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Chcesz urlopu? Złóż podanie do wydziału spraw beznadziejnych!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie?", "Twoja wydajność – siłą narodu!", "Zorganizowany Obywatel – fundamentem stabilizacji!", "Nie pytaj, co planer zrobi dla ciebie, pytaj, co ty wpiszesz do planera!", "Jeśli myślisz, że ściana jest nie do przebicia – widocznie słabo bijesz!", "Gdy góra zadania wydaje się zbyt wysoka, zacznij kopać tunel wydajności!", "Jeśli narzędzia są tępe, naostrz je swoim entuzjazmem!", "Poczucie beznadziei? Złóż podanie o natychmiastową zmianę nastawienia!", "Oporna materia ugina się pod ciężarem konsekwentnego planowania!", "Nie szukaj sensu – szukaj sposobu na domkniecie terminu!", "Jeśli plan zawodzi, zmień siebie, a nie plan!", "Gdy wszystko idzie źle, idź w drugą stronę, dopóki nie będzie szło dobrze!", "Obywatelu! Nie patrz w tył, tam są tylko błędy, patrz w harmonogram!", "Nie przejmuj się terminem. Spóźnienie to też tradycja, choć niezbyt chwalebna.", "Pamiętaj: Planer nie służy do planowania marzeń, tylko do ewidencji obowiązków.", "Zegar nie czeka na lenia – wyprzedź czas sumiennością!", "Kto rano wstaje, ten wcześniej postoi w kolejce do sukcesu!", "Zadanie to nie gołąb – nie wyleci przez okno. Zrób je wreszcie!", "Nie myśl – notuj! Papier jest pewniejszy od Twojej pamięci.", "Bądź jak traktor – nie do zdarcia, aż do końca listy zadań!"];
-        
+        const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Chcesz urlopu? Złóż podanie do wydziału spraw beznadziejnych!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!", "Twoja wydajność – siłą narodu!", "Zorganizowany Obywatel – fundamentem stabilizacji!", "Nie pytaj, co planer zrobi dla ciebie, pytaj, co ty wpiszesz do planera!", "Jeśli myślisz, że ściana jest nie do przebicia – widocznie słabo bijesz!", "Gdy góra zadania wydaje się zbyt wysoka, zacznij kopać tunel wydajności!", "Jeśli narzędzia są tępe, naostrz je swoim entuzjazmem!", "Poczucie beznadziei? Złóż podanie o natychmiastową zmianę nastawienia!", "Oporna materia ugina się pod ciężarem konsekwentnego planowania!", "Nie szukaj sensu – szukaj sposobu na domkniecie terminu!", "Jeśli plan zawodzi, zmień siebie, a nie plan!", "Gdy wszystko idzie źle, idź w drugą stronę, dopóki nie będzie szło dobrze!", "Obywatelu! Nie patrz w tył, tam są tylko błędy, patrz w harmonogram!", "Nie przejmuj się terminem. Spóźnienie to też tradycja, choć niezbyt chwalebna.", "Pamiętaj: Planer nie służy do planowania marzeń, tylko do ewidencji obowiązków.", "Zegar nie czeka na lenia – wyprzedź czas sumiennością!", "Kto rano wstaje, ten wcześniej postoi w kolejce do sukcesu!", "Zadanie to nie gołąb – nie wyleci przez okno. Zrób je wreszcie!", "Nie myśl – notuj! Papier jest pewniejszy od Twojej pamięci.", "Bądź jak traktor – nie do zdarcia, aż do końca listy zadań!"];
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
@@ -831,464 +443,196 @@
             { id: 118, text: "", shape: "none", color: "custom", icon: '<img src="termometr.png" alt="Termometr" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true }
         ];
 
-        let state = {
-            tasks: [], plans: [], reports: [], events: {}, credits: 0, 
-            unlockedStamps: [], selectedStampIds: [2], stampSelectionMode: 'manual', 
-            selfCriticism: { subject: 'lenistwo', desc: '', reason: '', fix: '' }, 
-            viewDate: null, currentGoal: null, citizenName: "Jan Kowalski", 
-            notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "" 
-        };
+        let state = { tasks: [], plans: [], reports: [], events: {}, credits: 0, unlockedStamps: [], selectedStampIds: [2], stampSelectionMode: 'manual', selfCriticism: { subject: 'lenistwo', desc: '', reason: '', fix: '' }, viewDate: null, citizenName: "Jan Kowalski", notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "" };
         let currentEditingDateKey = null, currentQuoteIndex = 0;
 
         window.onload = function() { initSplashScreen(); init(); };
-
         function initSplashScreen() {
-            const bar = document.getElementById('splash-progress');
-            const status = document.getElementById('splash-status');
-            const loadingContainer = document.getElementById('loading-container');
-            const startContainer = document.getElementById('start-container');
+            const bar = document.getElementById('splash-progress'), status = document.getElementById('splash-status'), loading = document.getElementById('loading-container'), start = document.getElementById('start-container');
             setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100);
             setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600);
             setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów..."; }, 1200);
             setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800);
-            setTimeout(() => { if(loadingContainer) loadingContainer.style.display = 'none'; if(startContainer) { startContainer.classList.remove('hidden'); startContainer.classList.add('flex'); } }, 2200);
+            setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200);
         }
-
-        function enterApp() { const screen = document.getElementById('splash-screen'); screen.style.opacity = '0'; setTimeout(() => { screen.style.display = 'none'; }, 1000); }
-
+        function enterApp() { const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); }
         function init() {
             loadState(); state.viewDate = new Date(); initQuote(); renderDate(); setInterval(renderDate, 60000);
             renderTasks(); renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderNotesList(); 
-            const editor = document.getElementById('note-editor');
-            const titleInput = document.getElementById('note-title-input');
-            const tagsInput = document.getElementById('note-tags-input');
-            if(editor && !state.activeNoteId) { 
-                editor.innerHTML = state.scratchpad || "<div><br></div>"; 
-                if (titleInput) titleInput.value = state.scratchpadTitle || "";
-                if (tagsInput) tagsInput.value = state.scratchpadTags || "";
-            }
-            const radioManual = document.querySelector(`input[name="stampMode"][value="manual"]`);
-            const radioRandom = document.querySelector(`input[name="stampMode"][value="random"]`);
-            if (state.stampSelectionMode === 'random') { if (radioRandom) radioRandom.checked = true; } else { if (radioManual) radioManual.checked = true; }
-            const citizenNameInput = document.getElementById('citizen-name');
-            if (citizenNameInput && state.citizenName) citizenNameInput.value = state.citizenName;
-            
-            ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => {
-                const el = document.getElementById(id); if (el) el.addEventListener('input', saveState);
-            });
-            if (citizenNameInput) citizenNameInput.addEventListener('input', saveState);
-            if (editor) {
-                editor.addEventListener('input', saveState);
-                editor.addEventListener('keydown', (e) => { 
-                    if (e.key === 'Enter' && !e.shiftKey) { 
-                        e.preventDefault(); 
-                        saveCurrentNote(); 
-                    } 
-                });
-            }
-            if (titleInput) titleInput.addEventListener('input', saveState);
-            if (tagsInput) tagsInput.addEventListener('input', saveState);
-            const taskInput = document.getElementById('task-input');
-            if (taskInput) taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
+            const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
+            if(e && !state.activeNoteId) { e.innerHTML = state.scratchpad || "<div><br></div>"; if (t) t.value = state.scratchpadTitle || ""; if (tg) tg.value = state.scratchpadTags || ""; }
+            const rm = document.querySelector(`input[name="stampMode"][value="manual"]`), rr = document.querySelector(`input[name="stampMode"][value="random"]`);
+            if (state.stampSelectionMode === 'random') { if (rr) rr.checked = true; } else { if (rm) rm.checked = true; }
+            const cn = document.getElementById('citizen-name'); if (cn && state.citizenName) cn.value = state.citizenName;
+            ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', saveState); });
+            if (cn) cn.addEventListener('input', saveState);
+            if (e) { e.addEventListener('input', saveState); e.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); saveCurrentNote(); } }); }
+            if (t) t.addEventListener('input', saveState); if (tg) tg.addEventListener('input', saveState);
+            const ti = document.getElementById('task-input'); if (ti) ti.addEventListener('keypress', (ev) => { if(ev.key === 'Enter') addTask(); });
         }
-
-        /* --- STABILNA LOGIKA ZAKREŚLACZA (BRUTE FORCE CLEANING) --- */
-        function sanitizeEditor(editor) {
-            if (editor.innerText.trim() === "" && editor.querySelectorAll('img').length === 0) {
-                editor.innerHTML = '<div><br></div>';
-            }
-            const emptySpans = editor.querySelectorAll('span:empty');
-            emptySpans.forEach(s => s.remove());
-        }
-
+        function sanitizeEditor(e) { if (e.innerText.trim() === "" && e.querySelectorAll('img').length === 0) e.innerHTML = '<div><br></div>'; const s = e.querySelectorAll('span:empty'); s.forEach(x => x.remove()); }
         function applyZakreslacz() {
-            const editor = document.getElementById('note-editor');
-            const selection = window.getSelection();
-            if (!selection.rangeCount || selection.isCollapsed) {
-                return showAlert("Obywatelu! Najpierw zaznacz tekst myszką.");
-            }
-            const range = selection.getRangeAt(0);
-            if (!editor.contains(range.commonAncestorContainer)) return;
-
-            const span = document.createElement('span');
-            span.className = 'marked';
-            
-            try {
-                span.appendChild(range.extractContents());
-                range.insertNode(span);
-                const zwsp = document.createTextNode('\u200B');
-                span.after(zwsp);
-                const newRange = document.createRange();
-                newRange.setStartAfter(zwsp);
-                newRange.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-                editor.focus();
-                saveState();
-            } catch (e) {
-                console.error("Błąd Selection API:", e);
-            }
+            const e = document.getElementById('note-editor'), sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst myszką.");
+            const r = sel.getRangeAt(0); if (!e.contains(r.commonAncestorContainer)) return;
+            const span = document.createElement('span'); span.className = 'marked';
+            try { span.appendChild(r.extractContents()); r.insertNode(span); const z = document.createTextNode('\u200B'); span.after(z); const nr = document.createRange(); nr.setStartAfter(z); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); e.focus(); saveState(); } catch (err) { console.error(err); }
         }
-
-        function forceCleanEditor() {
-            const editor = document.getElementById('note-editor');
-            const pureText = editor.innerText;
-            editor.innerHTML = '';
-            if (pureText.trim() === '') {
-                editor.innerHTML = '<div><br></div>';
-            } else {
-                editor.innerText = pureText;
-            }
-            saveState();
-        }
-
-        /* --- NOWY WEWNĘTRZNY PODGLĄD NOTATEK (INTERNAL VIEWER) --- */
+        function forceCleanEditor() { const e = document.getElementById('note-editor'), p = e.innerText; e.innerHTML = p.trim() === '' ? '<div><br></div>' : p; saveState(); }
         function viewNoteInternal(id) {
-            const n = state.notes.find(x => x.id === id);
-            if (!n) return;
-
-            document.getElementById('viewer-date').innerText = n.date;
-            document.getElementById('viewer-title').innerText = n.title || 'NOTATKA SŁUŻBOWA';
-            document.getElementById('viewer-tags').innerText = n.tags || '';
-            document.getElementById('viewer-content').innerHTML = n.content;
+            const n = state.notes.find(x => x.id === id); if (!n) return;
+            document.getElementById('viewer-date').innerText = n.date; document.getElementById('viewer-title').innerText = n.title || 'NOTATKA SŁUŻBOWA';
+            document.getElementById('viewer-tags').innerText = n.tags || ''; document.getElementById('viewer-content').innerHTML = n.content;
             document.getElementById('viewer-citizen').innerText = state.citizenName || "OBYWATEL(KA)";
-            
-            const overlay = document.getElementById('note-viewer-overlay');
-            overlay.classList.add('active');
-            overlay.scrollTop = 0; 
+            const o = document.getElementById('note-viewer-overlay'); o.classList.add('active'); o.scrollTop = 0; 
         }
-
-        function closeNoteViewer() {
-            document.getElementById('note-viewer-overlay').classList.remove('active');
-        }
-
-        /* --- LOGIKA ŁADOWANIA NOTATKI DO EDYCJI --- */
+        function closeNoteViewer() { document.getElementById('note-viewer-overlay').classList.remove('active'); }
         function loadNoteForEdit(id) {
-            const n = state.notes.find(x => x.id === id);
-            if (!n) return;
-            
-            const editor = document.getElementById('note-editor');
-            const titleInput = document.getElementById('note-title-input');
-            const tagsInput = document.getElementById('note-tags-input');
-            
-            const currentContent = editor.innerText.trim();
-            if (currentContent !== "" && state.activeNoteId !== id) {
-                showConfirm("Obecna treść edytora zostanie zastąpiona. Kontynuować?", () => {
-                    executeLoad(n);
-                });
-            } else {
-                executeLoad(n);
-            }
-
-            function executeLoad(note) {
-                editor.innerHTML = note.content;
-                titleInput.value = note.title || "";
-                tagsInput.value = note.tags || "";
-                state.activeNoteId = note.id;
-                state.scratchpad = ""; 
-                state.scratchpadTitle = ""; 
-                state.scratchpadTags = "";
-                renderNotesList(); 
-                editor.focus();
-            }
+            const n = state.notes.find(x => x.id === id); if (!n) return;
+            const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'), c = e.innerText.trim();
+            const load = (note) => { e.innerHTML = note.content; if(t) t.value = note.title || ""; if(tg) tg.value = note.tags || ""; state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; renderNotesList(); e.focus(); };
+            if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona. Kontynuować?", () => load(n)); else load(n);
         }
-
         function initQuote() { currentQuoteIndex = Math.floor(Math.random() * quotes.length); renderQuote(); }
-        function renderQuote() { const banner = document.getElementById('quote-banner'); if (banner) banner.innerText = `"${quotes[currentQuoteIndex]}"`; }
+        function renderQuote() { const b = document.getElementById('quote-banner'); if (b) b.innerText = `"${quotes[currentQuoteIndex]}"`; }
         function cycleQuote() { currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length; renderQuote(); }
-        function renderDate() { const display = document.getElementById('date-display'); if (display) display.innerText = new Date().toLocaleDateString('pl-PL', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase(); }
+        function renderDate() { const d = document.getElementById('date-display'); if (d) d.innerText = new Date().toLocaleDateString('pl-PL', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase(); }
         function resetCalendarToToday() { state.viewDate = new Date(); renderCalendar(); }
-        
-        function addTask() { 
-            const input = document.getElementById('task-input'); if (!input || !input.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
-            state.tasks.push({ id: Date.now(), text: input.value.trim(), done: false, stamp: null, stampRotation: 0 }); 
-            input.value = ''; saveState(); renderTasks(); 
-        }
-        
-        function toggleTask(id) { 
-            const task = state.tasks.find(t => t.id === id); 
-            if (task) { 
-                if (!task.done) { 
-                    task.done = true; state.credits += 1; 
-                    let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2);
-                    task.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0];
-                    task.stampRotation = Math.floor(Math.random() * 20) - 10; 
-                } else { task.done = false; task.stamp = null; } 
-                saveState(); renderTasks(); 
-            } 
+        function addTask() { const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0 }); i.value = ''; saveState(); renderTasks(); }
+        function toggleTask(id) {
+            const t = state.tasks.find(x => x.id === id);
+            if (t) {
+                if (!t.done) { t.done = true; state.credits += 1; let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; t.stampRotation = Math.floor(Math.random() * 20) - 10; }
+                else { t.done = false; t.stamp = null; }
+                saveState(); renderTasks();
+            }
         }
         function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); }
-        
         function startEditingTask(id, el) {
-            const task = state.tasks.find(t => t.id === id);
-            if (!task || task.done) return;
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = task.text;
-            input.className = 'task-edit-input z-10';
-            const finishEdit = () => {
-                const newText = input.value.trim();
-                if (newText && newText !== task.text) { task.text = newText; saveState(); }
-                renderTasks();
-            };
-            input.onblur = finishEdit;
-            input.onkeydown = (e) => { if (e.key === 'Enter') finishEdit(); if (e.key === 'Escape') renderTasks(); };
-            el.parentNode.replaceChild(input, el);
-            input.focus();
+            const t = state.tasks.find(x => x.id === id); if (!t || t.done) return;
+            const i = document.createElement('input'); i.type = 'text'; i.value = t.text; i.className = 'task-edit-input z-10';
+            const finish = () => { const txt = i.value.trim(); if (txt && txt !== t.text) { t.text = txt; saveState(); } renderTasks(); };
+            i.onblur = finish; i.onkeydown = (ev) => { if (ev.key === 'Enter') finish(); if (ev.key === 'Escape') renderTasks(); };
+            el.parentNode.replaceChild(i, el); i.focus();
         }
-
-        function renderTasks() { 
-            const list = document.getElementById('task-list'); if (!list) return; list.innerHTML = ''; 
-            if (state.tasks.length === 0) list.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div>'; 
-            else state.tasks.forEach(task => { 
-                list.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${task.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text">${task.text}</span>${task.done && task.stamp ? `<div class="stamp-container" style="transform: rotate(${task.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${task.stamp.shape} col-${task.stamp.color}"></div><div class="stamp-inner col-${task.stamp.color}"><div class="stamp-icon">${task.stamp.icon}</div><div style="margin-top:2px;">${task.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${task.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 uppercase text-xs" title="Usuń zadanie">USUŃ</button></li>`; 
-            }); 
-            updateTaskProgress(); 
+        function renderTasks() {
+            const l = document.getElementById('task-list'); if (!l) return; l.innerHTML = '';
+            if (state.tasks.length === 0) l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div>';
+            else state.tasks.forEach(t => { l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 uppercase text-xs">USUŃ</button></li>`; });
+            updateTaskProgress();
         }
-
-        function updateTaskProgress() { const percent = state.tasks.length === 0 ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = percent + "%"; document.getElementById('task-progress-bar').style.width = percent + "%"; }
+        function updateTaskProgress() { const p = state.tasks.length === 0 ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; }
         function openAddGoalModal() { document.getElementById('add-goal-modal').classList.add('active'); }
         function closeAddGoalModal() { document.getElementById('add-goal-modal').classList.remove('active'); }
-
         function saveNewGoal() {
-            const name = document.getElementById('goal-name').value.trim();
-            const target = parseFloat(document.getElementById('goal-target').value);
-            const unit = document.getElementById('goal-unit').value.trim();
-            if (!name || isNaN(target) || target <= 0 || !unit) { showAlert("Obywatelu! Formularz niekompletny!"); return; }
-            if(!state.plans) state.plans = []; state.plans.push({ id: Date.now(), text: name, targetValue: target, unit: unit, currentValue: 0 });
+            const n = document.getElementById('goal-name').value.trim(), t = parseFloat(document.getElementById('goal-target').value), u = document.getElementById('goal-unit').value.trim();
+            if (!n || isNaN(t) || t <= 0 || !u) return showAlert("Obywatelu! Formularz niekompletny!");
+            if(!state.plans) state.plans = []; state.plans.push({ id: Date.now(), text: n, targetValue: t, unit: u, currentValue: 0 });
             document.getElementById('goal-name').value = ''; document.getElementById('goal-target').value = ''; saveState(); renderPlans(); closeAddGoalModal();
         }
-
-        function changeGoalProgress(id, direction) {
-            const goal = state.plans.find(p => p.id === id);
-            const valInput = document.getElementById('global-increment-input');
-            let increment = valInput ? parseFloat(valInput.value) : 10;
-            if (goal) { goal.currentValue = Math.max(0, goal.currentValue + (increment * direction)); saveState(); renderPlans(); }
+        function changeGoalProgress(id, dir) {
+            const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10;
+            if (g) { g.currentValue = Math.max(0, g.currentValue + (i * dir)); saveState(); renderPlans(); }
         }
         function deleteGoal(id) { showConfirm("Porzucić cel?", () => { state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); }); }
-
-        function renderPlans() { 
-            const chartContainer = document.getElementById('chart-area'); if (!chartContainer) return; chartContainer.innerHTML = '';
-            if (!state.plans || state.plans.length === 0) { chartContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div>'; }
-            else {
-                state.plans.forEach(p => {
-                    let percent = p.targetValue > 0 ? (p.currentValue / p.targetValue) * 100 : 0;
-                    const col = document.createElement('div'); col.className = 'chart-col';
-                    const track = document.createElement('div'); track.className = 'bar-track';
-                    const fill = document.createElement('div'); fill.className = `bar-fill ${percent >= 100 ? 'complete' : ''}`; fill.style.height = `${Math.min(100, Math.max(5, percent))}%`;
-                    const label = document.createElement('div'); label.className = 'bar-label-vertical'; label.innerText = p.text;
-                    fill.appendChild(label); track.appendChild(fill);
-                    const val = document.createElement('div'); val.className = 'bar-value'; val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
-                    track.appendChild(val); col.appendChild(track);
-                    const controls = document.createElement('div'); controls.className = 'chart-controls';
-                    const btnPlus = document.createElement('div'); btnPlus.className = 'chart-btn btn-plus'; btnPlus.innerText = '+'; btnPlus.onclick = () => changeGoalProgress(p.id, 1);
-                    const btnMinus = document.createElement('div'); btnMinus.className = 'chart-btn btn-minus'; btnMinus.innerText = '-'; btnMinus.onclick = () => changeGoalProgress(p.id, -1);
-                    const btnDel = document.createElement('div'); btnDel.className = 'chart-btn btn-del'; btnDel.innerText = 'x'; btnDel.onclick = () => deleteGoal(p.id);
-                    controls.appendChild(btnPlus); controls.appendChild(btnMinus); controls.appendChild(btnDel);
-                    col.appendChild(controls); chartContainer.appendChild(col);
-                });
-            }
+        function renderPlans() {
+            const c = document.getElementById('chart-area'); if (!c) return; c.innerHTML = '';
+            if (!state.plans || state.plans.length === 0) c.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div>';
+            else state.plans.forEach(p => {
+                let pct = p.targetValue > 0 ? (p.currentValue / p.targetValue) * 100 : 0;
+                const col = document.createElement('div'); col.className = 'chart-col';
+                const track = document.createElement('div'); track.className = 'bar-track';
+                const fill = document.createElement('div'); fill.className = `bar-fill ${pct >= 100 ? 'complete' : ''}`; fill.style.height = `${Math.min(100, Math.max(5, pct))}%`;
+                const label = document.createElement('div'); label.className = 'bar-label-vertical'; label.innerText = p.text;
+                fill.appendChild(label); track.appendChild(fill);
+                const val = document.createElement('div'); val.className = 'bar-value'; val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
+                track.appendChild(val); col.appendChild(track);
+                const ctrl = document.createElement('div'); ctrl.className = 'chart-controls';
+                const bp = document.createElement('div'); bp.className = 'chart-btn btn-plus'; bp.innerText = '+'; bp.onclick = () => changeGoalProgress(p.id, 1);
+                const bm = document.createElement('div'); bm.className = 'chart-btn btn-minus'; bm.innerText = '-'; bm.onclick = () => changeGoalProgress(p.id, -1);
+                const bd = document.createElement('div'); bd.className = 'chart-btn btn-del'; bd.innerText = 'x'; bd.onclick = () => deleteGoal(p.id);
+                ctrl.appendChild(bp); ctrl.appendChild(bm); ctrl.appendChild(bd); col.appendChild(ctrl); c.appendChild(col);
+            });
         }
-        
-        function setStampMode(mode) { state.stampSelectionMode = mode; saveState(); renderStampsGallery(); }
+        function setStampMode(m) { state.stampSelectionMode = m; saveState(); renderStampsGallery(); }
         function selectStamp(id) { if (state.stampSelectionMode === 'random') return; const idx = state.selectedStampIds.indexOf(id); if (idx > -1) state.selectedStampIds.splice(idx, 1); else state.selectedStampIds.push(id); renderStampsGallery(); saveState(); }
-        
-        function renderStampsGallery() { 
-            const el = document.getElementById('stamps-gallery'); if (!el) return; el.innerHTML = ''; 
-            stampDefinitions.forEach(s => { 
-                const selected = state.selectedStampIds.includes(s.id); 
-                el.innerHTML += `<div class="stamp-item ${selected ? 'selected' : ''}" onclick="selectStamp(${s.id})"><div class="stamp-container" style="position: relative; transform: scale(0.6);"><div class="stamp-border shape-${s.shape} col-${s.color}"></div><div class="stamp-inner col-${s.color}"><div class="stamp-icon">${s.icon}</div><div style="margin-top:2px;">${s.text}</div></div></div>${selected ? `<div style="position: absolute; top: 0; right: 0; font-weight: bold; padding: 2px;">✓</div>` : ''}</div>`; 
-            }); 
+        function renderStampsGallery() {
+            const el = document.getElementById('stamps-gallery'); if (!el) return; el.innerHTML = '';
+            stampDefinitions.forEach(s => { const sel = state.selectedStampIds.includes(s.id); el.innerHTML += `<div class="stamp-item ${sel ? 'selected' : ''}" onclick="selectStamp(${s.id})"><div class="stamp-container" style="position: relative; transform: scale(0.6);"><div class="stamp-border shape-${s.shape} col-${s.color}"></div><div class="stamp-inner col-${s.color}"><div class="stamp-icon">${s.icon}</div><div style="margin-top:2px;">${s.text}</div></div></div>${sel ? `<div style="position: absolute; top: 0; right: 0; font-weight: bold; padding: 2px;">✓</div>` : ''}</div>`; });
         }
-        
         function changeMonth(dir) { const d = state.viewDate || new Date(); d.setMonth(d.getMonth() + dir); state.viewDate = d; renderCalendar(); }
-        
-        function getEventForDate(day, month, year) {
-            const current = new Date(year, month - 1, day);
-            for (let anchorKey in state.events) {
-                const event = state.events[anchorKey]; const [aD, aM, aY] = anchorKey.split('-').map(Number); const anchor = new Date(aY, aM - 1, aD);
-                if (current < anchor) continue;
-                const rec = event.recurrence || 'none';
-                if (rec === 'none' && day === aD && month === aM && year === aY) return { text: event.text, sourceKey: anchorKey };
-                if (rec === 'daily') return { text: event.text, sourceKey: anchorKey };
-                if (rec === 'weekly' && current.getDay() === anchor.getDay()) return { text: event.text, sourceKey: anchorKey };
-                if (rec === 'monthly' && current.getDate() === anchor.getDate()) return { text: event.text, sourceKey: anchorKey };
-                if (rec === 'yearly' && current.getDate() === anchor.getDate() && current.getMonth() === anchor.getMonth()) return { text: event.text, sourceKey: anchorKey };
+        function getEventForDate(d, m, y) {
+            const cur = new Date(y, m - 1, d);
+            for (let k in state.events) {
+                const e = state.events[k], [aD, aM, aY] = k.split('-').map(Number), anc = new Date(aY, aM - 1, aD);
+                if (cur < anc) continue;
+                const r = e.recurrence || 'none';
+                if ((r === 'none' && d === aD && m === aM && y === aY) || r === 'daily' || (r === 'weekly' && cur.getDay() === anc.getDay()) || (r === 'monthly' && cur.getDate() === anc.getDate()) || (r === 'yearly' && cur.getDate() === anc.getDate() && cur.getMonth() === anc.getMonth())) return { text: e.text, sourceKey: k };
             }
             return null;
         }
-
         function renderCalendar() {
-            const grid = document.getElementById('calendar-grid'); if (!grid) return; grid.innerHTML = '';
-            const d = state.viewDate || new Date(); const year = d.getFullYear(), month = d.getMonth();
-            const months = ["STYCZEŃ", "LUTY", "MARZEC", "KWIECIEŃ", "MAJ", "CZERWIEC", "LIPIEC", "SIERPIEŃ", "WRZESIEŃ", "PAŹDZIERNIK", "LISTOPAD", "GRUDZIEŃ"];
-            const monthHeader = document.getElementById('calendar-month-year');
-            if(monthHeader) monthHeader.innerText = `${months[month]} ${year}`;
-            ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; grid.appendChild(el); });
-            const firstDay = new Date(year, month, 1).getDay(); const offset = firstDay === 0 ? 6 : firstDay - 1;
-            const daysInMonth = new Date(year, month + 1, 0).getDate(); const today = new Date();
-            for(let i=0; i<offset; i++) grid.appendChild(Object.assign(document.createElement('div'), {className: "calendar-cell empty"}));
-            for(let i=1; i<=daysInMonth; i++) {
-                const eventData = getEventForDate(i, month + 1, year);
-                const isToday = (i === today.getDate() && month === today.getMonth() && year === today.getFullYear());
-                const c = document.createElement('div'); c.className = `calendar-cell ${isToday ? 'today' : ''}`;
-                let html = `<span style="font-weight: bold; margin-left: 2px;">${i}</span>`;
-                if(eventData) { c.classList.add('active'); html += `<div class="event-marker"></div><div class="cal-event-text selectable-text">${eventData.text}</div>`; }
-                c.innerHTML = html; c.onclick = () => openEventModal(eventData ? eventData.sourceKey : `${i}-${month+1}-${year}`); grid.appendChild(c);
+            const g = document.getElementById('calendar-grid'); if (!g) return; g.innerHTML = '';
+            const d = state.viewDate || new Date(), y = d.getFullYear(), m = d.getMonth(), months = ["STYCZEŃ", "LUTY", "MARZEC", "KWIECIEŃ", "MAJ", "CZERWIEC", "LIPIEC", "SIERPIEŃ", "WRZESIEŃ", "PAŹDZIERNIK", "LISTOPAD", "GRUDZIEŃ"], hdr = document.getElementById('calendar-month-year');
+            if(hdr) hdr.innerText = `${months[m]} ${y}`;
+            ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; g.appendChild(el); });
+            const first = new Date(y, m, 1).getDay(), off = first === 0 ? 6 : first - 1, days = new Date(y, m + 1, 0).getDate(), today = new Date();
+            for(let i=0; i<off; i++) g.appendChild(Object.assign(document.createElement('div'), {className: "calendar-cell empty"}));
+            for(let i=1; i<=days; i++) {
+                const evData = getEventForDate(i, m + 1, y), isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear()), c = document.createElement('div'); c.className = `calendar-cell ${isT ? 'today' : ''}`;
+                let h = `<span style="font-weight: bold; margin-left: 2px;">${i}</span>`;
+                if(evData) { c.classList.add('active'); h += `<div class="event-marker"></div><div class="cal-event-text selectable-text">${evData.text}</div>`; }
+                c.innerHTML = h; c.onclick = () => openEventModal(evData ? evData.sourceKey : `${i}-${m+1}-${y}`); g.appendChild(c);
             }
         }
-
-        function openEventModal(key) {
-            currentEditingDateKey = key; const parts = key.split('-'); const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
-            const existingEvent = state.events[key];
-            const displayDate = document.getElementById('event-date-display');
-            if(displayDate) displayDate.innerText = `${parts[0]} ${months[parseInt(parts[1])-1]} ${parts[2]}`;
-            const eventInput = document.getElementById('event-input');
-            if(eventInput) eventInput.value = existingEvent ? (existingEvent.text || "") : "";
-            const eventRec = document.getElementById('event-recurrence');
-            if(eventRec) eventRec.value = existingEvent ? (existingEvent.recurrence || "none") : "none";
-            const deleteBtn = document.getElementById('btn-delete-event');
-            if(deleteBtn) deleteBtn.classList.toggle('hidden', !existingEvent);
-            const m = document.getElementById('event-modal'); 
-            if(m) { m.classList.add('active'); m.style.display = 'flex'; }
+        function openEventModal(k) {
+            currentEditingDateKey = k; const p = k.split('-'), mths = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"], ex = state.events[k], dDisp = document.getElementById('event-date-display'), i = document.getElementById('event-input'), r = document.getElementById('event-recurrence'), b = document.getElementById('btn-delete-event'), mod = document.getElementById('event-modal');
+            if(dDisp) dDisp.innerText = `${p[0]} ${mths[parseInt(p[1])-1]} ${p[2]}`; if(i) i.value = ex ? (ex.text || "") : ""; if(r) r.value = ex ? (ex.recurrence || "none") : "none"; if(b) b.classList.toggle('hidden', !ex); if(mod) { mod.classList.add('active'); mod.style.display = 'flex'; }
         }
         function closeEventModal() { document.getElementById('event-modal').classList.remove('active'); document.getElementById('event-modal').style.display = 'none'; currentEditingDateKey = null; }
-        function saveEvent() { 
-            if(!currentEditingDateKey) return; const val = document.getElementById('event-input').value.trim(); const rec = document.getElementById('event-recurrence').value;
-            if(val) state.events[currentEditingDateKey] = { text: val, recurrence: rec }; else delete state.events[currentEditingDateKey];
-            saveState(); renderCalendar(); closeEventModal(); 
-        }
+        function saveEvent() { if(!currentEditingDateKey) return; const v = document.getElementById('event-input').value.trim(), r = document.getElementById('event-recurrence').value; if(v) state.events[currentEditingDateKey] = { text: v, recurrence: r }; else delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }
         function deleteEvent() { if(!currentEditingDateKey) return; showConfirm("Usunąć całą serię wydarzeń?", () => { delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }); }
-
-        function loadPhoto(input) { 
-            if(input.files && input.files[0]) { 
-                const reader = new FileReader(); 
-                reader.onload = (e) => { 
-                    const img = new Image(); img.onload = function() {
-                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                        const MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height;
-                        if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
-                        canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
-                        state.photo = canvas.toDataURL('image/jpeg', 0.7);
-                        const photoImg = document.getElementById('user-photo');
-                        const photoPlaceholder = document.getElementById('photo-placeholder');
-                        if(photoImg) { photoImg.src = state.photo; photoImg.classList.remove('hidden'); }
-                        if(photoPlaceholder) photoPlaceholder.classList.add('hidden'); 
-                        saveState();
-                    }; img.src = e.target.result;
-                }; reader.readAsDataURL(input.files[0]); 
-            } 
-        }
-
-        function saveState() { 
-            const subject = document.getElementById('sc-subject'), desc = document.getElementById('sc-desc'), reason = document.getElementById('sc-reason'), fix = document.getElementById('sc-fix'), citizen = document.getElementById('citizen-name'), editor = document.getElementById('note-editor'), titleInput = document.getElementById('note-title-input'), tagsInput = document.getElementById('note-tags-input');
-            if (subject && desc && reason && fix) state.selfCriticism = { subject: subject.value, desc: desc.value, reason: reason.value, fix: fix.value };
-            if (citizen) state.citizenName = citizen.value; 
-            if (editor && !state.activeNoteId) {
-                state.scratchpad = editor.innerHTML; 
-                state.scratchpadTitle = titleInput ? titleInput.value : "";
-                state.scratchpadTags = tagsInput ? tagsInput.value : "";
-            }
+        function loadPhoto(inp) { if(inp.files && inp.files[0]) { const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.7); const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); } }
+        function saveState() {
+            const s = document.getElementById('sc-subject'), d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), c = document.getElementById('citizen-name'), ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
+            if (s && d && r && f) state.selfCriticism = { subject: s.value, desc: d.value, reason: r.value, fix: f.value }; if (c) state.citizenName = c.value; 
+            if (ed && !state.activeNoteId) { state.scratchpad = ed.innerHTML; state.scratchpadTitle = t ? t.value : ""; state.scratchpadTags = tg ? tg.value : ""; }
             localStorage.setItem('prl_planer_v10', JSON.stringify(state)); 
         }
-
-        function loadState() { 
-            const s = localStorage.getItem('prl_planer_v10'); 
-            if(s) { 
-                const p = JSON.parse(s); state = { ...state, ...p }; 
-                if(state.photo) { 
-                    const photoImg = document.getElementById('user-photo');
-                    const photoPlaceholder = document.getElementById('photo-placeholder');
-                    if(photoImg) { photoImg.src = state.photo; photoImg.classList.remove('hidden'); }
-                    if(photoPlaceholder) photoPlaceholder.classList.add('hidden'); 
-                } 
-            } 
-        }
-
+        function loadState() { const s = localStorage.getItem('prl_planer_v10'); if(s) { const p = JSON.parse(s); state = { ...state, ...p }; if(state.photo) { const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); } } }
         function renderNotesList() {
-            const list = document.getElementById('notes-list'); if (!list) return; list.innerHTML = '';
-            const searchInput = document.getElementById('note-search');
-            const term = searchInput ? searchInput.value.toLowerCase().trim() : "";
-            let filteredNotes = state.notes;
-            if (term) { filteredNotes = state.notes.filter(n => (n.title && n.title.toLowerCase().includes(term)) || (n.content && n.content.toLowerCase().includes(term)) || (n.tags && n.tags.toLowerCase().includes(term)) || (n.date && n.date.toLowerCase().includes(term))); }
-            if (!filteredNotes || filteredNotes.length === 0) list.innerHTML = '<li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li>';
-            else filteredNotes.forEach(n => {
-                const li = document.createElement('li'); li.className = `archive-item flex items-center gap-2 ${state.activeNoteId === n.id ? 'active' : ''}`;
-                li.innerHTML = `
-                    <input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c]" value="${n.id}" onclick="event.stopPropagation()">
-                    <div class="truncate flex-1 cursor-pointer" onclick="viewNoteInternal(${n.id})">
-                        <div class="font-bold text-[#8c1c1c]">${n.title || 'Bez tytułu'}</div>
-                        <div class="text-[9px] text-gray-600 mt-0.5">${n.date} ${n.tags ? `<span class="text-[#103090] font-bold ml-1">${n.tags}</span>` : ''}</div>
-                    </div>
-                    <button onclick="event.stopPropagation(); loadNoteForEdit(${n.id})" 
-                            class="text-[9px] bg-[#292524] text-white px-2 py-1 hover:bg-black font-bold border border-gray-600 uppercase"
-                            title="Wczytaj dokument do edytora">EDYTUJ</button>
-                `;
-                list.appendChild(li);
-            });
-            const cancelBtn = document.getElementById('btn-cancel-edit');
-            if(cancelBtn) cancelBtn.classList.toggle('hidden', !state.activeNoteId);
+            const l = document.getElementById('notes-list'); if (!l) return; l.innerHTML = '';
+            const s = document.getElementById('note-search'), term = s ? s.value.toLowerCase().trim() : "";
+            let fn = state.notes; if (term) fn = state.notes.filter(x => (x.title && x.title.toLowerCase().includes(term)) || (x.content && x.content.toLowerCase().includes(term)) || (x.tags && x.tags.toLowerCase().includes(term)) || (x.date && x.date.toLowerCase().includes(term)));
+            if (!fn || fn.length === 0) l.innerHTML = '<li class="text-center text-gray-500 italic p-2">Brak akt w archiwum.</li>';
+            else fn.forEach(x => { const li = document.createElement('li'); li.className = `archive-item flex items-center gap-2 ${state.activeNoteId === x.id ? 'active' : ''}`; li.innerHTML = `<input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c]" value="${x.id}" onclick="event.stopPropagation()"><div class="truncate flex-1 cursor-pointer" onclick="viewNoteInternal(${x.id})"><div class="font-bold text-[#8c1c1c]">${x.title || 'Bez tytułu'}</div><div class="text-[9px] text-gray-600 mt-0.5">${x.date} ${x.tags ? `<span class="text-[#103090] font-bold ml-1">${x.tags}</span>` : ''}</div></div><button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[9px] bg-[#292524] text-white px-2 py-1 hover:bg-black font-bold border border-gray-600 uppercase">EDYTUJ</button>`; l.appendChild(li); });
+            const cb = document.getElementById('btn-cancel-edit'); if(cb) cb.classList.toggle('hidden', !state.activeNoteId);
         }
-        
-        function clearEditor() { 
-            state.activeNoteId = null; 
-            const e = document.getElementById('note-editor'); 
-            const titleInput = document.getElementById('note-title-input');
-            const tagsInput = document.getElementById('note-tags-input');
-            if(e) { e.innerHTML = state.scratchpad || '<div><br></div>'; } 
-            if(titleInput) titleInput.value = state.scratchpadTitle || ''; 
-            if(tagsInput) tagsInput.value = state.scratchpadTags || ''; 
-            saveState(); renderNotesList(); 
-        }
-
+        function clearEditor() { state.activeNoteId = null; const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; saveState(); renderNotesList(); }
         function saveCurrentNote() {
-            const e = document.getElementById('note-editor'); 
-            const titleInput = document.getElementById('note-title-input');
-            const tagsInput = document.getElementById('note-tags-input');
-            if (!e) return; 
-            const c = e.innerHTML.trim(); 
-            const plainText = e.innerText.trim();
-            const customTitle = titleInput ? titleInput.value.trim() : "";
-            const tags = tagsInput ? tagsInput.value.trim() : "";
-            if (!plainText && !customTitle) { showAlert("Obywatelu! Pustych akt nie archiwizujemy."); return; }
-            const t = customTitle || plainText.split('\n')[0].substring(0, 20) + (plainText.length > 20 ? '...' : ''); 
-            const dObj = new Date();
-            const days = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
-            const d = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')} | [${days[dObj.getDay()]}]`;
-            if (state.activeNoteId) { 
-                const i = state.notes.findIndex(n => n.id === state.activeNoteId); 
-                if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tags; } 
-                showAlert("Aktualizacja akt zakończona pomyślnie."); 
-            } else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: d, tags: tags }); showAlert("Notatka przekazana do archiwum."); }
-            e.innerHTML = '<div><br></div>'; if(titleInput) titleInput.value = ''; if(tagsInput) tagsInput.value = '';
-            state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = "";
-            state.activeNoteId = null; saveState(); renderNotesList();
+            const ed = document.getElementById('note-editor'), tI = document.getElementById('note-title-input'), tgI = document.getElementById('note-tags-input');
+            if (!ed) return; const c = ed.innerHTML.trim(), pt = ed.innerText.trim(), ct = tI ? tI.value.trim() : "", tg = tgI ? tgI.value.trim() : "";
+            if (!pt && !ct) return showAlert("Obywatelu! Pustych akt nie archiwizujemy.");
+            const t = ct || pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...' : ''), dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')} | [${dys[dObj.getDay()]}]`;
+            if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; } showAlert("Aktualizacja akt zakończona pomyślnie."); }
+            else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg }); showAlert("Notatka przekazana do archiwum."); }
+            ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderNotesList();
         }
-
         function deleteMarkedNotes() {
-            const boxes = document.querySelectorAll('.note-checkbox:checked'); if (boxes.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
-            showConfirm(`Zniszczyć ${boxes.length} teczek?`, () => {
-                const ids = Array.from(boxes).map(cb => parseInt(cb.value));
-                state.notes = state.notes.filter(n => !ids.includes(n.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderNotesList();
-            });
+            const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
+            showConfirm(`Zniszczyć ${b.length} teczek?`, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderNotesList(); });
         }
-
         function submitSelfCriticism() {
-            const d = document.getElementById('sc-desc'); const r = document.getElementById('sc-reason'); const f = document.getElementById('sc-fix');
+            const d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), s = document.getElementById('sc-subject');
             if (!d || !d.value.trim()) return showAlert("Raport bez opisu czynu jest nieważny!");
-            state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: document.getElementById('sc-subject').options[document.getElementById('sc-subject').selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
+            state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: s.options[s.selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
             d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); showAlert("Raport przyjęty.");
         }
         function deleteReport(id) { state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); }
-        
         function renderSelfCriticismHistory() {
-            const list = document.getElementById('sc-history-list'); if (!list) return; list.innerHTML = '';
-            if (!state.reports || state.reports.length === 0) { list.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>'; return; }
-            state.reports.forEach(r => {
-                const item = document.createElement('li'); item.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text";
-                item.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`;
-                list.appendChild(item);
-            });
+            const l = document.getElementById('sc-history-list'); if (!l) return; l.innerHTML = '';
+            if (!state.reports || state.reports.length === 0) l.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>';
+            else state.reports.forEach(r => { const i = document.createElement('li'); i.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text"; i.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`; l.appendChild(i); });
         }
     </script>
 </body>
