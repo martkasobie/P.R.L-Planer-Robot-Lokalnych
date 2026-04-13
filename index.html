@@ -5,19 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>P.R.L - Planer Robót Lokalnych</title>
     
-    <!-- KONFIGURACJA PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#262626">
 
-    <!-- DYNAMICZNY MANIFEST PWA -->
-    <link rel="manifest" id="pwa-manifest">
+    <link rel="manifest" href="manifest.json">
     
-    <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FONTY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Oswald:wght@500;700&family=Special+Elite&family=Rye&family=VT323&display=swap" rel="stylesheet">
@@ -199,7 +195,6 @@
 </head>
 <body class="flex flex-col items-center justify-start md:justify-center p-2 md:p-4 min-h-screen pb-24 md:pb-4">
 
-    <!-- SPLASH SCREEN -->
     <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-y-auto py-10">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
@@ -223,7 +218,6 @@
         </div>
     </div>
 
-    <!-- PRZEGLĄDARKA NOTATEK -->
     <div id="note-viewer-overlay">
         <div class="viewer-paper">
             <button class="viewer-close-x" onclick="closeNoteViewer()" title="Zamknij podgląd">X</button>
@@ -238,7 +232,6 @@
         <button class="close-viewer-btn" onclick="closeNoteViewer()">ZAMKNIJ I WRÓĆ DO PLANERA</button>
     </div>
 
-    <!-- MODALE -->
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeAlert()" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black transition">Zrozumiałem</button></div></div>
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="closeConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button><button onclick="closeConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zatwierdź</button></div></div></div>
     
@@ -288,7 +281,6 @@
         </div>
     </div>
 
-    <!-- GŁÓWNA KARTKA -->
     <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative rotate-[0.5deg]">
         <div class="paper-dirt"></div>
         <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
@@ -384,17 +376,18 @@
     </div>
 
     <script>
-        // --- PWA MANIFEST ---
-        const manifest = {
-            name: "P.R.L - Planer Robót Lokalnych",
-            short_name: "P.R.L",
-            start_url: location.href,
-            display: "standalone",
-            background_color: "#262626",
-            theme_color: "#8c1c1c",
-            icons: [{ src: "https://cdn-icons-png.flaticon.com/512/2666/2666505.png", sizes: "512x512", type: "image/png" }]
-        };
-        document.getElementById('pwa-manifest').setAttribute('href', 'data:application/json,' + JSON.stringify(manifest));
+        // --- REJESTRACJA SERVICE WORKERA (TRYB OFFLINE) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Obywatelu! Service Worker zameldował się z sukcesem:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Błąd meldunku Service Workera:', error);
+                    });
+            });
+        }
 
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -636,4 +629,4 @@
         }
     </script>
 </body>
-</html>
+</html>        
