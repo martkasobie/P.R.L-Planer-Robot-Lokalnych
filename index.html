@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#262626">
 
     <!-- DYNAMICZNY MANIFEST PWA -->
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" id="pwa-manifest">
     
     <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -634,50 +634,6 @@
             if (!state.reports || state.reports.length === 0) l.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>';
             else state.reports.forEach(r => { const i = document.createElement('li'); i.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text"; i.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`; l.appendChild(i); });
         }
-    </script>
-<script>
-        // Rejestracja Service Workera
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Służba zdrowia i bezpieczeństwa (SW) zarejestrowana!'))
-                    .catch(err => console.log('Błąd w kartotece: ', err));
-            });
-        }
-
-        // Twoja funkcja wejścia do aplikacji
-        function enterApp() {
-            const splash = document.getElementById('splash-screen');
-            if (splash) {
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                }, 1000);
-            }
-        }
-
-        // Logika paska ładowania dla splash screena
-        window.addEventListener('DOMContentLoaded', () => {
-            const progress = document.getElementById('splash-progress');
-            const status = document.getElementById('splash-status');
-            const startBtn = document.getElementById('start-container');
-            const loadingCont = document.getElementById('loading-container');
-
-            if (progress) {
-                // Symulacja ładowania biurokracji
-                setTimeout(() => {
-                    progress.style.width = '100%';
-                    if (status) status.innerText = 'System gotowy, Obywatelu!';
-                    setTimeout(() => {
-                        if (loadingCont) loadingCont.classList.add('hidden');
-                        if (startBtn) {
-                            startBtn.classList.remove('hidden');
-                            startBtn.classList.add('flex');
-                        }
-                    }, 500);
-                }, 1500);
-            }
-        });
     </script>
 </body>
 </html>
