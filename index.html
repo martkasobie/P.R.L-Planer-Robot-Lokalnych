@@ -689,16 +689,15 @@
             const ed = document.getElementById('note-editor'), tI = document.getElementById('note-title-input'), tgI = document.getElementById('note-tags-input');
             if (!ed) return; const c = ed.innerHTML.trim(), pt = ed.innerText.trim(), ct = tI ? tI.value.trim() : "", tg = tgI ? tgI.value.trim() : "";
             if (!pt && !ct) return showAlert("Obywatelu! Pustych akt nie archiwizujemy.");
-            const t = ct || pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...' : ''), dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')} | [${dys[dObj.getDay()]}]`;
+            const t = ct || pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...') : '', dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')} | [${dys[dObj.getDay()]}]`;
             if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; } showAlert("Aktualizacja akt zakończona pomyślnie."); }
             else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg }); showAlert("Notatka przekazana do archiwum."); }
             ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderNotesList();
         }
         function deleteMarkedNotes() {
-    const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
-    const msg = b.length === 1 ? "Czy zniszczyć 1 szt. teczki?" : `Czy zniszczyć ${b.length} szt. teczek?`;
-    showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderNotesList(); });
-}
+            const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
+            const msg = b.length === 1 ? "Czy zniszczyć 1 szt. teczki?" : `Czy zniszczyć ${b.length} szt. teczek?`;
+            showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderNotesList(); });
         }
         function submitSelfCriticism() {
             const d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), s = document.getElementById('sc-subject');
