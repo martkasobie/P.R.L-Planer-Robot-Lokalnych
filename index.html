@@ -10,9 +10,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#262626">
 
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icon-512.png">
-<link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -481,78 +481,40 @@
             try { span.appendChild(r.extractContents()); r.insertNode(span); const z = document.createTextNode('\u200B'); span.after(z); const nr = document.createRange(); nr.setStartAfter(z); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); e.focus(); scheduleSave(); } catch (err) { console.error(err); }
         }
         
-        // POTĘŻNA, ODPORNA NA PRZEGLĄDARKI WERSJA CZYSZCZENIA ZAKREŚLEŃ
         function forceCleanEditor() {
             const sel = window.getSelection();
             if (!sel.rangeCount) return showAlert("Obywatelu! Najpierw kliknij na zakreślony tekst.");
-            
             const editor = document.getElementById('note-editor');
             if (!editor.contains(sel.anchorNode)) return;
-
             let removed = false;
-
-            // Sprytny detektor - wyłapuje nasze klasy, ale też style, które złośliwie wstawia Chrome
             const isBadNode = (n) => {
                 if (n.nodeType !== 1) return false;
                 const t = n.tagName.toUpperCase();
                 return (t === 'SPAN' || t === 'B' || t === 'STRONG' || t === 'FONT' || t === 'I' || t === 'U' || t === 'MARK');
             };
-
-            // Maszyna do usuwania otoczki
             const unwrap = (el) => {
                 const parent = el.parentNode;
                 if (!parent) return;
-                while (el.firstChild) {
-                    parent.insertBefore(el.firstChild, el);
-                }
+                while (el.firstChild) { parent.insertBefore(el.firstChild, el); }
                 parent.removeChild(el);
                 removed = true;
             };
-
-            // Krok 1: Szerokie zaznaczenie (jeśli obywatel przeciągnął palcem po kilku słowach)
             if (!sel.isCollapsed) {
                 const range = sel.getRangeAt(0);
                 const elements = Array.from(editor.querySelectorAll('*'));
-                elements.forEach(el => {
-                    if (isBadNode(el) && (sel.containsNode(el, true) || range.intersectsNode(el))) {
-                        unwrap(el);
-                    }
-                });
-                // Siłowe uderzenie natywnym mechanizmem systemu!
+                elements.forEach(el => { if (isBadNode(el) && (sel.containsNode(el, true) || range.intersectsNode(el))) { unwrap(el); } });
                 document.execCommand('removeFormat', false, null);
-                removed = true; // Zawsze traktuj jako sukces, bo mogło usunąć natywny format
+                removed = true;
             }
-
-            // Krok 2: Szukanie w górę (działa punktowo, gdy obywatel tylko kliknął w wyraz)
             let node = sel.anchorNode;
-            
-            // Poprawka dla złośliwych przeglądarek łapiących całą ramkę
-            if (node === editor && editor.childNodes[sel.anchorOffset]) {
-                node = editor.childNodes[sel.anchorOffset];
-            }
-            
+            if (node === editor && editor.childNodes[sel.anchorOffset]) { node = editor.childNodes[sel.anchorOffset]; }
             while (node && node !== editor) {
                 let nextNode = node.parentNode;
-                if (isBadNode(node)) {
-                    unwrap(node);
-                }
+                if (isBadNode(node)) { unwrap(node); }
                 node = nextNode;
             }
-
-            // Krok 3: Eksterminacja niewidzialnych pustych śmieci pozostawionych przez Backspace
-            editor.querySelectorAll('*').forEach(s => {
-                if (isBadNode(s) && s.textContent.trim() === '') {
-                    s.remove();
-                }
-            });
-
-            // Raport do centrali
-            if (removed || !sel.isCollapsed) {
-                editor.normalize(); // Sklejanie zmasakrowanych części wyrazów
-                scheduleSave();
-            } else {
-                showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza.");
-            }
+            editor.querySelectorAll('*').forEach(s => { if (isBadNode(s) && s.textContent.trim() === '') { s.remove(); } });
+            if (removed || !sel.isCollapsed) { editor.normalize(); scheduleSave(); } else { showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza."); }
         }
         
         function viewNoteInternal(id) {
@@ -669,6 +631,7 @@
         function saveEvent() { if(!currentEditingDateKey) return; const v = document.getElementById('event-input').value.trim(), r = document.getElementById('event-recurrence').value; if(v) state.events[currentEditingDateKey] = { text: v, recurrence: r }; else delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }
         function deleteEvent() { if(!currentEditingDateKey) return; showConfirm("Usunąć całą serię wydarzeń?", () => { delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }); }
         function loadPhoto(inp) { if(inp.files && inp.files[0]) { const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.7); const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); } }
+        
         function saveState() {
             const s = document.getElementById('sc-subject'), d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), c = document.getElementById('citizen-name'), ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
             if (s && d && r && f) state.selfCriticism = { subject: s.value, desc: d.value, reason: r.value, fix: f.value }; if (c) state.citizenName = c.value; 
@@ -676,6 +639,7 @@
             localStorage.setItem('prl_planer_v10', JSON.stringify(state)); 
         }
         function loadState() { const s = localStorage.getItem('prl_planer_v10'); if(s) { const p = JSON.parse(s); state = { ...state, ...p }; if(state.photo) { const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); } } }
+        
         function renderNotesList() {
             const l = document.getElementById('notes-list'); if (!l) return; l.innerHTML = '';
             const s = document.getElementById('note-search'), term = s ? s.value.toLowerCase().trim() : "";
@@ -685,20 +649,24 @@
             const cb = document.getElementById('btn-cancel-edit'); if(cb) cb.classList.toggle('hidden', !state.activeNoteId);
         }
         function clearEditor() { state.activeNoteId = null; const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; saveState(); renderNotesList(); }
+        
         function saveCurrentNote() {
             const ed = document.getElementById('note-editor'), tI = document.getElementById('note-title-input'), tgI = document.getElementById('note-tags-input');
             if (!ed) return; const c = ed.innerHTML.trim(), pt = ed.innerText.trim(), ct = tI ? tI.value.trim() : "", tg = tgI ? tgI.value.trim() : "";
             if (!pt && !ct) return showAlert("Obywatelu! Pustych akt nie archiwizujemy.");
-            const t = ct || pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...') : '', dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')} | [${dys[dObj.getDay()]}]`;
+            const t = ct || pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...' : ''); 
+            const dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = dObj.getFullYear() + "-" + String(dObj.getMonth()+1).padStart(2,'0') + "-" + String(dObj.getDate()).padStart(2,'0') + " | [" + dys[dObj.getDay()] + "]";
             if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; } showAlert("Aktualizacja akt zakończona pomyślnie."); }
             else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg }); showAlert("Notatka przekazana do archiwum."); }
             ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderNotesList();
         }
+        
         function deleteMarkedNotes() {
             const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie zaznaczono akt.");
-            const msg = b.length === 1 ? "Czy zniszczyć 1 szt. teczki?" : `Czy zniszczyć ${b.length} szt. teczek?`;
+            const msg = b.length === 1 ? "Czy zniszczyć 1 szt. teczki?" : "Czy zniszczyć " + b.length + " szt. teczek?";
             showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderNotesList(); });
         }
+        
         function submitSelfCriticism() {
             const d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), s = document.getElementById('sc-subject');
             if (!d || !d.value.trim()) return showAlert("Raport bez opisu czynu jest nieważny!");
