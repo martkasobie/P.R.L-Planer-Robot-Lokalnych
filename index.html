@@ -349,8 +349,17 @@
                              <div id="note-editor" contenteditable="true" oninput="scheduleSave();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-sm leading-[20px] text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto" placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
                              <div class="border-t border-gray-400 p-2 flex flex-wrap justify-end items-center bg-gray-200/80 z-10 gap-2">
                                 <div class="flex flex-wrap items-center gap-2 justify-end flex-grow">
-                                    <div class="flex items-center shadow-[1px_1px_0px_#444]"><button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 hover:bg-[#631212] transition uppercase">Zaznacz</button><button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-gray-200 transition uppercase">Odznacz</button></div>
-                                    <div class="flex gap-1"><button id="btn-cancel-edit" onclick="clearEditor()" class="hidden bg-gray-500 text-white border border-[#333] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-gray-600 transition">Anuluj</button><button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-[#631212] transition">ZAPISZ DO AKT</button></div>
+                                    <div class="flex items-center shadow-[1px_1px_0px_#444]">
+                                        <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 hover:bg-[#631212] transition uppercase">Zaznacz</button>
+                                        <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-gray-200 transition uppercase">Odznacz</button>
+                                    </div>
+                                    <button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-black transition uppercase ml-1">📸 Foto</button>
+                                    <input type="file" id="note-photo-upload" class="hidden" accept="image/*" onchange="insertPhotoToNote(this)">
+
+                                    <div class="flex gap-1 ml-auto">
+                                        <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden bg-gray-500 text-white border border-[#333] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-gray-600 transition">Anuluj</button>
+                                        <button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-bold uppercase hover:bg-[#631212] transition">ZAPISZ DO AKT</button>
+                                    </div>
                                 </div>
                              </div>
                         </div>
@@ -516,6 +525,47 @@
             editor.querySelectorAll('*').forEach(s => { if (isBadNode(s) && s.textContent.trim() === '') { s.remove(); } });
             if (removed || !sel.isCollapsed) { editor.normalize(); scheduleSave(); } else { showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza."); }
         }
+
+        // --- FUNKCJA DODAWANIA ZDJĘĆ DO NOTATEK ---
+        function insertPhotoToNote(inp) {
+            if(inp.files && inp.files[0]) {
+                const rd = new FileReader();
+                rd.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d');
+                        // Limit rozmiaru aby uniknąć przekroczenia limitu bazy danych localStorage
+                        const MAX_W = 600, MAX_H = 800; 
+                        let w = img.width, h = img.height;
+                        if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
+                        cvs.width = w; cvs.height = h; 
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const dataUrl = cvs.toDataURL('image/jpeg', 0.6); // Kompresja dla oszczędności limitu
+                        
+                        const editor = document.getElementById('note-editor');
+                        editor.focus();
+                        const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`;
+                        
+                        if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) {
+                            const range = window.getSelection().getRangeAt(0);
+                            if (editor.contains(range.commonAncestorContainer)) {
+                                document.execCommand('insertHTML', false, imgHtml);
+                            } else {
+                                editor.innerHTML += imgHtml;
+                            }
+                        } else {
+                            editor.innerHTML += imgHtml;
+                        }
+                        
+                        inp.value = ''; // Reset inputu
+                        scheduleSave();
+                    };
+                    img.src = ev.target.result;
+                };
+                rd.readAsDataURL(inp.files[0]);
+            }
+        }
+        // ------------------------------------------
         
         function viewNoteInternal(id) {
             const n = state.notes.find(x => x.id === id); if (!n) return;
@@ -653,8 +703,8 @@
         function saveCurrentNote() {
             const ed = document.getElementById('note-editor'), tI = document.getElementById('note-title-input'), tgI = document.getElementById('note-tags-input');
             if (!ed) return; const c = ed.innerHTML.trim(), pt = ed.innerText.trim(), ct = tI ? tI.value.trim() : "", tg = tgI ? tgI.value.trim() : "";
-            if (!pt && !ct) return showAlert("Obywatelu! Pustych akt nie archiwizujemy.");
-            const t = ct || pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...' : ''); 
+            if (!pt && !ct && ed.querySelectorAll('img').length === 0) return showAlert("Obywatelu! Pustych akt nie archiwizujemy.");
+            const t = ct || (pt ? pt.split('\n')[0].substring(0, 20) + (pt.length > 20 ? '...' : '') : 'Notatka ze zdjęciem'); 
             const dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = dObj.getFullYear() + "-" + String(dObj.getMonth()+1).padStart(2,'0') + "-" + String(dObj.getDate()).padStart(2,'0') + " | [" + dys[dObj.getDay()] + "]";
             if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; } showAlert("Aktualizacja akt zakończona pomyślnie."); }
             else { state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg }); showAlert("Notatka przekazana do archiwum."); }
