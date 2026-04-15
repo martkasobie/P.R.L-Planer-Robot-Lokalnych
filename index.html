@@ -353,7 +353,7 @@
                                         <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-2 py-1.5 sm:py-1 border border-[#444] border-r-0 hover:bg-[#631212] transition uppercase">Zaznacz</button>
                                         <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-gray-200 transition uppercase">Odznacz</button>
                                     </div>
-                                    <button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-black transition uppercase ml-1">📸 Foto</button>
+                                    <button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-2 py-1.5 sm:py-1 border border-[#444] hover:bg-black transition uppercase ml-1">FOTO</button>
                                     <input type="file" id="note-photo-upload" class="hidden" accept="image/*" onchange="insertPhotoToNote(this)">
 
                                     <div class="flex gap-1 ml-auto">
@@ -447,26 +447,80 @@
 
         let state = { tasks: [], plans: [], reports: [], events: {}, credits: 0, unlockedStamps: [], selectedStampIds: [2], stampSelectionMode: 'manual', selfCriticism: { subject: 'lenistwo', desc: '', reason: '', fix: '' }, viewDate: null, citizenName: "Jan Kowalski", notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "" };
         let currentEditingDateKey = null, currentQuoteIndex = 0;
-
         let saveTimeout;
+
+        // --- SILNIK BAZY DANYCH INDEXED DB ---
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('PRL_Database', 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('appState')) {
+                        db.createObjectStore('appState');
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveToDB(stateObj) {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('appState', 'readwrite');
+                const store = tx.objectStore('appState');
+                const req = store.put(stateObj, 'masterState');
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function loadFromDB() {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('appState', 'readonly');
+                const store = tx.objectStore('appState');
+                const req = store.get('masterState');
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+        // -------------------------------------
+
         function scheduleSave() {
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(saveState, 500);
         }
 
-        window.onload = function() { initSplashScreen(); init(); };
+        window.onload = function() { 
+            initSplashScreen(); 
+            init(); 
+        };
+
         function initSplashScreen() {
             const bar = document.getElementById('splash-progress'), status = document.getElementById('splash-status'), loading = document.getElementById('loading-container'), start = document.getElementById('start-container');
             setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100);
             setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600);
-            setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów..."; }, 1200);
+            setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów z serwera..."; }, 1200);
             setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800);
             setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200);
         }
+
         function enterApp() { const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); }
-        function init() {
-            loadState(); state.viewDate = new Date(); initQuote(); renderDate(); setInterval(renderDate, 60000);
-            renderTasks(); renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderNotesList(); 
+        
+        async function init() {
+            await loadState(); 
+            state.viewDate = new Date(); 
+            initQuote(); 
+            renderDate(); 
+            setInterval(renderDate, 60000);
+            renderTasks(); 
+            renderPlans(); 
+            renderCalendar(); 
+            renderStampsGallery(); 
+            renderSelfCriticismHistory(); 
+            renderNotesList(); 
+            
             const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
             if(e && !state.activeNoteId) { e.innerHTML = state.scratchpad || "<div><br></div>"; if (t) t.value = state.scratchpadTitle || ""; if (tg) tg.value = state.scratchpadTags || ""; }
             const rm = document.querySelector(`input[name="stampMode"][value="manual"]`), rr = document.querySelector(`input[name="stampMode"][value="random"]`);
@@ -475,11 +529,30 @@
             
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
-            if (e) { e.addEventListener('input', scheduleSave); e.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); saveCurrentNote(); } }); }
+            
+            if (e) { 
+                e.addEventListener('input', scheduleSave); 
+                e.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); saveCurrentNote(); } }); 
+                
+                // Zabezpieczenie przed przepełnieniem pamięci przy wklejaniu zdjęć metodą Ctrl+V
+                e.addEventListener('paste', function(ev) {
+                    if (ev.clipboardData && ev.clipboardData.items) {
+                        for (let i = 0; i < ev.clipboardData.items.length; i++) {
+                            if (ev.clipboardData.items[i].type.indexOf("image") !== -1) {
+                                ev.preventDefault(); // Zatrzymujemy wklejenie surowego pliku
+                                let file = ev.clipboardData.items[i].getAsFile();
+                                processImageFile(file); // Przepuszczamy przez nasz kompresor
+                                return;
+                            }
+                        }
+                    }
+                });
+            }
             if (t) t.addEventListener('input', scheduleSave); if (tg) tg.addEventListener('input', scheduleSave);
             
             const ti = document.getElementById('task-input'); if (ti) ti.addEventListener('keypress', (ev) => { if(ev.key === 'Enter') addTask(); });
         }
+
         function sanitizeEditor(e) { if (e.innerText.trim() === "" && e.querySelectorAll('img').length === 0) e.innerHTML = '<div><br></div>'; const s = e.querySelectorAll('span:empty'); s.forEach(x => x.remove()); }
         
         function applyZakreslacz() {
@@ -526,43 +599,48 @@
             if (removed || !sel.isCollapsed) { editor.normalize(); scheduleSave(); } else { showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza."); }
         }
 
-        // --- FUNKCJA DODAWANIA ZDJĘĆ DO NOTATEK ---
-        function insertPhotoToNote(inp) {
-            if(inp.files && inp.files[0]) {
-                const rd = new FileReader();
-                rd.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = function() {
-                        const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d');
-                        // Limit rozmiaru aby uniknąć przekroczenia limitu bazy danych localStorage
-                        const MAX_W = 600, MAX_H = 800; 
-                        let w = img.width, h = img.height;
-                        if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
-                        cvs.width = w; cvs.height = h; 
-                        ctx.drawImage(img, 0, 0, w, h);
-                        const dataUrl = cvs.toDataURL('image/jpeg', 0.6); // Kompresja dla oszczędności limitu
-                        
-                        const editor = document.getElementById('note-editor');
-                        editor.focus();
-                        const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`;
-                        
-                        if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) {
-                            const range = window.getSelection().getRangeAt(0);
-                            if (editor.contains(range.commonAncestorContainer)) {
-                                document.execCommand('insertHTML', false, imgHtml);
-                            } else {
-                                editor.innerHTML += imgHtml;
-                            }
+        // --- FUNKCJE PRZETWARZANIA ZDJĘĆ ---
+        function processImageFile(file) {
+            const rd = new FileReader();
+            rd.onload = (ev) => {
+                const img = new Image();
+                img.onload = function() {
+                    const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d');
+                    // Wyższe limity szerokości i wysokości (dla wspaniałej jakości w IndexedDB)
+                    const MAX_W = 1200, MAX_H = 1200; 
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
+                    cvs.width = w; cvs.height = h; 
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    // Lepsza jakość kompresji (0.85) 
+                    const dataUrl = cvs.toDataURL('image/jpeg', 0.85); 
+                    
+                    const editor = document.getElementById('note-editor');
+                    editor.focus();
+                    const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`;
+                    
+                    if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) {
+                        const range = window.getSelection().getRangeAt(0);
+                        if (editor.contains(range.commonAncestorContainer)) {
+                            document.execCommand('insertHTML', false, imgHtml);
                         } else {
                             editor.innerHTML += imgHtml;
                         }
-                        
-                        inp.value = ''; // Reset inputu
-                        scheduleSave();
-                    };
-                    img.src = ev.target.result;
+                    } else {
+                        editor.innerHTML += imgHtml;
+                    }
+                    scheduleSave();
                 };
-                rd.readAsDataURL(inp.files[0]);
+                img.src = ev.target.result;
+            };
+            rd.readAsDataURL(file);
+        }
+
+        function insertPhotoToNote(inp) {
+            if(inp.files && inp.files[0]) {
+                processImageFile(inp.files[0]);
+                inp.value = ''; // Reset inputu
             }
         }
         // ------------------------------------------
@@ -680,15 +758,49 @@
         function closeEventModal() { document.getElementById('event-modal').classList.remove('active'); document.getElementById('event-modal').style.display = 'none'; currentEditingDateKey = null; }
         function saveEvent() { if(!currentEditingDateKey) return; const v = document.getElementById('event-input').value.trim(), r = document.getElementById('event-recurrence').value; if(v) state.events[currentEditingDateKey] = { text: v, recurrence: r }; else delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }
         function deleteEvent() { if(!currentEditingDateKey) return; showConfirm("Usunąć całą serię wydarzeń?", () => { delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeEventModal(); }); }
-        function loadPhoto(inp) { if(inp.files && inp.files[0]) { const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.7); const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); } }
         
-        function saveState() {
+        function loadPhoto(inp) { if(inp.files && inp.files[0]) { const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.85); const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); } }
+        
+        async function saveState() {
             const s = document.getElementById('sc-subject'), d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), c = document.getElementById('citizen-name'), ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
             if (s && d && r && f) state.selfCriticism = { subject: s.value, desc: d.value, reason: r.value, fix: f.value }; if (c) state.citizenName = c.value; 
             if (ed && !state.activeNoteId) { state.scratchpad = ed.innerHTML; state.scratchpadTitle = t ? t.value : ""; state.scratchpadTags = tg ? tg.value : ""; }
-            localStorage.setItem('prl_planer_v10', JSON.stringify(state)); 
+            
+            try {
+                await saveToDB(state);
+            } catch (e) {
+                console.error("Błąd zapisu do archiwum IndexedDB:", e);
+                showAlert("OBYWATELU! Błąd zapisu do magazynu bazodanowego.");
+            }
         }
-        function loadState() { const s = localStorage.getItem('prl_planer_v10'); if(s) { const p = JSON.parse(s); state = { ...state, ...p }; if(state.photo) { const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); } } }
+        
+        async function loadState() { 
+            try {
+                let loadedState = await loadFromDB();
+                
+                // SKRYPT MIGRACYJNY - Jeżeli IndexedDB jest puste, pobierz ze starego localStorage
+                if (!loadedState) {
+                    const oldS = localStorage.getItem('prl_planer_v10');
+                    if (oldS) {
+                        loadedState = JSON.parse(oldS);
+                        console.log("Migracja starych akt z localStorage do IndexedDB przebiegła pomyślnie.");
+                    }
+                }
+
+                if (loadedState) { 
+                    state = { ...state, ...loadedState }; 
+                    if (state.photo) { 
+                        const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); 
+                        if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } 
+                        if(pP) pP.classList.add('hidden'); 
+                    }
+                    // Zapisz po migracji, aby od razu wypełnić nową bazę
+                    saveToDB(state);
+                }
+            } catch (e) {
+                console.error("Nie udało się otworzyć archiwum IndexedDB:", e);
+            }
+        }
         
         function renderNotesList() {
             const l = document.getElementById('notes-list'); if (!l) return; l.innerHTML = '';
