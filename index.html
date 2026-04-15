@@ -283,7 +283,7 @@
         </div>
     </div>
 
-    <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative rotate-[0.5deg]">
+    <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative">
         <div class="paper-dirt"></div>
         <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
 
@@ -346,7 +346,7 @@
                                 <input type="text" id="note-title-input" placeholder="NAGŁÓWEK" class="bg-transparent border-b border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-sm text-[#8c1c1c] placeholder-gray-500">
                                 <input type="text" id="note-tags-input" placeholder="TAGI (np. #plan #ważne)..." class="bg-transparent border-none outline-none font-['Courier_Prime'] text-xs text-[#103090] placeholder-gray-500">
                              </div>
-                             <div id="note-editor" contenteditable="true" oninput="scheduleSave();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-base leading-relaxed text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto" placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
+                             <div id="note-editor" contenteditable="true" oninput="scheduleSave();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 outline-none font-['Courier_Prime'] text-base leading-relaxed text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto break-words whitespace-pre-wrap" placeholder="Miejsce na notatki służbowe, obserwacje i wnioski..."></div>
                              <div class="border-t border-gray-400 p-2 flex flex-wrap justify-end items-center bg-gray-200/80 z-10 gap-2">
                                 <div class="flex flex-wrap items-center gap-2 justify-end flex-grow">
                                     <div class="flex items-center shadow-[1px_1px_0px_#444]">
