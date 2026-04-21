@@ -306,7 +306,7 @@
                         <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
                         <div class="flex flex-row gap-2 mt-2">
                             <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
-                            <button onclick="requestNotificationPermission()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] transition" title="Zezwól na powiadomienia">ODBIÓR DYREKTYW</button>
+                            <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">ODBIÓR DYREKTYW</button>
                         </div>
                     </div>
                 </div>
@@ -390,6 +390,7 @@
     </div>
 
     <script>
+        // Logika Service Workera
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
@@ -418,21 +419,7 @@
             }
         }
 
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                showAlert("Obywatelu! Twój odbiornik nie obsługuje dyrektyw (brak wsparcia dla Push).");
-                return;
-            }
-
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    showAlert("Zgoda zatwierdzona! Oczekuj na dyrektywy z Centrali.");
-                } else {
-                    showAlert("Odmowa? Komitet Bezpieczeństwa się tym zainteresuje...");
-                }
-            });
-        }
-
+        // --- STARA LOGIKA APLIKACJI ---
         let confirmCallback = null;
         function showAlert(text) { document.getElementById('alert-text').innerText = text; document.getElementById('alert-modal').classList.add('active'); }
         function closeAlert() { document.getElementById('alert-modal').classList.remove('active'); }
@@ -552,14 +539,13 @@
                 e.addEventListener('input', scheduleSave); 
                 e.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); saveCurrentNote(); } }); 
                 
-                // Zabezpieczenie przed przepełnieniem pamięci przy wklejaniu zdjęć metodą Ctrl+V
                 e.addEventListener('paste', function(ev) {
                     if (ev.clipboardData && ev.clipboardData.items) {
                         for (let i = 0; i < ev.clipboardData.items.length; i++) {
                             if (ev.clipboardData.items[i].type.indexOf("image") !== -1) {
-                                ev.preventDefault(); // Zatrzymujemy wklejenie surowego pliku
+                                ev.preventDefault(); 
                                 let file = ev.clipboardData.items[i].getAsFile();
-                                processImageFile(file); // Przepuszczamy przez nasz kompresor
+                                processImageFile(file); 
                                 return;
                             }
                         }
@@ -617,37 +603,25 @@
             if (removed || !sel.isCollapsed) { editor.normalize(); scheduleSave(); } else { showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza."); }
         }
 
-        // --- FUNKCJE PRZETWARZANIA ZDJĘĆ ---
         function processImageFile(file) {
             const rd = new FileReader();
             rd.onload = (ev) => {
                 const img = new Image();
                 img.onload = function() {
                     const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d');
-                    // Wyższe limity szerokości i wysokości (dla wspaniałej jakości w IndexedDB)
                     const MAX_W = 1200, MAX_H = 1200; 
                     let w = img.width, h = img.height;
                     if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
                     cvs.width = w; cvs.height = h; 
                     ctx.drawImage(img, 0, 0, w, h);
-                    
-                    // Lepsza jakość kompresji (0.85) 
                     const dataUrl = cvs.toDataURL('image/jpeg', 0.85); 
-                    
                     const editor = document.getElementById('note-editor');
                     editor.focus();
                     const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`;
-                    
                     if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) {
                         const range = window.getSelection().getRangeAt(0);
-                        if (editor.contains(range.commonAncestorContainer)) {
-                            document.execCommand('insertHTML', false, imgHtml);
-                        } else {
-                            editor.innerHTML += imgHtml;
-                        }
-                    } else {
-                        editor.innerHTML += imgHtml;
-                    }
+                        if (editor.contains(range.commonAncestorContainer)) { document.execCommand('insertHTML', false, imgHtml); } else { editor.innerHTML += imgHtml; }
+                    } else { editor.innerHTML += imgHtml; }
                     scheduleSave();
                 };
                 img.src = ev.target.result;
@@ -655,13 +629,7 @@
             rd.readAsDataURL(file);
         }
 
-        function insertPhotoToNote(inp) {
-            if(inp.files && inp.files[0]) {
-                processImageFile(inp.files[0]);
-                inp.value = ''; // Reset inputu
-            }
-        }
-        // ------------------------------------------
+        function insertPhotoToNote(inp) { if(inp.files && inp.files[0]) { processImageFile(inp.files[0]); inp.value = ''; } }
         
         function viewNoteInternal(id) {
             const n = state.notes.find(x => x.id === id); if (!n) return;
@@ -784,40 +752,22 @@
             if (s && d && r && f) state.selfCriticism = { subject: s.value, desc: d.value, reason: r.value, fix: f.value }; if (c) state.citizenName = c.value; 
             if (ed && !state.activeNoteId) { state.scratchpad = ed.innerHTML; state.scratchpadTitle = t ? t.value : ""; state.scratchpadTags = tg ? tg.value : ""; }
             
-            try {
-                await saveToDB(state);
-            } catch (e) {
-                console.error("Błąd zapisu do archiwum IndexedDB:", e);
-                showAlert("OBYWATELU! Błąd zapisu do magazynu bazodanowego.");
-            }
+            try { await saveToDB(state); } catch (e) { console.error("Błąd zapisu do archiwum IndexedDB:", e); showAlert("OBYWATELU! Błąd zapisu do magazynu bazodanowego."); }
         }
         
         async function loadState() { 
             try {
                 let loadedState = await loadFromDB();
-                
-                // SKRYPT MIGRACYJNY - Jeżeli IndexedDB jest puste, pobierz ze starego localStorage
                 if (!loadedState) {
                     const oldS = localStorage.getItem('prl_planer_v10');
-                    if (oldS) {
-                        loadedState = JSON.parse(oldS);
-                        console.log("Migracja starych akt z localStorage do IndexedDB przebiegła pomyślnie.");
-                    }
+                    if (oldS) { loadedState = JSON.parse(oldS); }
                 }
-
                 if (loadedState) { 
                     state = { ...state, ...loadedState }; 
-                    if (state.photo) { 
-                        const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); 
-                        if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } 
-                        if(pP) pP.classList.add('hidden'); 
-                    }
-                    // Zapisz po migracji, aby od razu wypełnić nową bazę
+                    if (state.photo) { const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); }
                     saveToDB(state);
                 }
-            } catch (e) {
-                console.error("Nie udało się otworzyć archiwum IndexedDB:", e);
-            }
+            } catch (e) {}
         }
         
         function renderNotesList() {
@@ -859,6 +809,56 @@
             if (!state.reports || state.reports.length === 0) l.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>';
             else state.reports.forEach(r => { const i = document.createElement('li'); i.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text"; i.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`; l.appendChild(i); });
         }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp7RWF-GWZ0-AuGAjwyI5x0FecuzzODec",
+            authDomain: "planer-robot-lokalnych.firebaseapp.com",
+            projectId: "planer-robot-lokalnych",
+            storageBucket: "planer-robot-lokalnych.firebasestorage.app",
+            messagingSenderId: "807809303313",
+            appId: "1:807809303313:web:b6d84d65f14a0ec60902b0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        // Funkcja przypięta do globalnego widoku, by nasz przycisk mógł w nią kliknąć
+        window.requestFCMToken = async () => {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    // Wymuszenie załadowania Service Workera przed pobraniem tokenu
+                    const registration = await navigator.serviceWorker.ready;
+                    const token = await getToken(messaging, { 
+                        vapidKey: 'BFb0rdnc2ZtYsa7z0bmhLM7xmROrTEcVhBSIknCvL6J5DB0DjvxBoiG0jo99SZio1685jE2ZEzVvdVmEHTKfEHY',
+                        serviceWorkerRegistration: registration
+                    });
+                    
+                    if (token) {
+                        console.log('FCM Token (skopiuj do wysyłki!):', token);
+                        showAlert("Zgoda zatwierdzona! \n\nTwój token został wydrukowany w Konsoli (F12). \n\nPoczątek Tokenu to: " + token.substring(0, 15) + "...");
+                    } else {
+                        showAlert("Błąd: Nie udało się pobrać przepustki z Centrali.");
+                    }
+                } else {
+                    showAlert("Odmowa? Komitet Bezpieczeństwa się tym zainteresuje...");
+                }
+            } catch (error) {
+                console.error('Błąd pobierania przepustki', error);
+                showAlert("Awaria łączności z Centralą! Sprawdź logi (F12).");
+            }
+        };
+
+        // Nasłuchiwanie wiadomości, gdy masz otwartą kartę z aplikacją
+        onMessage(messaging, (payload) => {
+            console.log('Wiadomość otrzymana na żywo: ', payload);
+            showAlert("NAGŁA DYREKTYWA: " + payload.notification.title + "\n\n" + payload.notification.body);
+        });
     </script>
 </body>
 </html>
