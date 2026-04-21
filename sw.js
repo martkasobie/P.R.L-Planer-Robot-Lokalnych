@@ -13,7 +13,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'prl-planer-v7';
+const CACHE_NAME = 'prl-planer-v8'; // Podbita wersja bufora
 
 const ASSETS_TO_CACHE = [
   './',
@@ -45,7 +45,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Obywatelu! Archiwizuję akta (v7) w pamięci urządzenia...');
+      console.log('Obywatelu! Archiwizuję akta (v8) w pamięci urządzenia...');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
@@ -97,9 +97,17 @@ self.addEventListener('fetch', (event) => {
 messaging.onBackgroundMessage(function(payload) {
   console.log('[sw.js] Otrzymano tajną dyrektywę w tle', payload);
   
-  const notificationTitle = payload.notification.title || 'CENTRALNE WEZWANIE';
+  // URZĘDOWA CENZURA: Jeśli to jest oficjalne powiadomienie, 
+  // system Firebase sam je wyświetli. Przerwij dublowanie!
+  if (payload.notification) {
+      console.log('[sw.js] Firebase wyświetla to z automatu. Pasuję.');
+      return;
+  }
+  
+  // Ten kod wykona się TYLKO dla powiadomień technicznych ("data payload")
+  const notificationTitle = payload.data?.title || 'CENTRALNE WEZWANIE';
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.data?.body || 'Nowe wytyczne czekają w Planerze.',
     icon: './icon-512.png',
     badge: './icon-512.png',
     vibrate: [200, 100, 200, 100, 200],
@@ -116,12 +124,12 @@ self.addEventListener('notificationclick', function(event) {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url.indexOf(event.notification.data.url) !== -1 && 'focus' in client) {
+        if (client.url.indexOf(event.notification.data?.url || './index.html') !== -1 && 'focus' in client) {
           return client.focus();
         }
       }
       if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
+        return clients.openWindow(event.notification.data?.url || './index.html');
       }
     })
   );
