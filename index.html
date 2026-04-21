@@ -304,7 +304,10 @@
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1c1917] tracking-tight">P.R.L</h1>
                     <div class="flex flex-col items-end">
                         <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
-                        <button id="install-button" onclick="installPWA()" class="mt-2 bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
+                        <div class="flex flex-row gap-2 mt-2">
+                            <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
+                            <button onclick="requestNotificationPermission()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] transition" title="Zezwól na powiadomienia">ODBIÓR DYREKTYW</button>
+                        </div>
                     </div>
                 </div>
                 <h2 class="text-xl font-bold text-[#292524] mb-6">Planer Robót Lokalnych</h2>
@@ -413,6 +416,21 @@
                 if (outcome === 'accepted') document.getElementById('install-button').style.display = 'none';
                 deferredPrompt = null;
             }
+        }
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                showAlert("Obywatelu! Twój odbiornik nie obsługuje dyrektyw (brak wsparcia dla Push).");
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    showAlert("Zgoda zatwierdzona! Oczekuj na dyrektywy z Centrali.");
+                } else {
+                    showAlert("Odmowa? Komitet Bezpieczeństwa się tym zainteresuje...");
+                }
+            });
         }
 
         let confirmCallback = null;
