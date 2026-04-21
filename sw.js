@@ -71,3 +71,48 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// Odbieranie dyrektyw z centrali (Push Notification Event)
+self.addEventListener('push', function(event) {
+  // Jeśli serwer prześle dane, używamy ich, inaczej dajemy domyślny komunikat
+  const data = event.data ? event.data.json() : { 
+      title: 'CENTRALNE WEZWANIE', 
+      body: 'Obywatelu, staw się do planera natychmiast!' 
+  };
+
+  const options = {
+    body: data.body,
+    icon: './icon-512.png',
+    badge: './icon-512.png', // Mała ikonka na pasku
+    vibrate: [200, 100, 200, 100, 200], // Rytm alarmu
+    data: {
+      url: './index.html' // Gdzie przekierować po kliknięciu
+    }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Reakcja Obywatela na wezwanie (Notification Click Event)
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close(); // Zamknij powiadomienie
+
+  // Otwórz aplikację, jeśli Obywatel kliknął
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(windowClients => {
+      // Sprawdź, czy karta jest już otwarta, jeśli tak - przenieś na nią focus
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url.indexOf(event.notification.data.url) !== -1 && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Jeśli nie ma otwartej karty, otwórz nową
+      if (clients.openWindow) {
+        return clients.openWindow(event.notification.data.url);
+      }
+    })
+  );
+});
