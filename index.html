@@ -306,7 +306,7 @@
                         <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
                         <div class="flex flex-row gap-2 mt-2">
                             <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
-                            <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">ODBIÓR DYREKTYW</button>
+                            <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">WŁĄCZ POWIADOMIENIA</button>
                         </div>
                     </div>
                 </div>
@@ -831,17 +831,17 @@
                     });
                     
                     if (token) {
-                        console.log('FCM Token do ewentualnych testów Centrali:', token);
-                        showAlert("WNIOSEK ROZPATRZONY POZYTYWNIE!\n\nTwój odbiornik został oficjalnie zarejestrowany w rejestrach Ministerstwa. Kanał łączności otwarty.\n\nOczekuj na dyrektywy z Centrali.");
+                        console.log('FCM Token:', token);
+                        showAlert("POWIADOMIENIA AKTYWNE.\n\nBędziesz teraz otrzymywać bieżące dyrektywy na to urządzenie.");
                     } else {
-                        showAlert("Błąd: Wydział Łączności odmówił wydania przepustki. Złóż podanie w trzech kopiach.");
+                        showAlert("Błąd: Nie udało się aktywować powiadomień.");
                     }
                 } else {
-                    showAlert("Odmowa? Komitet Bezpieczeństwa się tym zainteresuje...");
+                    showAlert("Brak zgody na powiadomienia. System nie będzie wysyłał dyrektyw.");
                 }
             } catch (error) {
-                console.error('Błąd pobierania przepustki', error);
-                showAlert("Awaria łączności z Centralą! Sprawdź logi (F12).");
+                console.error('Błąd FCM:', error);
+                showAlert("Awaria systemu powiadomień.");
             }
         };
 
