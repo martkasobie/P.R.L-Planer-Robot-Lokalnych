@@ -13,7 +13,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'prl-planer-v10'; // Wersja v10 (Naprawa błędu POST)
+const CACHE_NAME = 'prl-planer-v11'; // Pancerna wersja 11
 
 const APP_URL = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/';
 const ICON_URL = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/icon-512.png';
@@ -48,7 +48,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Obywatelu! Archiwizuję akta (v10) w pamięci urządzenia...');
+      console.log('Obywatelu! Archiwizuję akta (v11) w pamięci urządzenia...');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
@@ -72,12 +72,9 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // URZĘDOWY ZAKAZ KSEROWANIA PACZEK TYPU POST!
-  // Przepuszczamy zapytania Firebase bezpośrednio do serwera, bez błędów.
   if (event.request.method !== 'GET') {
     return; 
   }
-
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
@@ -99,7 +96,6 @@ messaging.onBackgroundMessage(function(payload) {
   console.log('[sw.js] Otrzymano tajną dyrektywę w tle', payload);
   
   if (payload.notification) {
-      console.log('[sw.js] Firebase wyświetla to z automatu. Pasuję.');
       return;
   }
   
@@ -108,29 +104,31 @@ messaging.onBackgroundMessage(function(payload) {
     body: payload.data?.body || 'Nowe wytyczne czekają w Planerze.',
     icon: ICON_URL,
     badge: ICON_URL,
-    vibrate: [200, 100, 200, 100, 200],
-    data: { url: APP_URL }
+    vibrate: [200, 100, 200, 100, 200]
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Obsługa kliknięcia powiadomienia
+// OSTATECZNA CENZURA KLIKNIĘCIA
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   
-  const urlToOpen = event.notification.data?.url || APP_URL;
+  // Nieważne, co przysyła Firebase, my ZAWSZE wymuszamy ten jeden poprawny adres:
+  const exactUrl = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // Jeśli apka jest już otwarta gdzieś w tle, po prostu ją pokaż (focus)
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url.indexOf(urlToOpen) !== -1 && 'focus' in client) {
+        if (client.url === exactUrl && 'focus' in client) {
           return client.focus();
         }
       }
+      // Jeśli apka jest całkowicie zamknięta, otwórz ją na nowo pod twardym adresem
       if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
+        return clients.openWindow(exactUrl);
       }
     })
   );
