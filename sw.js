@@ -13,10 +13,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'prl-planer-v11'; // Pancerna wersja 11
-
-const APP_URL = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/';
-const ICON_URL = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/icon-512.png';
+const CACHE_NAME = 'prl-planer-v12'; // Wersja ostateczna (Pancerna)
 
 const ASSETS_TO_CACHE = [
   './',
@@ -47,10 +44,7 @@ const ASSETS_TO_CACHE = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Obywatelu! Archiwizuję akta (v11) w pamięci urządzenia...');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
   self.skipWaiting();
 });
@@ -58,78 +52,61 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Niszczenie starych akt z bufora:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
+      return Promise.all(cacheNames.map((name) => {
+        if (name !== CACHE_NAME) return caches.delete(name);
+      }));
     })
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') {
-    return; 
-  }
+  // Przepuszczamy zapytania Firebase bezpośrednio
+  if (event.request.method !== 'GET') return; 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
+      return cachedResponse || fetch(event.request).then((networkResponse) => {
         const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          if (event.request.url.startsWith('http')) {
-            cache.put(event.request, responseToCache);
-          }
+          if (event.request.url.startsWith('http')) cache.put(event.request, responseToCache);
         });
         return networkResponse;
       }).catch(() => {});
-      return cachedResponse || fetchPromise;
     })
   );
 });
 
-// Odbieranie dyrektyw
 messaging.onBackgroundMessage(function(payload) {
   console.log('[sw.js] Otrzymano tajną dyrektywę w tle', payload);
-  
-  if (payload.notification) {
-      return;
-  }
+  if (payload.notification) return;
   
   const notificationTitle = payload.data?.title || 'CENTRALNE WEZWANIE';
   const notificationOptions = {
     body: payload.data?.body || 'Nowe wytyczne czekają w Planerze.',
-    icon: ICON_URL,
-    badge: ICON_URL,
+    icon: 'icon-512.png',
+    badge: 'icon-512.png',
     vibrate: [200, 100, 200, 100, 200]
   };
-
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// OSTATECZNA CENZURA KLIKNIĘCIA
+// PANCERNE KLIKNIĘCIE - BLOKUJEMY FIREBASE I WYMUSZAMY APLIKACJĘ
 self.addEventListener('notificationclick', function(event) {
+  event.stopImmediatePropagation(); // KRYTYCZNE: Odcinamy Firebase od kliknięcia
   event.notification.close();
   
-  // Nieważne, co przysyła Firebase, my ZAWSZE wymuszamy ten jeden poprawny adres:
-  const exactUrl = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/';
+  // Twardy adres z upewnieniem się, że ładuje plik:
+  const exactUrl = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/index.html';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-      // Jeśli apka jest już otwarta gdzieś w tle, po prostu ją pokaż (focus)
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url === exactUrl && 'focus' in client) {
+        if (client.url.includes('P.R.L-Planer-Robot-Lokalnych') && 'focus' in client) {
           return client.focus();
         }
       }
-      // Jeśli apka jest całkowicie zamknięta, otwórz ją na nowo pod twardym adresem
-      if (clients.openWindow) {
-        return clients.openWindow(exactUrl);
-      }
+      if (clients.openWindow) return clients.openWindow(exactUrl);
     })
   );
 });
