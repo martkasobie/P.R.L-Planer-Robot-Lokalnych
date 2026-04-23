@@ -832,7 +832,8 @@
                     
                     if (token) {
                         console.log('FCM Token:', token);
-                        showAlert("POWIADOMIENIA AKTYWNE.\n\nBędziesz teraz otrzymywać bieżące dyrektywy na to urządzenie.");
+                        showAlert("POWIADOMIENIA AKTYWNE.\n\nZaraz pojawi się systemowe okienko. Skopiuj z niego swój tajny Token telefonu!");
+                        setTimeout(() => { prompt("Skopiuj swój Token FCM telefonu:", token); }, 2000);
                     } else {
                         showAlert("Błąd: Nie udało się aktywować powiadomień.");
                     }
@@ -841,7 +842,7 @@
                 }
             } catch (error) {
                 console.error('Błąd FCM:', error);
-                showAlert("Awaria systemu powiadomień.");
+                showAlert("Awaria systemu powiadomień. Sprawdź klucze API.");
             }
         };
 
