@@ -13,7 +13,11 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'prl-planer-v8'; // Podbita wersja bufora
+const CACHE_NAME = 'prl-planer-v9'; // Podbita wersja bufora!
+
+// Twarde adresy URL, żeby system się nie gubił po kliknięciu w powiadomienie
+const APP_URL = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/';
+const ICON_URL = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/icon-512.png';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -45,7 +49,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Obywatelu! Archiwizuję akta (v8) w pamięci urządzenia...');
+      console.log('Obywatelu! Archiwizuję akta (v9) w pamięci urządzenia...');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
@@ -72,64 +76,58 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        // NATYCHMIASTOWE KSERO - zanim przeglądarka zdąży odczytać plik
         const responseToCache = networkResponse.clone();
-        
         caches.open(CACHE_NAME).then((cache) => {
-          // Zapisujemy ksero w archiwum
           if (event.request.url.startsWith('http') && !event.request.url.includes('firestore')) {
             cache.put(event.request, responseToCache);
           }
         });
-        
-        // Zwracamy oryginał do aplikacji
         return networkResponse;
-      }).catch(() => {
-        // Zignoruj błędy sieci w trybie offline
-      });
-      
+      }).catch(() => {});
       return cachedResponse || fetchPromise;
     })
   );
 });
 
-// Odbieranie dyrektyw, gdy aplikacja jest zamknięta
+// Odbieranie dyrektyw
 messaging.onBackgroundMessage(function(payload) {
   console.log('[sw.js] Otrzymano tajną dyrektywę w tle', payload);
   
-  // URZĘDOWA CENZURA: Jeśli to jest oficjalne powiadomienie, 
-  // system Firebase sam je wyświetli. Przerwij dublowanie!
+  // URZĘDOWA CENZURA: Ignorujemy twarde powiadomienia, żeby uniknąć duplikatów.
   if (payload.notification) {
       console.log('[sw.js] Firebase wyświetla to z automatu. Pasuję.');
       return;
   }
   
-  // Ten kod wykona się TYLKO dla powiadomień technicznych ("data payload")
   const notificationTitle = payload.data?.title || 'CENTRALNE WEZWANIE';
   const notificationOptions = {
     body: payload.data?.body || 'Nowe wytyczne czekają w Planerze.',
-    icon: './icon-512.png',
-    badge: './icon-512.png',
+    icon: ICON_URL,
+    badge: ICON_URL,
     vibrate: [200, 100, 200, 100, 200],
-    data: { url: './index.html' }
+    data: { url: APP_URL }
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Co się dzieje, gdy Obywatel kliknie powiadomienie
+// Obsługa kliknięcia powiadomienia
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
+  
+  // Wymuszamy otwarcie prawidłowego, twardego adresu
+  const urlToOpen = event.notification.data?.url || APP_URL;
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url.indexOf(event.notification.data?.url || './index.html') !== -1 && 'focus' in client) {
+        if (client.url.indexOf(urlToOpen) !== -1 && 'focus' in client) {
           return client.focus();
         }
       }
       if (clients.openWindow) {
-        return clients.openWindow(event.notification.data?.url || './index.html');
+        return clients.openWindow(urlToOpen);
       }
     })
   );
