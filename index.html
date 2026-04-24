@@ -807,6 +807,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBp7RWF-GWZ0-AuGAjwyI5x0FecuzzODec",
@@ -814,13 +815,18 @@
             projectId: "planer-robot-lokalnych",
             storageBucket: "planer-robot-lokalnych.firebasestorage.app",
             messagingSenderId: "807809303313",
-            appId: "1:807809303313:web:b6d84d65f14a0ec60902b0"
+            appId: "1:807809303313:web:b6d84d65f14a0ec60902b0",
+            databaseURL: "https://planer-robot-lokalnych-default-rtdb.europe-west1.firebasedatabase.app"
         };
 
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
+        const db = getDatabase(app);
 
         window.requestFCMToken = async () => {
+            const citizenNameInput = document.getElementById('citizen-name');
+            const citizenName = citizenNameInput && citizenNameInput.value.trim() !== '' ? citizenNameInput.value : "Obywatel Anonim";
+
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
@@ -831,23 +837,29 @@
                     });
                     
                     if (token) {
-                        console.log('FCM Token:', token);
-                        showAlert("POWIADOMIENIA AKTYWNE.\n\nZaraz pojawi się systemowe okienko. Skopiuj z niego swój tajny Token telefonu!");
-                        setTimeout(() => { prompt("Skopiuj swój Token FCM telefonu:", token); }, 2000);
+                        console.log('Token pobrany z ukrycia.');
+                        const safeTokenKey = token.replace(/\./g, '_');
+                        
+                        await set(ref(db, 'tokens/' + safeTokenKey), {
+                            token: token,
+                            name: citizenName,
+                            registeredAt: new Date().toLocaleString()
+                        });
+
+                        showAlert("POWIADOMIENIA AKTYWNE!\n\nTwój identyfikator został automatycznie i bezpiecznie przekazany do Centrali.");
                     } else {
-                        showAlert("Błąd: Nie udało się aktywować powiadomień.");
+                        showAlert("Błąd: Nie udało się aktywować powiadomień. Brak tokenu.");
                     }
                 } else {
-                    showAlert("Brak zgody na powiadomienia. System nie będzie wysyłał dyrektyw.");
+                    showAlert("Odmowa. Brak zgody na powiadomienia. Centrala milczy.");
                 }
             } catch (error) {
                 console.error('Błąd FCM:', error);
-                showAlert("Awaria systemu powiadomień. Sprawdź klucze API.");
+                showAlert("Awaria systemu łączności! Sprawdź bezpieczniki (internet).");
             }
         };
 
         onMessage(messaging, (payload) => {
-            // Aplikacja otwarta - ignorujemy wyskakujące okienko, zachowujemy ciszę
             console.log('Ciche odebranie dyrektywy: ', payload);
         });
     </script>
