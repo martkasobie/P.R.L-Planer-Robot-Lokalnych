@@ -12,31 +12,27 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// POWIADOMIENIA W TLE - WERSJA PASYWNA (v15)
-// Nie tworzymy tu własnego showNotification, żeby nie dublować Chrome'a!
 messaging.onBackgroundMessage(function(payload) {
-    console.log('Depesza odebrana przez system, Chrome ją wyświetli.');
+  const notificationTitle = payload.data?.title || 'SYRENA PORANNA!';
+  const notificationOptions = {
+    body: payload.data?.body || 'Zgłoś gotowość do Czynu Społecznego!',
+    icon: 'icon-512.png',
+    badge: 'icon-512.png',
+    tag: 'prl-notif'
+  };
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// ROZKAZ OSTATECZNY KLIKNIĘCIA
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  
   const targetUrl = 'https://martkasobie.github.io/P.R.L-Planer-Robot-Lokalnych/';
-
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-      // 1. Jeśli apka jest otwarta, zrób focus
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url === targetUrl && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url === targetUrl && 'focus' in client) return client.focus();
       }
-      // 2. Jeśli nie jest otwarta, otwórz ją
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
+      if (clients.openWindow) return clients.openWindow(targetUrl);
     })
   );
 });
