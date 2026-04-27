@@ -1,4 +1,4 @@
-const SW_VERSION = 'v17'; // <--- PODBILIŚMY NA v17, ABY WYMUSIĆ AKTUALIZACJĘ Z v16
+const SW_VERSION = 'v20'; // <--- WERSJA 18: Ostateczna pacyfikacja marginesów!
 
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
