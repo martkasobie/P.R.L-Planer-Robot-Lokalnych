@@ -837,7 +837,7 @@
         const messaging = getMessaging(app);
         const db = getDatabase(app);
 
-        // --- CICHY PATROL: Automatyczne zgłaszanie aktywności przy każdym wejściu ---
+        // --- CICHY PATROL: Automatyczne zgłaszanie aktywności ---
         window.silentTokenRefresh = async () => {
             if (Notification.permission === 'granted') {
                 try {
@@ -848,8 +848,8 @@
                     });
                     
                     if (token) {
-                        const citizenNameInput = document.getElementById('citizen-name');
-                        const citizenName = citizenNameInput && citizenNameInput.value.trim() !== '' ? citizenNameInput.value : "Obywatel Anonim";
+                        // Odczytujemy imię prosto z załadowanego, globalnego stanu aplikacji!
+                        const citizenName = state.citizenName && state.citizenName.trim() !== '' ? state.citizenName : "Obywatel Anonim";
                         const safeTokenKey = token.replace(/\./g, '_');
                         
                         await set(ref(db, 'tokens/' + safeTokenKey), {
@@ -857,7 +857,7 @@
                             name: citizenName,
                             lastActive: new Date().toLocaleString() // Zgłasza aktualną datę do bazy
                         });
-                        console.log('Cichy raport z frontu zdany. Jesteś aktywna w Firebase.');
+                        console.log('Cichy raport z frontu zdany. Imię wpisane w akta:', citizenName);
                     }
                 } catch (error) {
                     console.log('Cichy raport zawiódł:', error);
@@ -865,10 +865,13 @@
             }
         };
 
-        // Wywołujemy Cichy Patrol tuż po uruchomieniu skryptów!
+        // Wywołujemy Cichy Patrol z 2-sekundowym opóźnieniem, żeby dać
+        // czas lokalnej bazie danych na prawidłowe wczytanie Twojego imienia!
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then(() => {
-                window.silentTokenRefresh();
+                setTimeout(() => {
+                    window.silentTokenRefresh();
+                }, 2000);
             });
         }
         // ---------------------------------------------------------------------------
