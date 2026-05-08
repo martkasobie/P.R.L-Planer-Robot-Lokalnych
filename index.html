@@ -912,7 +912,18 @@
         };
 
         onMessage(messaging, (payload) => {
-            console.log('Ciche odebranie dyrektywy: ', payload);
+            console.log('Odebrano dyrektywę w trybie czuwania: ', payload);
+            
+            // WYDZIAŁ INTERWENCYJNY: Wymuszamy dzwonek, nawet jeśli aplikacja działa w tle pod kłódką!
+            const title = payload.notification?.title || payload.data?.title || 'SYRENA PORANNA!';
+            const options = {
+                body: payload.notification?.body || payload.data?.body || 'Zgłoś gotowość do Czynu Społecznego!',
+                icon: 'icon-512.png',
+                badge: 'icon-512.png'
+            };
+            
+            // Odpalamy systemowe powiadomienie siłą:
+            new Notification(title, options);
         });
     </script>
 </body>
