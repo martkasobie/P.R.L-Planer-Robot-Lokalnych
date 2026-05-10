@@ -1,4 +1,4 @@
-const SW_VERSION = 'v22'; // <--- WERSJA 22: Wdrożono "Cichy Patrol" podtrzymujący status Aktywnego Obywatela!
+const SW_VERSION = 'v23'; // <--- WERSJA 23: Ostateczna dekapitacja biurokracji! Wymuszamy odświeżenie plików!
 
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
