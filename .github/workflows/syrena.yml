@@ -1,0 +1,28 @@
+name: Poranna Syrena PRL
+
+on:
+  schedule:
+    # Czas uruchomienia to UTC. 7:00 UTC to dokładnie 9:00 czasu letniego w Polsce (CEST).
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Ta linijka pozwala Ci odpalić syrenę RĘCZNIE z panelu GitHuba kiedy tylko chcesz!
+
+jobs:
+  budzik:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Klonowanie akt (Checkout)
+      uses: actions/checkout@v3
+
+    - name: Uruchomienie maszyny losującej (Setup Node.js)
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Pobieranie biurokratycznych narzędzi (NPM)
+      run: npm install firebase-admin
+
+    - name: Odpalenie Syreny!
+      env:
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      run: node send_notifications.js
