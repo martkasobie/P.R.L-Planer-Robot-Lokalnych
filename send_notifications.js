@@ -30,8 +30,8 @@ async function sendNotifications() {
     // To sprawia, że system Android jej nie widzi, a Service Worker generuje jedno powiadomienie otwierające APK!
     const message = {
       data: {
-        title: 'SYRENA PORANNA!',
-        body: 'Zgłoś gotowość do Czynu Społecznego!'
+        title: 'CO SIĘ GAPISZ? DO ROBOTY!!',
+        body: 'Od samego patrzenia norma się nie wyrobi! Otwieraj Planer, przybijaj pieczątki i zawstydź lenia w sobie.'
       },
       tokens: tokens
     };
