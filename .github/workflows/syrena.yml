@@ -9,6 +9,10 @@ on:
 jobs:
   budzik:
     runs-on: ubuntu-latest
+    
+    # Ta linijka mówi GitHubowi: "Tak, wiem o reformie, używaj silnika 24!"
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Klonowanie akt (Checkout)
@@ -17,7 +21,7 @@ jobs:
       - name: Uruchomienie maszyny losującej (Setup Node.js)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24' # Zmieniliśmy z 20 na 24!
 
       - name: Pobieranie biurokratycznych narzędzi (NPM)
         run: npm install firebase-admin
