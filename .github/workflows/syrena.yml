@@ -4,25 +4,25 @@ on:
   schedule:
     # 6:50 UTC to dokładnie 8:50 czasu letniego w Polsce (CEST).
     - cron: '50 6 * * *'
-  workflow_dispatch: # Ta linijka pozwala Ci odpalić syrenę RĘCZNIE z panelu GitHuba kiedy tylko chcesz!
+  workflow_dispatch: 
 
 jobs:
   budzik:
     runs-on: ubuntu-latest
 
-  steps:
-    - name: Klonowanie akt (Checkout)
-      uses: actions/checkout@v4
+    steps:
+      - name: Klonowanie akt (Checkout)
+        uses: actions/checkout@v4
 
-    - name: Uruchomienie maszyny losującej (Setup Node.js)
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Uruchomienie maszyny losującej (Setup Node.js)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Pobieranie biurokratycznych narzędzi (NPM)
-      run: npm install firebase-admin
+      - name: Pobieranie biurokratycznych narzędzi (NPM)
+        run: npm install firebase-admin
 
-    - name: Odpalenie Syreny!
-      env:
-        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      run: node send_notifications.js
+      - name: Odpalenie Syreny!
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node send_notifications.js
