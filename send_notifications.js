@@ -1,15 +1,18 @@
-const admin = require('firebase-admin');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getMessaging } = require('firebase-admin/messaging');
+const { getDatabase } = require('firebase-admin/database');
 
 // 1. Pobieramy tajny klucz z sejfu GitHuba
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
-// 2. Logujemy się do Twojej Centrali
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+// 2. Logujemy się do Twojej Centrali (Zaktualizowana składnia na 2026 rok!)
+const app = initializeApp({
+  credential: cert(serviceAccount),
   databaseURL: "https://planer-robot-lokalnych-default-rtdb.europe-west1.firebasedatabase.app"
 });
 
-const db = admin.database();
+const db = getDatabase(app);
+const messaging = getMessaging(app);
 
 async function sendNotifications() {
   console.log("URUCHAMIAM ROBOTA WYSYŁKOWEGO...");
@@ -37,12 +40,12 @@ async function sendNotifications() {
     };
 
     // 5. Strzał z syreny
-    const response = await admin.messaging().sendEachForMulticast(message);
+    const response = await messaging.sendEachForMulticast(message);
     console.log(`Raport z frontu: Wysłano pomyślnie ${response.successCount}, Błędów: ${response.failureCount}`);
   } catch (error) {
     console.error("Awaria maszyny:", error);
   } finally {
-    process.exit();
+    process.exit(0);
   }
 }
 
