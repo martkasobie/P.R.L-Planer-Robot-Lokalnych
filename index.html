@@ -494,9 +494,9 @@
                 <!-- PRZYCISK DO NOWEGO ARCHIWUM -->
                 <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-6 pb-2">
                     <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-3 pl-2 border-l-4 border-[#8c1c1c]">Zarządzanie Aktami</h3>
-                    <button onclick="openModalUI('archive-fullscreen')" class="w-full bg-[#292524] text-[#e7e5e4] border-4 border-[#1a1a1a] py-6 text-xl md:text-2xl font-bold font-['Oswald'] tracking-widest uppercase hover:bg-black transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] hover:translate-y-1 hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] group flex flex-col items-center gap-1">
+                    <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full bg-[#292524] text-[#e7e5e4] border-4 border-[#1a1a1a] py-6 text-xl md:text-2xl font-bold font-['Oswald'] tracking-widest uppercase transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:bg-black active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:bg-black md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] group flex flex-col items-center gap-1">
                         <span>NOTATNIK ARCHIWALNY</span>
-                        <span class="text-[10px] md:text-xs font-mono opacity-60 group-hover:opacity-100 font-normal normal-case tracking-normal">Ewidencja myśli ulotnych, danych technicznych i bieżących spraw</span>
+                        <span class="text-[10px] md:text-xs font-mono opacity-60 group-active:opacity-100 md:group-hover:opacity-100 font-normal normal-case tracking-normal">Ewidencja myśli ulotnych, danych technicznych i bieżących spraw</span>
                     </button>
                 </div>
 
@@ -597,14 +597,28 @@
 
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
+        
+        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO (Zostało 20 sztuk)
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 101, text: "", shape: "none", color: "custom", icon: '<img src="ziemniaki.png" alt="Ziemniaki" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 102, text: "", shape: "none", color: "custom", icon: '<img src="Ogórek1.png" alt="Ogórek" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 103, text: "", shape: "none", color: "custom", icon: '<img src="1zł.png" alt="1zł" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 104, text: "", shape: "none", color: "custom", icon: '<img src="karp.png" alt="Karp" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 105, text: "", shape: "none", color: "custom", icon: '<img src="Kaseta.png" alt="Kaseta" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 106, text: "", shape: "none", color: "custom", icon: '<img src="Kawa.png" alt="Kawa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 107, text: "", shape: "none", color: "custom", icon: '<img src="krzyzyk.png" alt="Krzyżyk" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 108, text: "", shape: "none", color: "custom", icon: '<img src="Kupon.png" alt="Kupon" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 109, text: "", shape: "none", color: "custom", icon: '<img src="kura.png" alt="Kura" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 110, text: "", shape: "none", color: "custom", icon: '<img src="Maluch.png" alt="Maluch" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 111, text: "", shape: "none", color: "custom", icon: '<img src="mandarynka.png" alt="Mandarynka" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 112, text: "", shape: "none", color: "custom", icon: '<img src="mis.png" alt="Miś" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 113, text: "", shape: "none", color: "custom", icon: '<img src="Pierog1.png" alt="Pieróg" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 114, text: "", shape: "none", color: "custom", icon: '<img src="TURBOGUMA.png" alt="Turbo Guma" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 115, text: "", shape: "none", color: "custom", icon: '<img src="waga.png" alt="Waga" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 116, text: "", shape: "none", color: "custom", icon: '<img src="Zupa1.png" alt="Zupa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
+            { id: 117, text: "", shape: "none", color: "custom", icon: '<img src="Bilet.png" alt="Bilet" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 118, text: "", shape: "none", color: "custom", icon: '<img src="termometr.png" alt="Termometr" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true }
         ];
 
@@ -652,7 +666,6 @@
             });
         }
         
-        // GŁÓWNY ARCHIWISTA - NAPRAWIONY!
         async function loadState() { 
             try {
                 let loadedState = await loadFromDB();
