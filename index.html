@@ -597,28 +597,14 @@
 
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
-        
-        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO (Bez Karty)
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 101, text: "", shape: "none", color: "custom", icon: '<img src="ziemniaki.png" alt="Ziemniaki" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 102, text: "", shape: "none", color: "custom", icon: '<img src="Ogórek1.png" alt="Ogórek" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 103, text: "", shape: "none", color: "custom", icon: '<img src="1zł.png" alt="1zł" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 104, text: "", shape: "none", color: "custom", icon: '<img src="karp.png" alt="Karp" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 105, text: "", shape: "none", color: "custom", icon: '<img src="Kaseta.png" alt="Kaseta" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 106, text: "", shape: "none", color: "custom", icon: '<img src="Kawa.png" alt="Kawa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 107, text: "", shape: "none", color: "custom", icon: '<img src="krzyzyk.png" alt="Krzyżyk" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 108, text: "", shape: "none", color: "custom", icon: '<img src="Kupon.png" alt="Kupon" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 109, text: "", shape: "none", color: "custom", icon: '<img src="kura.png" alt="Kura" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 110, text: "", shape: "none", color: "custom", icon: '<img src="Maluch.png" alt="Maluch" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 111, text: "", shape: "none", color: "custom", icon: '<img src="mandarynka.png" alt="Mandarynka" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 112, text: "", shape: "none", color: "custom", icon: '<img src="mis.png" alt="Miś" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 113, text: "", shape: "none", color: "custom", icon: '<img src="Pierog1.png" alt="Pieróg" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 114, text: "", shape: "none", color: "custom", icon: '<img src="TURBOGUMA.png" alt="Turbo Guma" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 115, text: "", shape: "none", color: "custom", icon: '<img src="waga.png" alt="Waga" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 116, text: "", shape: "none", color: "custom", icon: '<img src="Zupa1.png" alt="Zupa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 117, text: "", shape: "none", color: "custom", icon: '<img src="Bilet.png" alt="Bilet" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 118, text: "", shape: "none", color: "custom", icon: '<img src="termometr.png" alt="Termometr" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true }
         ];
 
@@ -666,6 +652,7 @@
             });
         }
         
+        // GŁÓWNY ARCHIWISTA - NAPRAWIONY!
         async function loadState() { 
             try {
                 let loadedState = await loadFromDB();
