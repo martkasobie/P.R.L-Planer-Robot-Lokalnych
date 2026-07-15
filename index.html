@@ -14,7 +14,15 @@
     <link rel="icon" type="image/png" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-512.png">
     
+    <!-- Silnik graficzny z poprawką na telefony dotykowe (Brak zacinającego się podświetlenia!) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            future: {
+                hoverOnlyWhenSupported: true,
+            }
+        }
+    </script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,8 +67,6 @@
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8c1c1c; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
 
         .paper-sheet {
             background-color: var(--paper-bg);
@@ -116,8 +122,8 @@
         .calendar-cell {
             aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2);
             position: relative; cursor: pointer; display: flex; flex-direction: column; padding: 1px; overflow: hidden;
+            transition: background 0.1s;
         }
-        .calendar-cell:hover { background-color: rgba(255,255,255,0.5); }
         .calendar-cell.today { background-color: #fca5a5; border: 2px solid #8c1c1c; }
         .calendar-cell.active { background-color: #bfdbfe; }
         .calendar-cell.empty { background-color: transparent; border: none; cursor: default; pointer-events: none; }
@@ -137,8 +143,7 @@
         
         .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg); }
 
-        .stamp-item { height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.2s; }
-        .stamp-item:hover { background-color: rgba(255,255,255,0.8); }
+        .stamp-item { height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.1s; }
         .stamp-item.selected { border: 2px solid #1f2937; background-color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
         
         .sc-label { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; display: block; color: #374151; }
@@ -154,8 +159,7 @@
         
         .chart-container { display: flex; align-items: flex-end; gap: 20px; height: 280px; padding: 10px; padding-top: 40px; padding-bottom: 90px; overflow-x: auto; border: 2px solid #333; }
         .chart-col { display: flex; flex-direction: column; align-items: center; width: 90px; flex-shrink: 0; position: relative; height: 100%; justify-content: flex-end; }
-        .bar-track { width: 100%; height: 100%; background: rgba(255,255,255,0.2); border: 2px solid #444; position: relative; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; transition: background 0.2s; }
-        .bar-track:hover { background: rgba(255,255,255,0.5); border-color: #8c1c1c; }
+        .bar-track { width: 100%; height: 100%; background: rgba(255,255,255,0.2); border: 2px solid #444; position: relative; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; transition: background 0.1s; }
         .bar-fill { width: 100%; background-color: #8c1c1c; transition: height 0.5s ease-out; position: relative; border-top: 2px solid #000; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px); pointer-events: none; }
         .bar-fill.complete { background-color: #15803d; }
         .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 10px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 4px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: 80%; overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
@@ -165,13 +169,11 @@
         .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
         .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
 
-        .archive-item { cursor: pointer; padding: 4px; border-bottom: 1px dashed #a8a29e; transition: background 0.2s; }
-        .archive-item:hover { background-color: rgba(255,255,255,0.5); }
+        .archive-item { cursor: pointer; padding: 4px; border-bottom: 1px dashed #a8a29e; transition: background 0.1s; }
         .archive-item.active { background-color: #e7e5e4; font-weight: bold; border-left: 3px solid #8c1c1c; }
         .note-checkbox { margin-right: 6px; cursor: pointer; }
         
         .folder-item { cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #ccc; font-weight: bold; font-family: 'Oswald', sans-serif; letter-spacing: 1px; color: #444; }
-        .folder-item:hover { background-color: rgba(0,0,0,0.05); }
         .folder-item.active { background-color: #8c1c1c; color: white; border-color: #631212; }
 
         .task-edit-input { width: 100%; background: rgba(255,255,255,0.4); border: none; border-bottom: 2px solid #8c1c1c; font-family: 'Courier Prime', monospace; font-size: 0.875rem; padding: 2px 4px; outline: none; color: #1a1a1a; font-weight: bold; }
@@ -199,7 +201,6 @@
         
         .close-viewer-btn { background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 4rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s; flex-shrink: 0; z-index: 99999; }
         @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; } }
-        .close-viewer-btn:hover { background-color: #631212; transform: scale(1.05); }
         .close-viewer-btn:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
 
         #install-button { display: none; }
@@ -226,6 +227,23 @@
             #pane-folders { position: relative; transform: none; width: 25%; max-width: none; z-index: 10; }
             #folder-drawer-overlay { display: none !important; }
         }
+
+        /* OSTATECZNE USUWANIE LEPKIEGO PALCA Z WYKORZYSTANIEM NATIVE CSS MEDIA QUERY */
+        @media (hover: hover) {
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
+            .calendar-cell:hover { background-color: rgba(255,255,255,0.5); }
+            .stamp-item:hover { background-color: rgba(255,255,255,0.8); }
+            .bar-track:hover { background: rgba(255,255,255,0.5); border-color: #8c1c1c; }
+            .archive-item:hover { background-color: rgba(255,255,255,0.5); }
+            .folder-item:hover { background-color: rgba(0,0,0,0.05); }
+            .close-viewer-btn:hover { background-color: #631212; transform: scale(1.05); }
+        }
+        /* Responsywne dotknięcia na telefony */
+        .calendar-cell:active { background-color: rgba(255,255,255,0.5); }
+        .stamp-item:active { background-color: rgba(255,255,255,0.8); }
+        .bar-track:active { background: rgba(255,255,255,0.5); border-color: #8c1c1c; }
+        .archive-item:active { background-color: rgba(255,255,255,0.5); }
+        .folder-item:active { background-color: rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="flex flex-col items-center justify-start md:justify-center p-2 md:p-4 min-h-screen pb-24 md:pb-4">
@@ -247,7 +265,7 @@
                 <p class="font-['Special_Elite'] text-sm sm:text-lg mb-6 leading-relaxed text-[#dcd0c0] border-t border-b border-[#444] py-4">
                     „Obywatelu, nie błądź myślami w chmurach, gdy na stanowisku czeka kolejka zadań!”
                 </p>
-                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
+                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] active:bg-[#631212] hover:scale-105 active:scale-105 transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
                     PRZYSTĄP DO PRACY
                 </button>
             </div>
@@ -273,10 +291,10 @@
         <!-- NAGŁÓWEK ARCHIWUM -->
         <div class="bg-[#1a1a1a] text-[#e7e5e4] p-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20">
             <div class="flex items-center gap-3">
-                <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ SKOROSZYTY</button>
+                <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ SKOROSZYTY</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
-            <button onclick="closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
+            <button onclick="closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
@@ -286,7 +304,7 @@
             <!-- PANE 1: SKOROSZYTY (MENU BOCZNE / LEWA KOLUMNA) -->
             <div id="pane-folders" class="w-full md:w-1/4 lg:w-1/5 border-r-2 border-[#57534e] bg-[#e5e5e5] shadow-[5px_0_15px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col">
                 <!-- NOWY PIONOWY PRZYCISK SKOROSZYTÓW -->
-                <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] transition active:scale-[0.98]">
+                <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] active:bg-[#1a1a1a] transition active:scale-[0.98]">
                     <span>Skoroszyty</span>
                     <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowy skoroszyt">+</span>
                 </button>
@@ -302,11 +320,11 @@
                 
                 <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0">
                     <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span>
-                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm">Zniszcz</button>
+                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm">Zniszcz</button>
                 </div>
                 
                 <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0">
-                    <button onclick="createNewNoteMobile()" class="w-full md:hidden bg-[#8c1c1c] text-white py-2 mb-2 font-bold font-['Oswald'] text-base uppercase tracking-wider shadow-md hover:bg-[#631212] transition border border-[#3d0808]">+ ZAKŁADAM NOWE AKTA</button>
+                    <button onclick="createNewNoteMobile()" class="w-full md:hidden bg-[#8c1c1c] text-white py-2 mb-2 font-bold font-['Oswald'] text-base uppercase tracking-wider shadow-md hover:bg-[#631212] active:bg-[#631212] transition border border-[#3d0808]">+ ZAKŁADAM NOWE AKTA</button>
                     <input type="text" id="note-search" oninput="renderArchiveNotes()" placeholder="Szukaj w aktach..." class="w-full bg-white border border-gray-400 p-2 text-xs font-mono outline-none shadow-inner">
                 </div>
                 
@@ -321,7 +339,7 @@
                 
                 <div class="p-3 md:p-4 border-b-2 border-[#57534e] bg-[#f5eedc] z-10 flex flex-col gap-2 shrink-0">
                     <div class="flex items-center gap-2 mb-1">
-                        <button onclick="goBackFromEditor()" class="md:hidden bg-[#8c1c1c] text-white px-3 py-1.5 text-xs font-bold font-['Oswald'] uppercase border border-[#3d0808] shadow-sm hover:bg-[#631212]">◀ WSTECZ DO SPISU</button>
+                        <button onclick="goBackFromEditor()" class="md:hidden bg-[#8c1c1c] text-white px-3 py-1.5 text-xs font-bold font-['Oswald'] uppercase border border-[#3d0808] shadow-sm hover:bg-[#631212] active:bg-[#631212] transition">◀ WSTECZ DO SPISU</button>
                     </div>
                     
                     <input type="text" id="note-title-input" placeholder="TYTUŁ DOKUMENTU..." class="w-full bg-transparent border-b-2 border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-xl md:text-2xl text-[#8c1c1c] placeholder-gray-500 pb-1">
@@ -339,15 +357,15 @@
                 <div class="border-t-2 border-[#57534e] p-3 flex flex-wrap justify-between items-center bg-[#292524] z-10 gap-2 shrink-0">
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="flex items-center shadow-[1px_1px_0px_#444]">
-                            <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-3 py-2 border border-[#444] border-r-0 hover:bg-[#631212] transition uppercase">Zaznacz</button>
-                            <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-3 py-2 border border-[#444] hover:bg-gray-200 transition uppercase">Odznacz</button>
+                            <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-3 py-2 border border-[#444] border-r-0 hover:bg-[#631212] active:bg-[#631212] transition uppercase">Zaznacz</button>
+                            <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-3 py-2 border border-[#444] hover:bg-gray-200 active:bg-gray-200 transition uppercase">Odznacz</button>
                         </div>
-                        <button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-3 py-2 border border-gray-600 hover:bg-black transition uppercase ml-1 sm:ml-2">FOTO</button>
+                        <button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-3 py-2 border border-gray-600 hover:bg-black active:bg-black transition uppercase ml-1 sm:ml-2">FOTO</button>
                         <input type="file" id="note-photo-upload" class="hidden" accept="image/*" onchange="insertPhotoToNote(this)">
                     </div>
                     <div class="flex gap-2">
-                        <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden md:block bg-gray-600 text-white border border-[#444] px-4 py-2 text-xs font-bold uppercase hover:bg-gray-700 transition">Anuluj</button>
-                        <button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#dcd0c0] px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold uppercase hover:bg-[#631212] transition tracking-wide font-['Oswald'] shadow-sm">ZAPISZ</button>
+                        <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden md:block bg-gray-600 text-white border border-[#444] px-4 py-2 text-xs font-bold uppercase hover:bg-gray-700 active:bg-gray-700 transition">Anuluj</button>
+                        <button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#dcd0c0] px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition tracking-wide font-['Oswald'] shadow-sm">ZAPISZ</button>
                     </div>
                 </div>
             </div>
@@ -355,9 +373,9 @@
     </div>
 
     <!-- MODALE SYSTEMOWE -->
-    <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black transition">Zrozumiałem</button></div></div>
+    <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black active:bg-black transition">Zrozumiałem</button></div></div>
     
-    <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zatwierdź</button></div></div></div>
+    <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
     
     <div id="event-modal" class="app-modal-overlay">
         <div class="app-modal-window">
@@ -374,9 +392,9 @@
                 <option value="yearly">Co rok</option>
             </select>
             <div class="flex gap-2">
-                <button onclick="deleteEvent()" id="btn-delete-event" class="px-3 py-2 border-2 border-[#8c1c1c] text-[#8c1c1c] font-bold uppercase hover:bg-red-100 hidden" title="Usuń"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
-                <button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button>
-                <button onclick="saveEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zapisz</button>
+                <button onclick="deleteEvent()" id="btn-delete-event" class="px-3 py-2 border-2 border-[#8c1c1c] text-[#8c1c1c] font-bold uppercase hover:bg-red-100 active:bg-red-100 transition hidden" title="Usuń"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+                <button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
+                <button onclick="saveEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zapisz</button>
             </div>
         </div>
     </div>
@@ -400,8 +418,8 @@
                 </div>
             </div>
             <div class="flex gap-4 mt-4">
-                <button onclick="closeModalUI('add-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button>
-                <button onclick="saveNewGoal()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zatwierdź</button>
+                <button onclick="closeModalUI('add-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
+                <button onclick="saveNewGoal()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button>
             </div>
         </div>
     </div>
@@ -431,8 +449,8 @@
             <input type="number" id="edit-goal-current" class="sc-input bg-white mb-4" placeholder="0">
             
             <div class="flex gap-4">
-                <button onclick="closeModalUI('edit-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button>
-                <button onclick="saveEditedGoal()" class="flex-1 px-2 py-2 bg-[#103090] text-white font-bold uppercase hover:bg-blue-800">Aktualizuj</button>
+                <button onclick="closeModalUI('edit-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
+                <button onclick="saveEditedGoal()" class="flex-1 px-2 py-2 bg-[#103090] text-white font-bold uppercase hover:bg-blue-800 active:bg-blue-800 transition">Aktualizuj</button>
             </div>
         </div>
     </div>
@@ -461,8 +479,8 @@
                     <div class="flex flex-col items-end">
                         <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
                         <div class="flex flex-row gap-2 mt-2">
-                            <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
-                            <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">WŁĄCZ POWIADOMIENIA</button>
+                            <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 active:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
+                            <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] active:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">WŁĄCZ POWIADOMIENIA</button>
                         </div>
                     </div>
                 </div>
@@ -480,7 +498,7 @@
                 <!-- CZYN SPOŁECZNY (ZADANIA) -->
                 <div>
                     <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
-                    <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black">Zatwierdź</button></div>
+                    <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black active:bg-black transition">Zatwierdź</button></div>
                     <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"><div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div></ul>
                     <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
                 </div>
@@ -490,7 +508,7 @@
                     <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
                         <div class="flex flex-col w-full sm:w-2/3"><span class="text-[9px] font-bold uppercase text-gray-800">WARTOŚĆ WSADU (Dodaj/Odejmij):</span><div class="flex items-center"><input type="number" id="global-increment-input" class="w-full h-8 bg-white border border-gray-500 p-1 font-bold text-center font-mono outline-none" value="10"></div></div>
-                        <button onclick="openModalUI('add-goal-modal')" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">+ NOWY CEL</button>
+                        <button onclick="openModalUI('add-goal-modal')" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] active:bg-[#631212] transition w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">+ NOWY CEL</button>
                     </div>
                     <div id="chart-area" class="bg-graph-paper chart-container custom-scrollbar"><div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div></div>
                     <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu! <br><span class="font-bold text-black">(Kliknij w tło słupka, aby go edytować)</span></p>
@@ -505,7 +523,7 @@
                 </div>
 
                 <!-- PROTOKÓŁ SAMOKRYTYKI -->
-                <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
+                <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] active:bg-[#631212] transition mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
                 <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
             </div>
 
@@ -513,7 +531,7 @@
             <div class="lg:col-span-5 space-y-6 relative z-10">
                 <div class="bg-white/30 p-2 border border-gray-500 shadow-sm relative">
                     <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
-                    <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2"><button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 transition">&lt;</button><h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3><button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 transition">&gt;</button></div>
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2"><button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button><h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3><button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button></div>
                     <div id="calendar-grid" class="calendar-grid"></div>
                 </div>
                 <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
@@ -529,16 +547,6 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        // --- LIKWIDACJA "LEPKIEGO PALCA" (STICKY HOVER) NA TELEFONACH ---
-        document.addEventListener('touchend', (e) => {
-            const btn = e.target.closest('button');
-            if(btn) { setTimeout(() => btn.blur(), 150); }
-        });
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if(btn) { setTimeout(() => btn.blur(), 150); }
-        });
-
         // --- REJESTRACJA SERVICE WORKERA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -574,6 +582,9 @@
             
             modalStack.push(id);
             window.history.pushState({ modalId: id }, "");
+            
+            // Brutalne zgaszenie zaciętych przycisków
+            if(document.activeElement) document.activeElement.blur();
         }
 
         function closeModalUI(id) {
@@ -591,6 +602,7 @@
                 if (el.id === 'event-modal' || el.id === 'archive-fullscreen') el.style.display = 'none';
             }
             modalStack = modalStack.filter(m => m !== id);
+            setTimeout(() => { if(document.activeElement) document.activeElement.blur(); }, 10);
         }
 
         // Magia przycisku "Wstecz" na telefonie
@@ -610,7 +622,8 @@
                     forceCloseModal(id);
                 }
             }
-            if (document.activeElement) document.activeElement.blur();
+            // Zrzucenie fokusu ze wszystkiego po powrocie
+            setTimeout(() => { if (document.activeElement) document.activeElement.blur(); }, 10);
         });
 
         let confirmCallback = null;
@@ -869,7 +882,11 @@
         }
 
         // --- CZYN SPOŁECZNY (ZADANIA) ---
-        function addTask() { const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0 }); i.value = ''; saveState(); renderTasks(); }
+        function addTask() { 
+            const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
+            state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0 }); i.value = ''; saveState(); renderTasks(); 
+            if(document.activeElement) document.activeElement.blur();
+        }
         function toggleTask(id) {
             const t = state.tasks.find(x => x.id === id);
             if (t) {
@@ -894,7 +911,7 @@
         function renderTasks() {
             const l = document.getElementById('task-list'); if (!l) return; l.innerHTML = '';
             if (!state.tasks || state.tasks.length === 0) l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div>';
-            else state.tasks.forEach(t => { l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 uppercase text-xs">USUŃ</button></li>`; });
+            else state.tasks.forEach(t => { l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 active:border-[#8c1c1c] active:bg-red-100 transition uppercase text-xs">USUŃ</button></li>`; });
             updateTaskProgress();
         }
         function updateTaskProgress() { const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; }
@@ -940,11 +957,13 @@
             ev.stopPropagation();
             const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10;
             if (g) { g.currentValue = Math.max(0, g.currentValue + (i * dir)); saveState(); renderPlans(); }
+            if(document.activeElement) document.activeElement.blur();
         }
 
         function deleteGoal(ev, id) { 
             ev.stopPropagation();
             showConfirm("Zakończyć plan wykonania tego celu?", () => { state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); }); 
+            if(document.activeElement) document.activeElement.blur();
         }
 
         function renderPlans() {
@@ -998,7 +1017,13 @@
 
         // --- KALENDARZ I WEZWANIA ---
         function resetCalendarToToday() { state.viewDate = new Date(); renderCalendar(); }
-        function changeMonth(dir) { const d = state.viewDate || new Date(); d.setMonth(d.getMonth() + dir); state.viewDate = d; renderCalendar(); }
+        function changeMonth(dir) { 
+            const d = state.viewDate || new Date(); 
+            d.setMonth(d.getMonth() + dir); 
+            state.viewDate = d; 
+            renderCalendar(); 
+            if(document.activeElement) document.activeElement.blur();
+        }
         function getEventForDate(d, m, y) {
             if (!state.events) return null;
             const cur = new Date(y, m - 1, d);
@@ -1041,23 +1066,23 @@
             document.querySelectorAll('.archive-pane').forEach(p => p.classList.remove('active-pane'));
             document.getElementById('pane-' + paneId).classList.add('active-pane');
             
-            // Rejestrujemy wejście do edytora, żeby dało się z niego cofnąć sprzętowym Wstecz
             if (window.innerWidth < 768 && pushToHistory && paneId === 'editor') {
                 modalStack.push('archive-pane-editor');
                 window.history.pushState({ modalId: 'archive-pane-editor' }, "");
             }
         }
 
-        // Obsługa UI przycisku "Wstecz do spisu" w edytorze
         function goBackFromEditor() {
             if (modalStack[modalStack.length - 1] === 'archive-pane-editor') {
-                window.history.back(); // to odpali popstate
+                window.history.back();
             } else {
                 switchArchivePane('list', false);
             }
         }
 
         function toggleFolderDrawer() {
+            if(document.activeElement) document.activeElement.blur();
+            
             const drawer = document.getElementById('pane-folders');
             const isOpen = drawer.classList.contains('open');
             
@@ -1068,7 +1093,7 @@
                 window.history.pushState({ modalId: 'folder-drawer' }, "");
             } else {
                 if (modalStack[modalStack.length - 1] === 'folder-drawer') {
-                    window.history.back(); // odpali popstate
+                    window.history.back(); 
                 } else {
                     drawer.classList.remove('open');
                     document.getElementById('folder-drawer-overlay').classList.remove('active');
@@ -1077,6 +1102,7 @@
         }
 
         function createNewFolder() {
+            if(document.activeElement) document.activeElement.blur();
             const name = prompt("Podaj nazwę dla nowego skoroszytu:");
             if(name && name.trim()) {
                 const newId = 'folder_' + Date.now();
@@ -1123,7 +1149,7 @@
                 const isMain = f.id === 'main';
                 html += `<li onclick="selectFolder('${f.id}')" class="folder-item p-4 flex justify-between items-center group ${state.activeFolderId === f.id ? 'active' : ''}">
                     <span class="truncate">📁 ${f.name}</span>
-                    ${!isMain ? `<button onclick="deleteFolder(event, '${f.id}')" class="text-red-500 hover:text-red-700 font-bold px-2 md:opacity-0 group-hover:opacity-100 transition shadow-sm border border-transparent hover:border-red-500 bg-white/20">X</button>` : ''}
+                    ${!isMain ? `<button onclick="deleteFolder(event, '${f.id}')" class="text-red-500 hover:text-red-700 active:text-red-700 font-bold px-2 md:opacity-0 group-hover:opacity-100 transition shadow-sm border border-transparent hover:border-red-500 active:border-red-500 bg-white/20">X</button>` : ''}
                 </li>`;
             });
             list.innerHTML = html;
@@ -1135,7 +1161,7 @@
 
         function createNewNoteMobile() {
             clearEditor(); 
-            switchArchivePane('editor', true); // Dodajemy do historii, żeby dało się cofnąć!
+            switchArchivePane('editor', true);
             document.getElementById('note-title-input').focus();
         }
 
@@ -1158,7 +1184,7 @@
                     <div class="font-bold text-[#1a1a1a] truncate text-sm font-['Oswald'] tracking-wide">${x.title || 'Dokument bez tytułu'}</div>
                     <div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#103090] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div>
                 </div>
-                <button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-3 py-2 hover:bg-black font-bold border border-gray-600 uppercase shrink-0 shadow-sm">EDYTUJ</button>`; 
+                <button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-3 py-2 hover:bg-black active:bg-black font-bold border border-gray-600 uppercase shrink-0 shadow-sm transition">EDYTUJ</button>`; 
                 l.appendChild(li); 
             });
             const cb = document.getElementById('btn-cancel-edit'); if(cb) cb.classList.toggle('hidden', !state.activeNoteId);
@@ -1182,7 +1208,7 @@
                 if(fs) fs.value = note.folderId || 'main';
                 state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; 
                 renderArchiveNotes(); e.focus(); 
-                if (window.innerWidth < 768) switchArchivePane('editor', true);
+                switchArchivePane('editor', true);
             };
             if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n);
         }
@@ -1192,6 +1218,7 @@
             const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); 
             if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; 
             saveState(); renderArchiveNotes(); 
+            
             if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') {
                 window.history.back();
             } else {
@@ -1247,12 +1274,13 @@
             if (!state.reports) state.reports = [];
             state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: s.options[s.selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
             d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); showAlert("Raport przyjęty.");
+            if(document.activeElement) document.activeElement.blur();
         }
         function deleteReport(id) { state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); }
         function renderSelfCriticismHistory() {
             const l = document.getElementById('sc-history-list'); if (!l) return; l.innerHTML = '';
             if (!state.reports || state.reports.length === 0) l.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>';
-            else state.reports.forEach(r => { const i = document.createElement('li'); i.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text"; i.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 text-lg px-1">X</button>`; l.appendChild(i); });
+            else state.reports.forEach(r => { const i = document.createElement('li'); i.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text"; i.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 active:text-red-900 transition text-lg px-1">X</button>`; l.appendChild(i); });
         }
     </script>
 
