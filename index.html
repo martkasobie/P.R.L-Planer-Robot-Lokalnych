@@ -46,6 +46,9 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        button { outline: none !important; -webkit-tap-highlight-color: transparent; }
+        button:focus { outline: none !important; }
+        
         .selectable-text { user-select: text !important; -webkit-user-select: text !important; }
         img, video, svg { max-width: 100%; height: auto; }
         input, textarea, select { user-select: text; }
@@ -227,6 +230,7 @@
 </head>
 <body class="flex flex-col items-center justify-start md:justify-center p-2 md:p-4 min-h-screen pb-24 md:pb-4">
 
+    <!-- EKRAN ŁADOWANIA -->
     <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-y-auto py-10">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
@@ -243,13 +247,14 @@
                 <p class="font-['Special_Elite'] text-sm sm:text-lg mb-6 leading-relaxed text-[#dcd0c0] border-t border-b border-[#444] py-4">
                     „Obywatelu, nie błądź myślami w chmurach, gdy na stanowisku czeka kolejka zadań!”
                 </p>
-                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] hover:scale-105 transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
+                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
                     PRZYSTĄP DO PRACY
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- PEŁNOEKRANOWY PODGLĄD POJEDYNCZEJ NOTATKI -->
     <div id="note-viewer-overlay">
         <div class="viewer-paper">
             <div class="viewer-header">
@@ -263,7 +268,9 @@
         <button class="close-viewer-btn" onclick="closeModalUI('note-viewer-overlay')">ZAMKNIJ I WRÓĆ DO PLANERA</button>
     </div>
 
+    <!-- NOWE, PEŁNOEKRANOWE ARCHIWUM (Z BOCZNYM MENU) -->
     <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col">
+        <!-- NAGŁÓWEK ARCHIWUM -->
         <div class="bg-[#1a1a1a] text-[#e7e5e4] p-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20">
             <div class="flex items-center gap-3">
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ SKOROSZYTY</button>
@@ -276,15 +283,20 @@
             
             <div id="folder-drawer-overlay" onclick="toggleFolderDrawer()"></div>
 
-            <div id="pane-folders" class="w-full md:w-1/4 lg:w-1/5 border-r-2 border-[#57534e] bg-[#e5e5e5] shadow-[5px_0_15px_rgba(0,0,0,0.5)] md:shadow-none">
-                <div class="p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0">
+            <!-- PANE 1: SKOROSZYTY (MENU BOCZNE / LEWA KOLUMNA) -->
+            <div id="pane-folders" class="w-full md:w-1/4 lg:w-1/5 border-r-2 border-[#57534e] bg-[#e5e5e5] shadow-[5px_0_15px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col">
+                <!-- NOWY PIONOWY PRZYCISK SKOROSZYTÓW -->
+                <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] transition active:scale-[0.98]">
                     <span>Skoroszyty</span>
-                    <button onclick="createNewFolder()" class="text-[#dcd0c0] hover:text-white text-2xl leading-none font-bold" title="Dodaj nowy skoroszyt">+</button>
-                </div>
-                <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5]">
-                    </ul>
+                    <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowy skoroszyt">+</span>
+                </button>
+                
+                <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5] flex flex-col">
+                    <!-- Foldery generowane w JS -->
+                </ul>
             </div>
 
+            <!-- PANE 2: LISTA AKT -->
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
@@ -299,15 +311,17 @@
                 </div>
                 
                 <ul id="archive-notes-list" class="flex-1 overflow-y-auto custom-scrollbar p-1 text-xs font-mono space-y-1 z-10">
-                    </ul>
+                    <!-- Notatki generowane w JS -->
+                </ul>
             </div>
 
+            <!-- PANE 3: EDYTOR -->
             <div id="pane-editor" class="archive-pane w-full md:flex-1 bg-white relative shadow-inner">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
                 <div class="p-3 md:p-4 border-b-2 border-[#57534e] bg-[#f5eedc] z-10 flex flex-col gap-2 shrink-0">
                     <div class="flex items-center gap-2 mb-1">
-                        <button onclick="switchArchivePane('list')" class="md:hidden bg-[#8c1c1c] text-white px-3 py-1.5 text-xs font-bold font-['Oswald'] uppercase border border-[#3d0808] shadow-sm hover:bg-[#631212]">◀ WSTECZ DO SPISU</button>
+                        <button onclick="goBackFromEditor()" class="md:hidden bg-[#8c1c1c] text-white px-3 py-1.5 text-xs font-bold font-['Oswald'] uppercase border border-[#3d0808] shadow-sm hover:bg-[#631212]">◀ WSTECZ DO SPISU</button>
                     </div>
                     
                     <input type="text" id="note-title-input" placeholder="TYTUŁ DOKUMENTU..." class="w-full bg-transparent border-b-2 border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-xl md:text-2xl text-[#8c1c1c] placeholder-gray-500 pb-1">
@@ -315,7 +329,8 @@
                     <div class="flex flex-col sm:flex-row gap-2 mt-1">
                         <textarea id="note-tags-input" rows="1" placeholder="#tagi (np. #ważne)..." class="flex-1 bg-transparent border-none outline-none font-['Courier_Prime'] text-sm text-[#103090] placeholder-gray-500 resize-none overflow-hidden py-1"></textarea>
                         <select id="note-folder-select" class="bg-white border border-gray-400 font-mono text-xs p-1 outline-none h-8 min-w-[120px] shadow-sm">
-                            </select>
+                            <!-- Opcje generowane w JS -->
+                        </select>
                     </div>
                 </div>
                 
@@ -339,6 +354,7 @@
         </div>
     </div>
 
+    <!-- MODALE SYSTEMOWE -->
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black transition">Zrozumiałem</button></div></div>
     
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212]">Zatwierdź</button></div></div></div>
@@ -365,6 +381,7 @@
         </div>
     </div>
 
+    <!-- DODAWANIE CELU -->
     <div id="add-goal-modal" class="app-modal-overlay">
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
@@ -389,6 +406,7 @@
         </div>
     </div>
 
+    <!-- EDYCJA CELU -->
     <div id="edit-goal-modal" class="app-modal-overlay">
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3>
@@ -420,6 +438,7 @@
     </div>
 
 
+    <!-- GŁÓWNA KARTA PLANERA -->
     <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative">
         <div class="paper-dirt"></div>
         <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
@@ -458,6 +477,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-7 space-y-6 relative z-10">
                 
+                <!-- CZYN SPOŁECZNY (ZADANIA) -->
                 <div>
                     <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
                     <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black">Zatwierdź</button></div>
@@ -465,6 +485,7 @@
                     <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
                 </div>
                 
+                <!-- PLAN DŁUGOTERMINOWY (WYKRESY) -->
                 <div class="border-t-4 double border-gray-500 pt-4 bg-[#fefce840] p-4 shadow-inner relative">
                     <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
@@ -475,17 +496,20 @@
                     <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu! <br><span class="font-bold text-black">(Kliknij w tło słupka, aby go edytować)</span></p>
                 </div>
                 
+                <!-- PRZYCISK DO NOWEGO ARCHIWUM -->
                 <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-6 pb-2">
                     <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-3 pl-2 border-l-4 border-[#8c1c1c]">Zarządzanie Aktami</h3>
-                    <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer">
+                    <button onclick="openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer">
                         <img src="tablicanotatek.png" alt="Notatnik Archiwalny" class="w-full h-auto block">
                     </button>
                 </div>
 
+                <!-- PROTOKÓŁ SAMOKRYTYKI -->
                 <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
                 <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
             </div>
 
+            <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI) -->
             <div class="lg:col-span-5 space-y-6 relative z-10">
                 <div class="bg-white/30 p-2 border border-gray-500 shadow-sm relative">
                     <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
@@ -503,7 +527,18 @@
         <footer class="mt-8 text-center border-t border-gray-500 pt-4 opacity-60"><p class="text-[10px] font-mono uppercase">Ministerstwo Administracji Publicznej • Wzór zatwierdzony w 1978r.</p></footer>
     </div>
 
+    <!-- LOGIKA JAVASCRIPT -->
     <script>
+        // --- LIKWIDACJA "LEPKIEGO PALCA" (STICKY HOVER) NA TELEFONACH ---
+        document.addEventListener('touchend', (e) => {
+            const btn = e.target.closest('button');
+            if(btn) { setTimeout(() => btn.blur(), 150); }
+        });
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if(btn) { setTimeout(() => btn.blur(), 150); }
+        });
+
         // --- REJESTRACJA SERVICE WORKERA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -528,7 +563,7 @@
             }
         }
 
-        // --- SYSTEM ZARZĄDZANIA OKNAMI (MODAL STACK & HISTORY API) ---
+        // --- SYSTEM ZARZĄDZANIA OKNAMI Z OBSŁUGĄ COFANIA W TELEFONIE ---
         let modalStack = [];
 
         function openModalUI(id) {
@@ -543,7 +578,7 @@
 
         function closeModalUI(id) {
             if (modalStack.length > 0 && modalStack[modalStack.length - 1] === id) {
-                window.history.back(); 
+                window.history.back(); // Wywoła event popstate
             } else {
                 forceCloseModal(id);
             }
@@ -558,15 +593,24 @@
             modalStack = modalStack.filter(m => m !== id);
         }
 
+        // Magia przycisku "Wstecz" na telefonie
         window.addEventListener('popstate', (e) => {
             if (modalStack.length > 0) {
                 const id = modalStack.pop();
-                const el = document.getElementById(id);
-                if (el) {
-                    el.classList.remove('active');
-                    if (el.id === 'event-modal' || el.id === 'archive-fullscreen') el.style.display = 'none';
+                
+                if (id === 'archive-pane-editor') {
+                    // Zamknięcie edytora (powrót do listy akt)
+                    switchArchivePane('list', false);
+                } else if (id === 'folder-drawer') {
+                    // Zamknięcie wysuwanego menu skoroszytów
+                    document.getElementById('pane-folders').classList.remove('open');
+                    document.getElementById('folder-drawer-overlay').classList.remove('active');
+                } else {
+                    // Zamknięcie normalnego okienka (modala)
+                    forceCloseModal(id);
                 }
             }
+            if (document.activeElement) document.activeElement.blur();
         });
 
         let confirmCallback = null;
@@ -669,7 +713,7 @@
             clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500);
         }
 
-        // --- START APLIKACJI (Z PANCERNYM ROZRUCHEM) ---
+        // --- START APLIKACJI ---
         document.addEventListener('DOMContentLoaded', () => {
             initSplashScreen();
             init();
@@ -992,17 +1036,44 @@
         function saveEvent() { if(!currentEditingDateKey) return; const v = document.getElementById('event-input').value.trim(), r = document.getElementById('event-recurrence').value; if(v) state.events[currentEditingDateKey] = { text: v, recurrence: r }; else delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeModalUI('event-modal'); }
         function deleteEvent() { if(!currentEditingDateKey) return; showConfirm("Usunąć całą serię wydarzeń?", () => { delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeModalUI('event-modal'); }); }
 
-        // --- SKŁADNICA AKT (ZARZĄDZANIE BOCZNYM MENU) ---
-        function switchArchivePane(paneId) {
+        // --- SKŁADNICA AKT (ZARZĄDZANIE BOCZNYM MENU I PRZYCISKIEM WSTECZ) ---
+        function switchArchivePane(paneId, pushToHistory = false) {
             document.querySelectorAll('.archive-pane').forEach(p => p.classList.remove('active-pane'));
             document.getElementById('pane-' + paneId).classList.add('active-pane');
+            
+            // Rejestrujemy wejście do edytora, żeby dało się z niego cofnąć sprzętowym Wstecz
+            if (window.innerWidth < 768 && pushToHistory && paneId === 'editor') {
+                modalStack.push('archive-pane-editor');
+                window.history.pushState({ modalId: 'archive-pane-editor' }, "");
+            }
+        }
+
+        // Obsługa UI przycisku "Wstecz do spisu" w edytorze
+        function goBackFromEditor() {
+            if (modalStack[modalStack.length - 1] === 'archive-pane-editor') {
+                window.history.back(); // to odpali popstate
+            } else {
+                switchArchivePane('list', false);
+            }
         }
 
         function toggleFolderDrawer() {
             const drawer = document.getElementById('pane-folders');
-            const overlay = document.getElementById('folder-drawer-overlay');
-            drawer.classList.toggle('open');
-            overlay.classList.toggle('active');
+            const isOpen = drawer.classList.contains('open');
+            
+            if (!isOpen) {
+                drawer.classList.add('open');
+                document.getElementById('folder-drawer-overlay').classList.add('active');
+                modalStack.push('folder-drawer');
+                window.history.pushState({ modalId: 'folder-drawer' }, "");
+            } else {
+                if (modalStack[modalStack.length - 1] === 'folder-drawer') {
+                    window.history.back(); // odpali popstate
+                } else {
+                    drawer.classList.remove('open');
+                    document.getElementById('folder-drawer-overlay').classList.remove('active');
+                }
+            }
         }
 
         function createNewFolder() {
@@ -1032,9 +1103,13 @@
             renderArchiveFolders();
             renderArchiveNotes();
             if (window.innerWidth < 768) {
-                document.getElementById('pane-folders').classList.remove('open');
-                document.getElementById('folder-drawer-overlay').classList.remove('active');
-                switchArchivePane('list');
+                if (modalStack[modalStack.length - 1] === 'folder-drawer') {
+                    window.history.back();
+                } else {
+                    document.getElementById('pane-folders').classList.remove('open');
+                    document.getElementById('folder-drawer-overlay').classList.remove('active');
+                }
+                switchArchivePane('list', false);
             }
         }
 
@@ -1060,7 +1135,7 @@
 
         function createNewNoteMobile() {
             clearEditor(); 
-            switchArchivePane('editor');
+            switchArchivePane('editor', true); // Dodajemy do historii, żeby dało się cofnąć!
             document.getElementById('note-title-input').focus();
         }
 
@@ -1107,7 +1182,7 @@
                 if(fs) fs.value = note.folderId || 'main';
                 state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; 
                 renderArchiveNotes(); e.focus(); 
-                switchArchivePane('editor');
+                if (window.innerWidth < 768) switchArchivePane('editor', true);
             };
             if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n);
         }
@@ -1117,7 +1192,11 @@
             const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); 
             if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; 
             saveState(); renderArchiveNotes(); 
-            switchArchivePane('list');
+            if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') {
+                window.history.back();
+            } else {
+                switchArchivePane('list', false);
+            }
         }
         
         function saveCurrentNote() {
@@ -1139,7 +1218,12 @@
             
             ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; 
             saveState(); renderArchiveNotes();
-            switchArchivePane('list');
+            
+            if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') {
+                window.history.back();
+            } else {
+                switchArchivePane('list', false);
+            }
         }
         
         function deleteMarkedNotes() {
@@ -1172,6 +1256,7 @@
         }
     </script>
 
+    <!-- POŁĄCZENIE Z CENTRALĄ (FIREBASE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
