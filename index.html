@@ -14,7 +14,7 @@
     <link rel="icon" type="image/png" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-512.png">
     
-    <!-- Silnik graficzny z poprawką na telefony dotykowe (Brak zacinającego się podświetlenia!) -->
+    <!-- Silnik graficzny z poprawką na telefony dotykowe -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -646,7 +646,7 @@
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
         
-        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO (Zostało 20 sztuk)
+        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
@@ -738,10 +738,27 @@
             clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500);
         }
 
-        // --- START APLIKACJI (Z PANCERNYM ROZRUCHEM) ---
+        // --- START APLIKACJI Z OBSŁUGĄ WIDŻETU (SKRÓTU) ---
         document.addEventListener('DOMContentLoaded', () => {
-            initSplashScreen();
-            init();
+            const urlParams = new URLSearchParams(window.location.search);
+            const akcja = urlParams.get('akcja');
+            
+            if(akcja) {
+                // Skrót z pulpitu! Ukrywamy Splash Screen dla szybkości
+                document.getElementById('splash-screen').style.display = 'none';
+                init();
+                // Dajemy systemowi ułamek sekundy na wyrenderowanie akt przed ich otwarciem
+                setTimeout(() => {
+                    openModalUI('archive-fullscreen');
+                    if(akcja === 'nowanotatka') {
+                        createNewNoteMobile();
+                    }
+                }, 100);
+            } else {
+                // Zwykłe uruchomienie
+                initSplashScreen();
+                init();
+            }
         });
 
         function initSplashScreen() {
