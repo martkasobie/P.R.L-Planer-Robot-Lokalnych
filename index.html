@@ -165,7 +165,7 @@
         .bar-fill.complete { background-color: #15803d; }
         .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 10px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 4px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: 80%; overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
         .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; pointer-events: none; }
-        .chart-controls { position: absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
+        .chart-controls { absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
         .chart-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; cursor: pointer; border: 2px solid rgba(0,0,0,0.3); user-select: none; font-family: monospace; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); border-radius: 4px; }
         .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
         .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
@@ -716,7 +716,7 @@
             clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500);
         }
 
-        // --- START APLIKACJI (Z PANCERNYM ROZRUCHEM) ---
+        // --- START APLIKACJI ---
         document.addEventListener('DOMContentLoaded', () => {
             initSplashScreen();
             init();
@@ -764,7 +764,6 @@
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
             
-            // UWAGA: USUNIĘTO BLOKADĘ ENTERA (Można swobodnie robić akapity!)
             if (e) { 
                 e.addEventListener('input', scheduleSave); 
                 e.addEventListener('paste', function(ev) {
@@ -1137,13 +1136,13 @@
             if(!list || !select) return;
 
             let html = `<li onclick="selectFolder('all')" class="folder-item p-4 flex items-center gap-3 ${state.activeFolderId === 'all' ? 'active' : ''}">
-                <img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-[38px] h-[38px] object-contain shrink-0" onerror="this.style.display='none'">
+                <img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-[48px] h-[48px] object-contain shrink-0" onerror="this.style.display='none'">
                 <span class="truncate">WSZYSTKIE AKTA</span>
             </li>`;
             
             state.folders.forEach(f => {
                 // Teraz KAŻDY folder (i 'main', i stworzone przez użytkownika) ma ikonę glowneakta.png
-                const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-[38px] h-[38px] object-contain shrink-0" onerror="this.style.display='none'">`;
+                const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-[48px] h-[48px] object-contain shrink-0" onerror="this.style.display='none'">`;
                 
                 const isMain = f.id === 'main';
 
