@@ -25,5 +25,19 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nowa Notatka",
+      "short_name": "Notatka",
+      "url": "index.html?akcja=nowanotatka",
+      "icons": [{ "src": "icon-512.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Otwórz Kartotekę",
+      "short_name": "Kartoteka",
+      "url": "index.html?akcja=kartoteka",
+      "icons": [{ "src": "icon-512.png", "sizes": "192x192" }]
+    }
   ]
 }
