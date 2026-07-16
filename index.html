@@ -308,7 +308,7 @@
                 <!-- NOWY PIONOWY PRZYCISK SKOROSZYTÓW -->
                 <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] active:bg-[#1a1a1a] transition active:scale-[0.98]">
                     <span>Skoroszyty</span>
-                    <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowy skoroszyt">+</span>
+                    <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowy skoroszyt">+</button>
                 </button>
                 
                 <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5] flex flex-col">
@@ -646,7 +646,7 @@
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
         
-        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO (Zostało 20 sztuk)
+        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
@@ -786,7 +786,6 @@
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
             
-            // UWAGA: USUNIĘTO BLOKADĘ ENTERA (Można swobodnie robić akapity!)
             if (e) { 
                 e.addEventListener('input', scheduleSave); 
                 e.addEventListener('paste', function(ev) {
@@ -1164,10 +1163,10 @@
             </li>`;
             
             state.folders.forEach(f => {
+                // Teraz KAŻDY folder (i 'main', i stworzone przez użytkownika) ma ikonę glowneakta.png
+                const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-7 h-7 object-contain shrink-0" onerror="this.style.display='none'">`;
+                
                 const isMain = f.id === 'main';
-                const iconPart = isMain 
-                    ? `<img src="glowneakta.png" alt="Główne Akta" class="w-7 h-7 object-contain shrink-0" onerror="this.style.display='none'">` 
-                    : `<span class="w-7 h-7 flex items-center justify-center shrink-0 text-xl">📁</span>`;
 
                 html += `<li onclick="selectFolder('${f.id}')" class="folder-item p-4 flex justify-between items-center group ${state.activeFolderId === f.id ? 'active' : ''}">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
