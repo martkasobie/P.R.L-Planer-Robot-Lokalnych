@@ -14,7 +14,6 @@
     <link rel="icon" type="image/png" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-512.png">
     
-    <!-- Silnik graficzny z poprawką na telefony dotykowe (Brak zacinającego się podświetlenia!) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -293,7 +292,7 @@
         <!-- NAGŁÓWEK ARCHIWUM -->
         <div class="bg-[#1a1a1a] text-[#e7e5e4] p-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20">
             <div class="flex items-center gap-3">
-                <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ SKOROSZYTY</button>
+                <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
             <button onclick="closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
@@ -1116,7 +1115,7 @@
 
         function createNewFolder() {
             if(document.activeElement) document.activeElement.blur();
-            const name = prompt("Podaj nazwę dla nowego skoroszytu:");
+            const name = prompt("Podaj nazwę dla nowej teczki akt:");
             if(name && name.trim()) {
                 const newId = 'folder_' + Date.now();
                 state.folders.push({ id: newId, name: name.trim().toUpperCase() });
@@ -1126,7 +1125,7 @@
 
         function deleteFolder(ev, id) {
             ev.stopPropagation();
-            showConfirm("Zlikwidować skoroszyt? Teczki w nim zawarte powrócą do GŁÓWNYCH AKT.", () => {
+            showConfirm("Zlikwidować tę teczkę? Notatki w niej zawarte powrócą do GŁÓWNYCH AKT.", () => {
                 state.folders = state.folders.filter(f => f.id !== id);
                 state.notes.forEach(n => { if (n.folderId === id) n.folderId = 'main'; });
                 if (state.activeFolderId === id) state.activeFolderId = 'all';
@@ -1159,13 +1158,13 @@
             if(!list || !select) return;
 
             let html = `<li onclick="selectFolder('all')" class="folder-item p-4 flex items-center gap-3 ${state.activeFolderId === 'all' ? 'active' : ''}">
-                <img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'">
+                <img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-10 h-10 object-contain shrink-0" onerror="this.style.display='none'">
                 <span class="truncate">WSZYSTKIE AKTA</span>
             </li>`;
             
             state.folders.forEach(f => {
-                // Teraz KAŻDY folder (i 'main', i stworzone przez użytkownika) ma ikonę glowneakta.png 75x75px
-                const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'">`;
+                // Teraz KAŻDY folder (i 'main', i stworzone przez użytkownika) ma ikonę glowneakta.png
+                const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-10 h-10 object-contain shrink-0" onerror="this.style.display='none'">`;
                 
                 const isMain = f.id === 'main';
 
@@ -1199,7 +1198,7 @@
             
             if (term) fn = fn.filter(x => (x.title && x.title.toLowerCase().includes(term)) || (x.content && x.content.toLowerCase().includes(term)) || (x.tags && x.tags.toLowerCase().includes(term)) || (x.date && x.date.toLowerCase().includes(term)));
             
-            if (!fn || fn.length === 0) l.innerHTML = '<li class="text-center text-gray-500 italic p-4 font-bold bg-white/50 border border-dashed border-gray-400 mt-2 mx-2">Skoroszyt jest pusty.</li>';
+            if (!fn || fn.length === 0) l.innerHTML = '<li class="text-center text-gray-500 italic p-4 font-bold bg-white/50 border border-dashed border-gray-400 mt-2 mx-2">Teczka jest pusta.</li>';
             else fn.forEach(x => { 
                 const li = document.createElement('li'); 
                 li.className = `archive-item flex items-center gap-2 p-3 bg-white/70 mb-1 border border-gray-300 shadow-sm ${state.activeNoteId === x.id ? 'active border-l-4 border-[#8c1c1c]' : ''}`; 
