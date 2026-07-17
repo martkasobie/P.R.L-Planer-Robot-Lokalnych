@@ -316,22 +316,13 @@
                 </ul>
             </div>
 
-            <!-- PANE 2: LISTA AKT (Z PRZEŁĄCZNIKIEM DŹWIĘKU) -->
+            <!-- PANE 2: LISTA AKT -->
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
-                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
-                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
-                    
-                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
-                    <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
-                        <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
-                        <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
-                        <!-- Wyraźny napis widoczny na każdym urządzeniu -->
-                        <span class="ml-1 sm:ml-2 text-[9px] sm:text-[10px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
-                    </label>
-
-                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm shrink-0">Zniszcz</button>
+                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0">
+                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span>
+                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm">Zniszcz</button>
                 </div>
                 
                 <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0">
@@ -684,10 +675,7 @@
 
         // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
-        const audioKey = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
-        
         audioTrash.preload = "auto";
-        audioKey.preload = "auto";
         
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
@@ -700,30 +688,18 @@
             .then(buffer => { stampBuffer = buffer; })
             .catch(e => console.log("Błąd ładowania dźwięku pieczątki:", e));
 
-        let isKeyboardSoundEnabled = true;
-
         // BŁYSKAWICZNE ODBLOKOWANIE TAGÓW AUDIO NA TELEFONACH
         const unlockAudio = () => {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
             audioTrash.play().then(() => { audioTrash.pause(); audioTrash.currentTime = 0; }).catch(()=>{});
-            audioKey.play().then(() => { audioKey.pause(); audioKey.currentTime = 0; }).catch(()=>{});
             
             document.removeEventListener('click', unlockAudio);
             document.removeEventListener('touchstart', unlockAudio);
         };
         document.addEventListener('click', unlockAudio);
         document.addEventListener('touchstart', unlockAudio);
-        
-        function toggleKeyboardSound() {
-            const cb = document.getElementById('keyboard-sound-toggle');
-            if (cb) {
-                isKeyboardSoundEnabled = cb.checked;
-                state.keyboardSound = isKeyboardSoundEnabled;
-                saveState();
-            }
-        }
 
         function playSound(type) {
             try {
@@ -733,7 +709,7 @@
                         const source = audioCtx.createBufferSource();
                         source.buffer = stampBuffer;
                         const gain = audioCtx.createGain();
-                        gain.gain.value = 0.7; // Ustawienie głośności
+                        gain.gain.value = 0.7; // Ustawienie głośności pieczątki na 0.7
                         source.connect(gain);
                         gain.connect(audioCtx.destination);
                         source.start(0);
@@ -745,43 +721,6 @@
                 }
             } catch(e) {}
         }
-
-        function playKeySound() {
-            if (!isKeyboardSoundEnabled) return; 
-
-            try {
-                const k = audioKey.cloneNode();
-                k.volume = 0.4; 
-                k.play().catch(()=>{});
-            } catch(e) {}
-        }
-
-        // --- ZDARZENIE "INPUT" I "KEYDOWN" --- 
-        function checkAndPlayKeySound(active) {
-            if (!active) return;
-            
-            // OGRANICZENIE: Dźwięk działa TYLKO w Notatniku Archiwalnym
-            const isNoteEditor = active.id === 'note-title-input' || 
-                                 active.id === 'note-tags-input' || 
-                                 active.id === 'note-editor' || 
-                                 active.closest('#note-editor');
-            
-            if (isNoteEditor) {
-                playKeySound(); 
-            }
-        }
-
-        document.addEventListener('input', (e) => {
-            checkAndPlayKeySound(document.activeElement);
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
-            if (e.key === 'Enter') {
-                checkAndPlayKeySound(document.activeElement);
-            }
-        });
-
 
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
@@ -816,7 +755,7 @@
             selfCriticism: { subject: 'lenistwo', desc: '', reason: '', fix: '' }, 
             viewDate: null, citizenName: "Jan Kowalski", 
             notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "",
-            folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ], activeFolderId: 'all'
+            folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ] // Usunieto zapisywanie keyboardSound
         };
         let currentEditingDateKey = null, currentQuoteIndex = 0;
         let saveTimeout;
@@ -867,12 +806,6 @@
                         const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); 
                         if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); 
                     }
-                    // Ustawienie przełącznika dźwięku
-                    if (state.keyboardSound === undefined) state.keyboardSound = true;
-                    isKeyboardSoundEnabled = state.keyboardSound;
-                    const ksToggle = document.getElementById('keyboard-sound-toggle');
-                    if (ksToggle) ksToggle.checked = isKeyboardSoundEnabled;
-
                     saveToDB(state);
                 }
             } catch (e) {
@@ -925,13 +858,6 @@
                             const rr = document.querySelector(`input[name="stampMode"][value="random"]`);
                             if (state.stampSelectionMode === 'random') { if (rr) rr.checked = true; } else { if (rm) rm.checked = true; }
                             
-                            // Wczytanie przełącznika
-                            if (state.keyboardSound !== undefined) {
-                                isKeyboardSoundEnabled = state.keyboardSound;
-                                const ksToggle = document.getElementById('keyboard-sound-toggle');
-                                if (ksToggle) ksToggle.checked = isKeyboardSoundEnabled;
-                            }
-
                             renderTasks();
                             renderPlans();
                             renderCalendar();
