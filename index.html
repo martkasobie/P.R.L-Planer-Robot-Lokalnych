@@ -680,11 +680,18 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
+        // Aby na 100% obudzić AudioContext na urządzeniach mobilnych
+        document.addEventListener('click', () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
         function playSound(type) {
             try {
                 if (type === 'stamp') {
                     const s = audioStamp.cloneNode();
-                    s.volume = 0.8; // Zmniejszono o równe 20%
+                    s.volume = 0.65; // Zmniejszono o kolejne 15% (było 0.8)
                     s.play().catch(()=>{});
                 } else if (type === 'trash') {
                     const s = audioTrash.cloneNode();
@@ -698,32 +705,34 @@
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 
-                // Krótki, chrupiący dźwięk mechanicznej klawiatury bez opóźnień
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const t = audioCtx.currentTime;
                 
-                osc.type = 'square';
-                
-                if (isBackspace) {
-                    // Dźwięk kasowania (lekko grubszy, niższy ton)
-                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.05);
-                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                    osc.start(audioCtx.currentTime);
-                    osc.stop(audioCtx.currentTime + 0.05);
-                } else {
-                    // Zwykłe pisanie (szybki, wyższy klik)
-                    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.03);
-                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
-                    osc.start(audioCtx.currentTime);
-                    osc.stop(audioCtx.currentTime + 0.03);
+                // Tworzymy krótki strzał białego szumu (imitacja uderzenia plastiku)
+                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
                 }
                 
-                osc.connect(gain);
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                
+                // Filtr kształtujący dźwięk (wysoki klik dla liter, niższy dla kasowania)
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = isBackspace ? 'bandpass' : 'highpass';
+                filter.frequency.value = isBackspace ? 1200 : 3500;
+                
+                const gain = audioCtx.createGain();
+                // GŁOŚNOŚĆ KLAWIATURY (0.4 dla liter, 0.6 dla backspace)
+                gain.gain.setValueAtTime(isBackspace ? 0.6 : 0.4, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
+                
+                noise.connect(filter);
+                filter.connect(gain);
                 gain.connect(audioCtx.destination);
+                
+                noise.start(t);
             } catch(e) {}
         }
 
@@ -1111,6 +1120,7 @@
 
         // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
         function showDiploma(goalName) {
+            // USUNIĘTO DŹWIĘK PIECZĄTEK ZGODNIE Z DEKRETEM
             document.getElementById('diploma-goal').innerText = goalName;
             document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
             
