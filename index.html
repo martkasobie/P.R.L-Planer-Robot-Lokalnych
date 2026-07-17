@@ -607,13 +607,12 @@
             modalStack.push(id);
             window.history.pushState({ modalId: id }, "");
             
-            // Brutalne zgaszenie zaciętych przycisków
             if(document.activeElement) document.activeElement.blur();
         }
 
         function closeModalUI(id) {
             if (modalStack.length > 0 && modalStack[modalStack.length - 1] === id) {
-                window.history.back(); // Wywoła event popstate
+                window.history.back(); 
             } else {
                 forceCloseModal(id);
             }
@@ -629,24 +628,19 @@
             setTimeout(() => { if(document.activeElement) document.activeElement.blur(); }, 10);
         }
 
-        // Magia przycisku "Wstecz" na telefonie
         window.addEventListener('popstate', (e) => {
             if (modalStack.length > 0) {
                 const id = modalStack.pop();
                 
                 if (id === 'archive-pane-editor') {
-                    // Zamknięcie edytora (powrót do listy akt)
                     switchArchivePane('list', false);
                 } else if (id === 'folder-drawer') {
-                    // Zamknięcie wysuwanego menu skoroszytów
                     document.getElementById('pane-folders').classList.remove('open');
                     document.getElementById('folder-drawer-overlay').classList.remove('active');
                 } else {
-                    // Zamknięcie normalnego okienka (modala)
                     forceCloseModal(id);
                 }
             }
-            // Zrzucenie fokusu ze wszystkiego po powrocie
             setTimeout(() => { if (document.activeElement) document.activeElement.blur(); }, 10);
         });
 
@@ -654,6 +648,42 @@
         function showAlert(text) { document.getElementById('alert-text').innerText = text; openModalUI('alert-modal'); }
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
+
+        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
+        const audioStamp = new Audio('https://actions.google.com/sounds/v1/foley/wood_block_drop.ogg');
+        const audioType = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
+        const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
+        
+        audioStamp.volume = 1.0;
+        audioType.volume = 0.3; // Maszyna ciut ciszej by nie ogłuszyć pracownika
+        audioTrash.volume = 0.8;
+
+        function playSound(type) {
+            try {
+                let s;
+                // Klonujemy węzeł dźwiękowy, dzięki czemu dźwięki mogą na siebie nachodzić przy szybkim pisaniu
+                if(type === 'stamp') s = audioStamp.cloneNode();
+                else if(type === 'type') s = audioType.cloneNode();
+                else if(type === 'trash') s = audioTrash.cloneNode();
+                
+                if(s) { 
+                    s.volume = (type === 'type') ? 0.3 : (type === 'stamp' ? 1.0 : 0.8); 
+                    s.play().catch(()=>{}); // Ignorujemy cicho błędy z blokadą autoplay w przeglądarkach
+                }
+            } catch(e) {}
+        }
+
+        // Nasłuchiwanie klawiszy we wszystkich formularzach
+        document.addEventListener('keydown', (e) => {
+            const t = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+            if (t === 'input' || t === 'textarea' || (document.activeElement && document.activeElement.isContentEditable)) {
+                // Reaguj tylko na znaki drukowalne, spację, enter i backspace
+                if(e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+                    playSound('type');
+                }
+            }
+        });
+
 
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
@@ -878,7 +908,7 @@
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
             
-            // UWAGA: USUNIĘTO BLOKADĘ ENTERA (Można swobodnie robić akapity!)
+            // UWAGA: USUNIĘTO BLOKADĘ ENTERA
             if (e) { 
                 e.addEventListener('input', scheduleSave); 
                 e.addEventListener('paste', function(ev) {
@@ -999,12 +1029,16 @@
                     let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); 
                     t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; 
                     t.stampRotation = Math.floor(Math.random() * 20) - 10; 
+                    playSound('stamp'); // Dźwięk pieczątki
                 }
                 else { t.done = false; t.stamp = null; }
                 saveState(); renderTasks();
             }
         }
-        function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); }
+        function deleteTask(id) { 
+            playSound('trash'); // Dźwięk niszczarki
+            state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); 
+        }
         function startEditingTask(id, el) {
             const t = state.tasks.find(x => x.id === id); if (!t || t.done) return;
             const i = document.createElement('input'); i.type = 'text'; i.value = t.text; i.className = 'task-edit-input z-10';
@@ -1219,6 +1253,7 @@
         function deleteFolder(ev, id) {
             ev.stopPropagation();
             showConfirm("Zlikwidować tę teczkę? Notatki w niej zawarte powrócą do GŁÓWNYCH AKT.", () => {
+                playSound('trash'); // Dźwięk niszczarki
                 state.folders = state.folders.filter(f => f.id !== id);
                 state.notes.forEach(n => { if (n.folderId === id) n.folderId = 'main'; });
                 if (state.activeFolderId === id) state.activeFolderId = 'all';
@@ -1371,7 +1406,10 @@
         function deleteMarkedNotes() {
             const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia.");
             const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?";
-            showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderArchiveNotes(); });
+            showConfirm(msg, () => { 
+                playSound('trash'); // Dźwięk niszczarki
+                const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderArchiveNotes(); 
+            });
         }
 
         // ZAPIS GŁÓWNY W TLE
@@ -1388,10 +1426,15 @@
             if (!d || !d.value.trim()) return showAlert("Raport bez opisu czynu jest nieważny!");
             if (!state.reports) state.reports = [];
             state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: s.options[s.selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
-            d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); showAlert("Raport przyjęty.");
+            d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); 
+            playSound('stamp'); // Dźwięk pieczątki
+            showAlert("Raport przyjęty.");
             if(document.activeElement) document.activeElement.blur();
         }
-        function deleteReport(id) { state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); }
+        function deleteReport(id) { 
+            playSound('trash'); // Dźwięk niszczarki
+            state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); 
+        }
         function renderSelfCriticismHistory() {
             const l = document.getElementById('sc-history-list'); if (!l) return; l.innerHTML = '';
             if (!state.reports || state.reports.length === 0) l.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>';
