@@ -141,7 +141,7 @@
 
         .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
         .app-modal-overlay.active { display: flex !important; }
-        #alert-modal, #confirm-modal { z-index: 100000; }
+        #alert-modal, #confirm-modal, #diploma-modal { z-index: 100000; }
         
         .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg); }
 
@@ -378,6 +378,31 @@
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black active:bg-black transition">Zrozumiałem</button></div></div>
     
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
+
+    <!-- NOWY: DYPLOM PRZODOWNIKA PRACY -->
+    <div id="diploma-modal" class="app-modal-overlay">
+        <div class="app-modal-window" style="max-width: 95%; width: 420px; background-color: #f5eedc; border: 8px double #8c1c1c; padding: 15px; transform: rotate(-1deg); box-shadow: 15px 15px 30px rgba(0,0,0,0.8);">
+            <div style="border: 2px solid #8c1c1c; padding: 20px; position: relative; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 2px, transparent 2px, transparent 4px);">
+                <h2 style="font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: #8c1c1c; margin-bottom: 5px; line-height: 1.1; text-transform: uppercase;">DYPLOM<br><span style="font-size: 1.2rem; color: #1a1a1a;">PRZODOWNIKA PRACY</span></h2>
+                <div style="width: 50px; height: 2px; background-color: #1a1a1a; margin: 10px auto;"></div>
+                <p style="font-family: 'Special Elite', cursive; font-size: 0.8rem; margin-bottom: 15px; color: #333;">Za wybitne osiągnięcia, niezłomny hart ducha oraz wykonanie normy 100% w realizacji celu:</p>
+                <h3 id="diploma-goal" style="font-family: 'Courier Prime', monospace; font-size: 1.2rem; font-weight: bold; color: #103090; margin-bottom: 15px; border-bottom: 2px dashed #103090; display: inline-block; padding-bottom: 5px;"></h3>
+                <p style="font-family: 'Special Elite', cursive; font-size: 0.8rem; margin-bottom: 10px; color: #333;">Niniejszy dyplom nadaje się Obywatelowi/Obywatelce:</p>
+                <h2 id="diploma-citizen" style="font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #1a1a1a; margin-bottom: 20px; text-transform: uppercase;"></h2>
+                
+                <div class="flex justify-between items-end mt-4 font-['Special_Elite'] text-[10px]">
+                    <div class="text-left"><span class="text-gray-500">Data nadania:</span><br><strong id="diploma-date" class="text-black"></strong></div>
+                    <!-- Pieczątka wygenerowana w czystym CSS -->
+                    <div class="text-[#8c1c1c] rotate-[-15deg] font-bold border-[3px] border-dashed border-[#8c1c1c] rounded-full w-20 h-20 flex flex-col items-center justify-center text-[10px] shadow-[inset_0_0_8px_rgba(140,28,28,0.3)] opacity-90 z-10 leading-none">
+                        <span class="text-[16px] mb-1">100%</span>
+                        <span>NORMY</span>
+                    </div>
+                    <div class="text-right"><span class="text-gray-500">Z ramienia:</span><br><strong class="text-black">Centrali P.R.L</strong></div>
+                </div>
+            </div>
+            <button onclick="closeModalUI('diploma-modal')" class="w-full mt-4 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">KU CHWALE OJCZYZNY! (ZAMKNIJ)</button>
+        </div>
+    </div>
     
     <div id="event-modal" class="app-modal-overlay">
         <div class="app-modal-window">
@@ -544,7 +569,7 @@
                     <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.</p>
                 </div>
 
-                <!-- NOWA LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
+                <!-- LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
                 <div class="border-2 border-gray-500 p-4 bg-white/30 relative shadow-sm">
                     <h3 class="text-sm font-bold uppercase text-[#103090] mb-2 pl-2 border-l-4 border-[#103090]">Bezpieczeństwo Danych</h3>
                     <div class="flex flex-row gap-2">
@@ -602,7 +627,7 @@
             const el = document.getElementById(id);
             if (!el) return;
             el.classList.add('active');
-            if (el.id === 'event-modal' || el.id === 'archive-fullscreen') el.style.display = 'flex';
+            if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
             
             modalStack.push(id);
             window.history.pushState({ modalId: id }, "");
@@ -622,7 +647,7 @@
             const el = document.getElementById(id);
             if (el) {
                 el.classList.remove('active');
-                if (el.id === 'event-modal' || el.id === 'archive-fullscreen') el.style.display = 'none';
+                if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'none';
             }
             modalStack = modalStack.filter(m => m !== id);
             setTimeout(() => { if(document.activeElement) document.activeElement.blur(); }, 10);
@@ -661,23 +686,20 @@
         function playSound(type) {
             try {
                 let s;
-                // Klonujemy węzeł dźwiękowy, dzięki czemu dźwięki mogą na siebie nachodzić przy szybkim pisaniu
                 if(type === 'stamp') s = audioStamp.cloneNode();
                 else if(type === 'type') s = audioType.cloneNode();
                 else if(type === 'trash') s = audioTrash.cloneNode();
                 
                 if(s) { 
                     s.volume = (type === 'type') ? 0.3 : (type === 'stamp' ? 1.0 : 0.8); 
-                    s.play().catch(()=>{}); // Ignorujemy cicho błędy z blokadą autoplay w przeglądarkach
+                    s.play().catch(()=>{}); 
                 }
             } catch(e) {}
         }
 
-        // Nasłuchiwanie klawiszy we wszystkich formularzach
         document.addEventListener('keydown', (e) => {
             const t = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
             if (t === 'input' || t === 'textarea' || (document.activeElement && document.activeElement.isContentEditable)) {
-                // Reaguj tylko na znaki drukowalne, spację, enter i backspace
                 if(e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
                     playSound('type');
                 }
@@ -810,7 +832,6 @@
                             state = { ...state, ...importedState };
                             await saveToDB(state);
                             
-                            // Aktualizacja Interfejsu po wczytaniu
                             const pI = document.getElementById('user-photo');
                             const pP = document.getElementById('photo-placeholder');
                             if(state.photo && pI) { pI.src = state.photo; pI.classList.remove('hidden'); if(pP) pP.classList.add('hidden'); }
@@ -849,10 +870,8 @@
             const akcja = urlParams.get('akcja');
             
             if(akcja) {
-                // Skrót z pulpitu! Ukrywamy Splash Screen dla szybkości
                 document.getElementById('splash-screen').style.display = 'none';
                 init();
-                // Dajemy systemowi ułamek sekundy na wyrenderowanie akt przed ich otwarciem
                 setTimeout(() => {
                     openModalUI('archive-fullscreen');
                     if(akcja === 'nowanotatka') {
@@ -860,7 +879,6 @@
                     }
                 }, 100);
             } else {
-                // Zwykłe uruchomienie
                 initSplashScreen();
                 init();
             }
@@ -908,7 +926,6 @@
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
             
-            // UWAGA: USUNIĘTO BLOKADĘ ENTERA
             if (e) { 
                 e.addEventListener('input', scheduleSave); 
                 e.addEventListener('paste', function(ev) {
@@ -1054,6 +1071,20 @@
         }
         function updateTaskProgress() { const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; }
 
+        // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
+        function showDiploma(goalName) {
+            playSound('stamp');
+            setTimeout(() => playSound('stamp'), 400); // Drugie huknięcie pieczątki dla dramaturgii!
+            
+            document.getElementById('diploma-goal').innerText = goalName;
+            document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
+            
+            const d = new Date();
+            document.getElementById('diploma-date').innerText = d.toLocaleDateString('pl-PL');
+            
+            openModalUI('diploma-modal');
+        }
+
         // --- PLAN DŁUGOTERMINOWY (WYKRES I SŁUPKI) ---
         function saveNewGoal() {
             const n = document.getElementById('goal-name').value.trim(), t = parseFloat(document.getElementById('goal-target').value), u = document.getElementById('goal-unit').value.trim();
@@ -1083,24 +1114,48 @@
             if (!n || isNaN(t) || t <= 0 || !u) return showAlert("Obywatelu! Puste rubryki w dokumentacji korekty!");
             const gIndex = state.plans.findIndex(p => p.id === id);
             if (gIndex > -1) {
+                const wasComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue;
+                
                 state.plans[gIndex].text = n;
                 state.plans[gIndex].targetValue = t;
                 state.plans[gIndex].unit = u;
                 state.plans[gIndex].currentValue = Math.max(0, c);
+                
+                const isComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue;
+                
                 saveState(); renderPlans(); closeModalUI('edit-goal-modal');
+                
+                // Odpal Dyplom, jeśli po edycji cel właśnie dobił do 100%!
+                if (!wasComplete && isComplete) {
+                    setTimeout(() => showDiploma(n), 300);
+                }
             }
         }
 
         function changeGoalProgress(ev, id, dir) {
             ev.stopPropagation();
             const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10;
-            if (g) { g.currentValue = Math.max(0, g.currentValue + (i * dir)); saveState(); renderPlans(); }
+            if (g) { 
+                const wasComplete = g.currentValue >= g.targetValue;
+                g.currentValue = Math.max(0, g.currentValue + (i * dir)); 
+                const isComplete = g.currentValue >= g.targetValue;
+                
+                saveState(); renderPlans(); 
+                
+                // Odpal Dyplom, jeśli to właśnie to kliknięcie dało nam 100%!
+                if (!wasComplete && isComplete) {
+                    showDiploma(g.text);
+                }
+            }
             if(document.activeElement) document.activeElement.blur();
         }
 
         function deleteGoal(ev, id) { 
             ev.stopPropagation();
-            showConfirm("Zakończyć plan wykonania tego celu?", () => { state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); }); 
+            showConfirm("Zakończyć plan wykonania tego celu?", () => { 
+                playSound('trash'); // Dźwięk niszczarki
+                state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); 
+            }); 
             if(document.activeElement) document.activeElement.blur();
         }
 
