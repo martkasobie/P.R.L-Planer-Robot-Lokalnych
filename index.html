@@ -673,30 +673,57 @@
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
-        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy - Pliki Zewnętrzne) ---
+        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy - Połączenie Systemów) ---
         const audioStamp = new Audio('https://actions.google.com/sounds/v1/impacts/dumpster_door_hit.ogg');
-        const audioType = new Audio('https://actions.google.com/sounds/v1/office/keyboard_typing_fast.ogg');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
         
-        // Głośność
-        audioStamp.volume = 1.0;
-        audioType.volume = 0.8; 
-        audioTrash.volume = 0.8;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
 
         function playSound(type) {
             try {
-                if (type === 'type') {
-                    audioType.currentTime = 0;
-                    audioType.play().catch(()=>{});
-                } else if (type === 'stamp') {
+                if (type === 'stamp') {
                     const s = audioStamp.cloneNode();
-                    s.volume = 1.0;
+                    s.volume = 0.8; // Zmniejszono o równe 20%
                     s.play().catch(()=>{});
                 } else if (type === 'trash') {
                     const s = audioTrash.cloneNode();
                     s.volume = 0.8;
                     s.play().catch(()=>{});
                 }
+            } catch(e) {}
+        }
+
+        function playKeySound(isBackspace) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                // Krótki, chrupiący dźwięk mechanicznej klawiatury bez opóźnień
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'square';
+                
+                if (isBackspace) {
+                    // Dźwięk kasowania (lekko grubszy, niższy ton)
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                    osc.start(audioCtx.currentTime);
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else {
+                    // Zwykłe pisanie (szybki, wyższy klik)
+                    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.03);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+                    osc.start(audioCtx.currentTime);
+                    osc.stop(audioCtx.currentTime + 0.03);
+                }
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
             } catch(e) {}
         }
 
@@ -707,9 +734,10 @@
 
             const t = active ? active.tagName.toLowerCase() : '';
             if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
-                // Reaguj tylko na znaki drukowalne, spację, enter i backspace
-                if(e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
-                    playSound('type');
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    playKeySound(true); // Osobny dźwięk dla kasowania
+                } else if(e.key.length === 1 || e.key === 'Enter') {
+                    playKeySound(false); // Idealnie zsynchronizowany dźwięk pisania
                 }
             }
         });
@@ -1083,7 +1111,6 @@
 
         // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
         function showDiploma(goalName) {
-            // USUNIĘTO DŹWIĘK PIECZĄTEK ZGODNIE Z DEKRETEM
             document.getElementById('diploma-goal').innerText = goalName;
             document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
             
