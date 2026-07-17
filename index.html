@@ -327,7 +327,6 @@
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
-                        <!-- Wyraźny napis widoczny na każdym urządzeniu -->
                         <span class="ml-1 sm:ml-2 text-[9px] sm:text-[10px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
                     </label>
 
@@ -683,26 +682,24 @@
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
         // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
-        // Wracamy do drewnianego stempla! Brak kontenerów z echem.
-        const audioStamp = new Audio('https://actions.google.com/sounds/v1/foley/wood_block_drop.ogg');
+        // Własna pieczątka Obywatelki prosto z GitHuba!
+        const audioStamp = new Audio('freesound_community-stamp-81635.mp3');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
+        // Prawdziwy, krótki dźwięk klawiatury
+        const audioKey = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
         
         audioStamp.preload = "auto";
         audioTrash.preload = "auto";
+        audioKey.preload = "auto";
         
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-
         let isKeyboardSoundEnabled = true;
 
         // BŁYSKAWICZNE ODBLOKOWANIE TAGÓW AUDIO NA TELEFONACH
         const unlockAudio = () => {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            // Te dwie linijki gwarantują, że dźwięki będą potem grały z 0 opóźnieniem
+            // Te funkcje gwarantują, że dźwięki będą potem grały z 0 opóźnieniem w przeglądarce mobilnej
             audioStamp.play().then(() => { audioStamp.pause(); audioStamp.currentTime = 0; }).catch(()=>{});
             audioTrash.play().then(() => { audioTrash.pause(); audioTrash.currentTime = 0; }).catch(()=>{});
+            audioKey.play().then(() => { audioKey.pause(); audioKey.currentTime = 0; }).catch(()=>{});
             
             document.removeEventListener('click', unlockAudio);
             document.removeEventListener('touchstart', unlockAudio);
@@ -723,7 +720,7 @@
             try {
                 if (type === 'stamp') {
                     audioStamp.currentTime = 0;
-                    audioStamp.volume = 0.45; // Wyciszone zgodnie z ustaleniami
+                    audioStamp.volume = 1.0; 
                     audioStamp.play().catch(()=>{});
                 } else if (type === 'trash') {
                     audioTrash.currentTime = 0;
@@ -733,50 +730,14 @@
             } catch(e) {}
         }
 
-        // DZIALA IDEALNIE - TEGO KODU NIE RUSZAMY
         function playKeySound() {
             if (!isKeyboardSoundEnabled) return; 
 
             try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const t = audioCtx.currentTime;
-                
-                const bufferSize = audioCtx.sampleRate * 0.02; 
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = 1200;
-                
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.5, t);
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
-                
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                const osc = audioCtx.createOscillator();
-                const oscGain = audioCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(300, t);
-                osc.frequency.exponentialRampToValueAtTime(80, t + 0.05);
-                oscGain.gain.setValueAtTime(0.08, t);
-                oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-                
-                osc.connect(oscGain);
-                oscGain.connect(audioCtx.destination);
-                
-                noise.start(t);
-                osc.start(t);
-                osc.stop(t + 0.05);
+                // Szybki, bezlitosny klon żeby się nie ścinało
+                const k = audioKey.cloneNode();
+                k.volume = 0.4; 
+                k.play().catch(()=>{});
             } catch(e) {}
         }
 
@@ -786,7 +747,7 @@
             if (active.id === 'task-input') return; // Cisza przy wpisywaniu czynu
             
             const t = active.tagName.toLowerCase();
-            const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(active.type)) 
+            const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(active.type.toLowerCase())) 
                                 || t === 'textarea' 
                                 || active.isContentEditable;
             
@@ -1161,8 +1122,7 @@
                     let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); 
                     t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; 
                     t.stampRotation = Math.floor(Math.random() * 20) - 10; 
-                    
-                    playSound('stamp'); // Dźwięk pieczątki
+                    playSound('stamp'); 
                 }
                 else { 
                     t.done = false; t.stamp = null; 
