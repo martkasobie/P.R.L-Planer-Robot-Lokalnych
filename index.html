@@ -522,14 +522,6 @@
                     <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer mb-4">
                         <img src="tablicanotatek.png" alt="Notatnik Archiwalny" class="w-full h-auto block">
                     </button>
-                    
-                    <!-- NOWA SEKCJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
-                    <h3 class="text-sm font-bold uppercase text-[#103090] mb-2 pl-2 border-l-4 border-[#103090]">BEZPIECZEŃSTWO DANYCH</h3>
-                    <div class="flex flex-row gap-2">
-                        <button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">⬇️ POBIERZ KOPIĘ</button>
-                        <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">⬆️ WGRAJ KOPIĘ</button>
-                        <input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)">
-                    </div>
                 </div>
 
                 <!-- PROTOKÓŁ SAMOKRYTYKI -->
@@ -537,18 +529,30 @@
                 <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
             </div>
 
-            <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI) -->
+            <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI, BEZPIECZEŃSTWO) -->
             <div class="lg:col-span-5 space-y-6 relative z-10">
                 <div class="bg-white/30 p-2 border border-gray-500 shadow-sm relative">
                     <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
                     <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2"><button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button><h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3><button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button></div>
                     <div id="calendar-grid" class="calendar-grid"></div>
                 </div>
+                
                 <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
                     <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2"><span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span><div class="flex gap-2"><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Inicjatywa Własna</span></label><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Przydział Centralny</span></label></div></div>
                     <div class="flex justify-between items-center bg-[#292524] text-[#e7e5e4] px-2 py-1 mb-3"><h3 class="text-xs font-bold uppercase">Pieczątki:</h3></div>
                     <div class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar transition-opacity duration-300" id="stamps-gallery"></div>
                     <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.</p>
+                </div>
+
+                <!-- NOWA LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
+                <div class="border-2 border-gray-500 p-4 bg-white/30 relative shadow-sm">
+                    <h3 class="text-sm font-bold uppercase text-[#103090] mb-2 pl-2 border-l-4 border-[#103090]">Bezpieczeństwo Danych</h3>
+                    <div class="flex flex-row gap-2">
+                        <button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">POBIERZ KOPIĘ</button>
+                        <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button>
+                        <input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)">
+                    </div>
+                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2 text-gray-700 italic">Ochrona państwowych akt to Twój obowiązek!</p>
                 </div>
             </div>
         </div>
@@ -654,7 +658,7 @@
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
         
-        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO (Zostało 20 sztuk)
+        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
