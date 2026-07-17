@@ -323,7 +323,7 @@
                 <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
                     <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
                     
-                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA (Zawsze widoczny napis) -->
+                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
@@ -693,18 +693,11 @@
 
         let isKeyboardSoundEnabled = true;
 
-        const unlockAudio = () => {
+        document.addEventListener('click', () => {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            audioStamp.play().then(() => { audioStamp.pause(); audioStamp.currentTime = 0; }).catch(()=>{});
-            audioTrash.play().then(() => { audioTrash.pause(); audioTrash.currentTime = 0; }).catch(()=>{});
-            
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
-        };
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio);
+        }, { once: true });
         
         function toggleKeyboardSound() {
             const cb = document.getElementById('keyboard-sound-toggle');
@@ -736,7 +729,7 @@
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const t = audioCtx.currentTime;
                 
-                const bufferSize = audioCtx.sampleRate * 0.02; 
+                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
@@ -782,7 +775,7 @@
             // OGRANICZENIE: Dźwięk działa TYLKO w Notatniku Archiwalnym
             const isNoteEditor = active.id === 'note-title-input' || 
                                  active.id === 'note-tags-input' || 
-                                 (active.hasAttribute && active.hasAttribute('contenteditable') && active.id === 'note-editor') ||
+                                 active.id === 'note-editor' || 
                                  active.closest('#note-editor');
             
             if (isNoteEditor) {
