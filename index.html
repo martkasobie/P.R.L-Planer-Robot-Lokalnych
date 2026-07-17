@@ -316,7 +316,7 @@
                 </ul>
             </div>
 
-            <!-- PANE 2: LISTA AKT (Z NOWYM PRZEŁĄCZNIKIEM) -->
+            <!-- PANE 2: LISTA AKT (Z PRZEŁĄCZNIKIEM DŹWIĘKU) -->
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
@@ -327,7 +327,8 @@
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
-                        <span class="ml-2 text-[9px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
+                        <!-- Wyraźny napis widoczny na każdym urządzeniu -->
+                        <span class="ml-1 sm:ml-2 text-[9px] sm:text-[10px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
                     </label>
 
                     <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm shrink-0">Zniszcz</button>
@@ -692,7 +693,24 @@
         audioTrash.preload = "auto";
         audioKey.preload = "auto";
         
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
         let isKeyboardSoundEnabled = true;
+
+        // ODBLOKOWANIE DŹWIĘKU NA iOS / ANDROID
+        const unlockAudio = () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            audioStamp.load();
+            audioTrash.load();
+            audioKey.load();
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        };
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
         
         function toggleKeyboardSound() {
             const cb = document.getElementById('keyboard-sound-toggle');
@@ -706,13 +724,13 @@
         function playSound(type) {
             try {
                 if (type === 'stamp') {
-                    const s = audioStamp.cloneNode();
-                    s.volume = 0.65; // Przyciszona o 15% (stempel drewniany)
-                    s.play().catch(()=>{});
+                    audioStamp.currentTime = 0;
+                    audioStamp.volume = 0.55; // Wyciszono
+                    audioStamp.play().catch(()=>{});
                 } else if (type === 'trash') {
-                    const s = audioTrash.cloneNode();
-                    s.volume = 0.8;
-                    s.play().catch(()=>{});
+                    audioTrash.currentTime = 0;
+                    audioTrash.volume = 0.8;
+                    audioTrash.play().catch(()=>{});
                 }
             } catch(e) {}
         }
@@ -721,6 +739,7 @@
             if (!isKeyboardSoundEnabled) return; 
 
             try {
+                // Szybki, bezlitosny klon żeby się nie ścinało
                 const k = audioKey.cloneNode();
                 k.volume = 0.4; 
                 k.play().catch(()=>{});
