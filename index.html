@@ -327,6 +327,7 @@
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
+                        <!-- Wyraźny napis widoczny na każdym urządzeniu -->
                         <span class="ml-1 sm:ml-2 text-[9px] sm:text-[10px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
                     </label>
 
@@ -682,22 +683,38 @@
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
         // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
-        const audioStamp = new Audio('freesound_community-stamp-81635.mp3');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
+        const audioKey = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
         
-        audioStamp.preload = "auto";
         audioTrash.preload = "auto";
+        audioKey.preload = "auto";
         
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
+        // Rozwiązanie bez lagu dla Pieczątki (Web Audio API z bezpośrednim ładowaniem do RAM)
+        let stampBuffer = null;
+        fetch('freesound_community-stamp-81635.mp3')
+            .then(res => res.arrayBuffer())
+            .then(data => audioCtx.decodeAudioData(data))
+            .then(buffer => { stampBuffer = buffer; })
+            .catch(e => console.log("Błąd ładowania dźwięku pieczątki:", e));
+
         let isKeyboardSoundEnabled = true;
 
-        document.addEventListener('click', () => {
+        // BŁYSKAWICZNE ODBLOKOWANIE TAGÓW AUDIO NA TELEFONACH
+        const unlockAudio = () => {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-        }, { once: true });
+            audioTrash.play().then(() => { audioTrash.pause(); audioTrash.currentTime = 0; }).catch(()=>{});
+            audioKey.play().then(() => { audioKey.pause(); audioKey.currentTime = 0; }).catch(()=>{});
+            
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        };
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
         
         function toggleKeyboardSound() {
             const cb = document.getElementById('keyboard-sound-toggle');
@@ -711,9 +728,16 @@
         function playSound(type) {
             try {
                 if (type === 'stamp') {
-                    audioStamp.currentTime = 0;
-                    audioStamp.volume = 1.0; 
-                    audioStamp.play().catch(()=>{});
+                    if (stampBuffer) {
+                        if (audioCtx.state === 'suspended') audioCtx.resume();
+                        const source = audioCtx.createBufferSource();
+                        source.buffer = stampBuffer;
+                        const gain = audioCtx.createGain();
+                        gain.gain.value = 0.7; // Ustawienie głośności
+                        source.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        source.start(0);
+                    }
                 } else if (type === 'trash') {
                     audioTrash.currentTime = 0;
                     audioTrash.volume = 0.8;
@@ -726,45 +750,9 @@
             if (!isKeyboardSoundEnabled) return; 
 
             try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const t = audioCtx.currentTime;
-                
-                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = 1200;
-                
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.5, t);
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
-                
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                const osc = audioCtx.createOscillator();
-                const oscGain = audioCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(300, t);
-                osc.frequency.exponentialRampToValueAtTime(80, t + 0.05);
-                oscGain.gain.setValueAtTime(0.08, t);
-                oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-                
-                osc.connect(oscGain);
-                oscGain.connect(audioCtx.destination);
-                
-                noise.start(t);
-                osc.start(t);
-                osc.stop(t + 0.05);
+                const k = audioKey.cloneNode();
+                k.volume = 0.4; 
+                k.play().catch(()=>{});
             } catch(e) {}
         }
 
