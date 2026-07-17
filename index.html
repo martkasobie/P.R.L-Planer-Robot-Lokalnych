@@ -674,29 +674,64 @@
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
-        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
-        const audioStamp = new Audio('https://actions.google.com/sounds/v1/foley/wood_block_drop.ogg');
-        const audioType = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
-        const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
-        
-        audioStamp.volume = 1.0;
-        audioType.volume = 0.3; // Maszyna ciut ciszej by nie ogłuszyć pracownika
-        audioTrash.volume = 0.8;
+        // --- SYSTEM DŹWIĘKOWY (Elektroniczny Syntetyzator Urzędowy) ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
 
         function playSound(type) {
             try {
-                let s;
-                if(type === 'stamp') s = audioStamp.cloneNode();
-                else if(type === 'type') s = audioType.cloneNode();
-                else if(type === 'trash') s = audioTrash.cloneNode();
-                
-                if(s) { 
-                    s.volume = (type === 'type') ? 0.3 : (type === 'stamp' ? 1.0 : 0.8); 
-                    s.play().catch(()=>{}); 
+                // Wymuszenie odblokowania dźwięku na urządzeniach mobilnych
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (type === 'type') {
+                    // Maszyna do pisania
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'stamp') {
+                    // Pieczątka
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'trash') {
+                    // Szum niszczarki papieru
+                    const bufferSize = audioCtx.sampleRate * 0.2;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                    noise.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    noise.start();
                 }
             } catch(e) {}
         }
 
+        // Nasłuchiwanie maszyny do pisania
         document.addEventListener('keydown', (e) => {
             const t = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
             if (t === 'input' || t === 'textarea' || (document.activeElement && document.activeElement.isContentEditable)) {
@@ -893,7 +928,12 @@
             setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200);
         }
 
-        function enterApp() { const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); }
+        function enterApp() { 
+            // Odblokuj dźwięk po pierwszym kliknięciu wejścia do aplikacji!
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); 
+        }
         
         async function init() {
             try { await loadState(); } catch(e) { console.error("Blad wczytywania bazy:", e); }
@@ -1125,7 +1165,6 @@
                 
                 saveState(); renderPlans(); closeModalUI('edit-goal-modal');
                 
-                // Odpal Dyplom, jeśli po edycji cel właśnie dobił do 100%!
                 if (!wasComplete && isComplete) {
                     setTimeout(() => showDiploma(n), 300);
                 }
@@ -1142,7 +1181,6 @@
                 
                 saveState(); renderPlans(); 
                 
-                // Odpal Dyplom, jeśli to właśnie to kliknięcie dało nam 100%!
                 if (!wasComplete && isComplete) {
                     showDiploma(g.text);
                 }
