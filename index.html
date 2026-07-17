@@ -677,6 +677,10 @@
         const audioStamp = new Audio('https://actions.google.com/sounds/v1/impacts/dumpster_door_hit.ogg');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
         
+        // Zmuszamy przeglądarkę do załadowania plików od razu, co likwiduje opóźnienie (lag)
+        audioStamp.preload = "auto";
+        audioTrash.preload = "auto";
+        
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
@@ -690,18 +694,19 @@
         function playSound(type) {
             try {
                 if (type === 'stamp') {
-                    const s = audioStamp.cloneNode();
-                    s.volume = 0.65; // Zmniejszono o kolejne 15% (było 0.8)
-                    s.play().catch(()=>{});
+                    // "Przewinięcie do zera" uderza natychmiast, bez czekania na sklonowanie elementu
+                    audioStamp.currentTime = 0;
+                    audioStamp.volume = 0.55; // Wyciszone o kolejne 10%
+                    audioStamp.play().catch(()=>{});
                 } else if (type === 'trash') {
-                    const s = audioTrash.cloneNode();
-                    s.volume = 0.8;
-                    s.play().catch(()=>{});
+                    audioTrash.currentTime = 0;
+                    audioTrash.volume = 0.8;
+                    audioTrash.play().catch(()=>{});
                 }
             } catch(e) {}
         }
 
-        function playKeySound(isBackspace) {
+        function playKeySound() {
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 
@@ -718,21 +723,34 @@
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 
-                // Filtr kształtujący dźwięk (wysoki klik dla liter, niższy dla kasowania)
+                // Filtr kształtujący dźwięk - JEDEN, GRUBSZY DŹWIĘK DLA WSZYSTKICH KLAWISZY
                 const filter = audioCtx.createBiquadFilter();
-                filter.type = isBackspace ? 'bandpass' : 'highpass';
-                filter.frequency.value = isBackspace ? 1200 : 3500;
+                filter.type = 'bandpass';
+                filter.frequency.value = 1200;
                 
                 const gain = audioCtx.createGain();
-                // GŁOŚNOŚĆ KLAWIATURY (0.4 dla liter, 0.6 dla backspace)
-                gain.gain.setValueAtTime(isBackspace ? 0.6 : 0.4, t);
+                gain.gain.setValueAtTime(0.6, t);
                 gain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
                 
                 noise.connect(filter);
                 filter.connect(gain);
                 gain.connect(audioCtx.destination);
                 
+                // Dodatkowy oscylator dla "mechanicznego" stuknięcia
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, t);
+                osc.frequency.exponentialRampToValueAtTime(80, t + 0.05);
+                oscGain.gain.setValueAtTime(0.08, t);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+                
                 noise.start(t);
+                osc.start(t);
+                osc.stop(t + 0.05);
             } catch(e) {}
         }
 
@@ -743,10 +761,9 @@
 
             const t = active ? active.tagName.toLowerCase() : '';
             if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
-                if (e.key === 'Backspace' || e.key === 'Delete') {
-                    playKeySound(true); // Osobny dźwięk dla kasowania
-                } else if(e.key.length === 1 || e.key === 'Enter') {
-                    playKeySound(false); // Idealnie zsynchronizowany dźwięk pisania
+                // Jeden spójny dźwięk dla wpisywania i kasowania
+                if (e.key === 'Backspace' || e.key === 'Delete' || e.key.length === 1 || e.key === 'Enter') {
+                    playKeySound(); 
                 }
             }
         });
@@ -1120,7 +1137,6 @@
 
         // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
         function showDiploma(goalName) {
-            // USUNIĘTO DŹWIĘK PIECZĄTEK ZGODNIE Z DEKRETEM
             document.getElementById('diploma-goal').innerText = goalName;
             document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
             
