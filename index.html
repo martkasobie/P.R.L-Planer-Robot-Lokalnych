@@ -323,11 +323,10 @@
                 <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
                     <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
                     
-                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
+                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA (Zawsze widoczny napis) -->
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
-                        <!-- Wyraźny napis widoczny na każdym urządzeniu -->
                         <span class="ml-1 sm:ml-2 text-[9px] sm:text-[10px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
                     </label>
 
@@ -683,34 +682,22 @@
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
         // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
-        // Stary dobry, drewniany urzędowy stempel bez pogłosu
         const audioStamp = new Audio('https://actions.google.com/sounds/v1/foley/wood_block_drop.ogg');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
-        // Prawdziwy, krótki dźwięk klawiatury
-        const audioKey = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
         
         audioStamp.preload = "auto";
         audioTrash.preload = "auto";
-        audioKey.preload = "auto";
         
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
         let isKeyboardSoundEnabled = true;
 
-        // ODBLOKOWANIE DŹWIĘKU NA iOS / ANDROID
-        const unlockAudio = () => {
+        document.addEventListener('click', () => {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            audioStamp.load();
-            audioTrash.load();
-            audioKey.load();
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
-        };
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio);
+        }, { once: true });
         
         function toggleKeyboardSound() {
             const cb = document.getElementById('keyboard-sound-toggle');
@@ -724,13 +711,13 @@
         function playSound(type) {
             try {
                 if (type === 'stamp') {
-                    audioStamp.currentTime = 0;
-                    audioStamp.volume = 0.55; // Wyciszono
-                    audioStamp.play().catch(()=>{});
+                    const s = audioStamp.cloneNode();
+                    s.volume = 0.45; // Ściszone zgodnie z poleceniem
+                    s.play().catch(()=>{});
                 } else if (type === 'trash') {
-                    audioTrash.currentTime = 0;
-                    audioTrash.volume = 0.8;
-                    audioTrash.play().catch(()=>{});
+                    const s = audioTrash.cloneNode();
+                    s.volume = 0.8;
+                    s.play().catch(()=>{});
                 }
             } catch(e) {}
         }
@@ -739,24 +726,58 @@
             if (!isKeyboardSoundEnabled) return; 
 
             try {
-                // Szybki, bezlitosny klon żeby się nie ścinało
-                const k = audioKey.cloneNode();
-                k.volume = 0.4; 
-                k.play().catch(()=>{});
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const t = audioCtx.currentTime;
+                
+                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1200;
+                
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
+                
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, t);
+                osc.frequency.exponentialRampToValueAtTime(80, t + 0.05);
+                oscGain.gain.setValueAtTime(0.08, t);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+                
+                noise.start(t);
+                osc.start(t);
+                osc.stop(t + 0.05);
             } catch(e) {}
         }
 
         // --- ZDARZENIE "INPUT" I "KEYDOWN" --- 
-        function checkAndPlayKeySound(active) {
-            if (!active) return;
-            if (active.id === 'task-input') return; // Cisza w Czynie Społecznym
+        function checkAndPlayKeySound(e) {
+            const target = e.target;
+            if (!target) return;
+            if (target.id === 'task-input') return; // Cisza w Czynie Społecznym
             
-            const t = active.tagName.toLowerCase();
-            
-            // Weryfikacja, czy to jest PRAWDZIWE pole tekstowe, a nie np. checkbox
-            const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(active.type.toLowerCase())) 
+            const t = target.tagName.toLowerCase();
+            const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(target.type.toLowerCase())) 
                                 || t === 'textarea' 
-                                || active.isContentEditable;
+                                || target.isContentEditable;
             
             if (isTextField) {
                 playKeySound(); 
@@ -764,13 +785,13 @@
         }
 
         document.addEventListener('input', (e) => {
-            checkAndPlayKeySound(document.activeElement);
+            checkAndPlayKeySound(e);
         });
 
         document.addEventListener('keydown', (e) => {
             if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
             if (e.key === 'Enter') {
-                checkAndPlayKeySound(document.activeElement);
+                checkAndPlayKeySound(e);
             }
         });
 
