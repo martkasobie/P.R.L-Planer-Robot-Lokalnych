@@ -1,7 +1,7 @@
 {
   "name": "P.R.L - Planer Robót Lokalnych",
   "short_name": "Planer P.R.L",
-  "start_url": "index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#262626",
   "theme_color": "#8c1c1c",
@@ -9,13 +9,7 @@
   "icons": [
     {
       "src": "icon-512.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
+      "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any"
     },
@@ -30,14 +24,26 @@
     {
       "name": "Nowa Notatka",
       "short_name": "Notatka",
-      "url": "index.html?akcja=nowanotatka",
-      "icons": [{ "src": "icon-512.png", "sizes": "192x192" }]
+      "url": "./?akcja=nowanotatka",
+      "icons": [
+        {
+          "src": "icon-512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Otwórz Kartotekę",
       "short_name": "Kartoteka",
-      "url": "index.html?akcja=kartoteka",
-      "icons": [{ "src": "icon-512.png", "sizes": "192x192" }]
+      "url": "./?akcja=kartoteka",
+      "icons": [
+        {
+          "src": "icon-512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
