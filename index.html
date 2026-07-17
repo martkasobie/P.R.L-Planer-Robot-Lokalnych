@@ -316,7 +316,7 @@
                 </ul>
             </div>
 
-            <!-- PANE 2: LISTA AKT (Z PRZEŁĄCZNIKIEM DŹWIĘKU) -->
+            <!-- PANE 2: LISTA AKT (Z NOWYM PRZEŁĄCZNIKIEM) -->
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
@@ -682,21 +682,26 @@
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
         // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
+        // Własna pieczątka Obywatelki prosto z GitHuba!
         const audioStamp = new Audio('freesound_community-stamp-81635.mp3');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
-        const audioKey = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
         
         audioStamp.preload = "auto";
         audioTrash.preload = "auto";
-        audioKey.preload = "auto";
+        
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
 
         let isKeyboardSoundEnabled = true;
 
         // BŁYSKAWICZNE ODBLOKOWANIE TAGÓW AUDIO NA TELEFONACH
         const unlockAudio = () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            // Odblokowanie plików audio na telefony
             audioStamp.play().then(() => { audioStamp.pause(); audioStamp.currentTime = 0; }).catch(()=>{});
             audioTrash.play().then(() => { audioTrash.pause(); audioTrash.currentTime = 0; }).catch(()=>{});
-            audioKey.play().then(() => { audioKey.pause(); audioKey.currentTime = 0; }).catch(()=>{});
             
             document.removeEventListener('click', unlockAudio);
             document.removeEventListener('touchstart', unlockAudio);
@@ -717,7 +722,7 @@
             try {
                 if (type === 'stamp') {
                     audioStamp.currentTime = 0;
-                    audioStamp.volume = 0.7; 
+                    audioStamp.volume = 1.0; 
                     audioStamp.play().catch(()=>{});
                 } else if (type === 'trash') {
                     audioTrash.currentTime = 0;
@@ -727,19 +732,57 @@
             } catch(e) {}
         }
 
+        // --- SYNTEZATOR KLAWIATURY (IDEALNY KOD) ---
         function playKeySound() {
             if (!isKeyboardSoundEnabled) return; 
+
             try {
-                const k = audioKey.cloneNode();
-                k.volume = 0.4; 
-                k.play().catch(()=>{});
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const t = audioCtx.currentTime;
+                
+                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1200;
+                
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
+                
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, t);
+                osc.frequency.exponentialRampToValueAtTime(80, t + 0.05);
+                oscGain.gain.setValueAtTime(0.08, t);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+                
+                noise.start(t);
+                osc.start(t);
+                osc.stop(t + 0.05);
             } catch(e) {}
         }
 
-        // --- ZDARZENIE "INPUT" I "KEYDOWN" --- 
+        // --- ZDARZENIE "INPUT" I "KEYDOWN" DLA NOTATNIKA --- 
         function checkAndPlayKeySound(active) {
             if (!active) return;
-            if (active.id === 'task-input') return; // Cisza w Czynie Społecznym
+            if (active.id === 'task-input') return; // Cisza przy wpisywaniu czynu
             
             const t = active.tagName.toLowerCase();
             const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(active.type.toLowerCase())) 
