@@ -1,4 +1,4 @@
-const SW_VERSION = 'v68'; // <--- Podbita wersja, wymuszamy aktualizację Magazynu!
+const SW_VERSION = 'v69'; // <--- Podbita wersja, wymuszamy aktualizację Magazynu!
 const CACHE_NAME = 'prl-magazyn-' + SW_VERSION;
 
 // Podstawowe akta, które muszą być na stałe w szufladzie
