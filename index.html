@@ -754,15 +754,27 @@
             } catch(e) {}
         }
 
-        // Nasłuchiwanie klawiszy we wszystkich formularzach
-        document.addEventListener('keydown', (e) => {
+        // --- NASŁUCHIWANIE KLAWIATURY NA TELEFONACH DOTYKOWYCH ---
+        // Zdarzenie 'input' przechwytuje każde fizyczne dodanie lub usunięcie tekstu,
+        // omijając problemy ze słownikami klawiatur dotykowych!
+        document.addEventListener('input', (e) => {
             const active = document.activeElement;
             if (active && active.id === 'task-input') return; // WYCISZENIE CZYNU SPOŁECZNEGO
-
+            
             const t = active ? active.tagName.toLowerCase() : '';
             if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
-                // Jeden spójny dźwięk dla wpisywania i kasowania
-                if (e.key === 'Backspace' || e.key === 'Delete' || e.key.length === 1 || e.key === 'Enter') {
+                playKeySound(); // Zawsze odpala ten sam dźwięk przy zmianie tekstu
+            }
+        });
+
+        // 'keydown' zachowujemy TYLKO dla czystego Entera (bo Enter nie zawsze uruchamia 'input')
+        document.addEventListener('keydown', (e) => {
+            const active = document.activeElement;
+            if (active && active.id === 'task-input') return; 
+            
+            const t = active ? active.tagName.toLowerCase() : '';
+            if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
+                if (e.key === 'Enter') {
                     playKeySound(); 
                 }
             }
