@@ -392,7 +392,6 @@
                 
                 <div class="flex justify-between items-end mt-4 font-['Special_Elite'] text-[10px]">
                     <div class="text-left"><span class="text-gray-500">Data nadania:</span><br><strong id="diploma-date" class="text-black"></strong></div>
-                    <!-- Pieczątka wygenerowana w czystym CSS -->
                     <div class="text-[#8c1c1c] rotate-[-15deg] font-bold border-[3px] border-dashed border-[#8c1c1c] rounded-full w-20 h-20 flex flex-col items-center justify-center text-[10px] shadow-[inset_0_0_8px_rgba(140,28,28,0.3)] opacity-90 z-10 leading-none">
                         <span class="text-[16px] mb-1">100%</span>
                         <span>NORMY</span>
@@ -674,67 +673,41 @@
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
-        // --- SYSTEM DŹWIĘKOWY (Elektroniczny Syntetyzator Urzędowy) ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
+        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy - Pliki Zewnętrzne) ---
+        const audioStamp = new Audio('https://actions.google.com/sounds/v1/impacts/dumpster_door_hit.ogg');
+        const audioType = new Audio('https://actions.google.com/sounds/v1/office/keyboard_typing_fast.ogg');
+        const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
+        
+        // Głośność
+        audioStamp.volume = 1.0;
+        audioType.volume = 0.8; 
+        audioTrash.volume = 0.8;
 
         function playSound(type) {
             try {
-                // Wymuszenie odblokowania dźwięku na urządzeniach mobilnych
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-
                 if (type === 'type') {
-                    // Maszyna do pisania
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.05);
+                    audioType.currentTime = 0;
+                    audioType.play().catch(()=>{});
                 } else if (type === 'stamp') {
-                    // Pieczątka
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.15);
-                    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.15);
+                    const s = audioStamp.cloneNode();
+                    s.volume = 1.0;
+                    s.play().catch(()=>{});
                 } else if (type === 'trash') {
-                    // Szum niszczarki papieru
-                    const bufferSize = audioCtx.sampleRate * 0.2;
-                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        data[i] = Math.random() * 2 - 1;
-                    }
-                    const noise = audioCtx.createBufferSource();
-                    noise.buffer = buffer;
-                    const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-                    noise.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    noise.start();
+                    const s = audioTrash.cloneNode();
+                    s.volume = 0.8;
+                    s.play().catch(()=>{});
                 }
             } catch(e) {}
         }
 
-        // Nasłuchiwanie maszyny do pisania
+        // Nasłuchiwanie klawiszy we wszystkich formularzach
         document.addEventListener('keydown', (e) => {
-            const t = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-            if (t === 'input' || t === 'textarea' || (document.activeElement && document.activeElement.isContentEditable)) {
+            const active = document.activeElement;
+            if (active && active.id === 'task-input') return; // WYCISZENIE CZYNU SPOŁECZNEGO
+
+            const t = active ? active.tagName.toLowerCase() : '';
+            if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
+                // Reaguj tylko na znaki drukowalne, spację, enter i backspace
                 if(e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
                     playSound('type');
                 }
@@ -929,9 +902,6 @@
         }
 
         function enterApp() { 
-            // Odblokuj dźwięk po pierwszym kliknięciu wejścia do aplikacji!
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            
             const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); 
         }
         
@@ -1113,9 +1083,7 @@
 
         // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
         function showDiploma(goalName) {
-            playSound('stamp');
-            setTimeout(() => playSound('stamp'), 400); // Drugie huknięcie pieczątki dla dramaturgii!
-            
+            // USUNIĘTO DŹWIĘK PIECZĄTEK ZGODNIE Z DEKRETEM
             document.getElementById('diploma-goal').innerText = goalName;
             document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
             
