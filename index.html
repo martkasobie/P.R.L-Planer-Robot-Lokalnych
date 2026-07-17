@@ -320,14 +320,14 @@
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
-                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-2">
+                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
                     <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
                     
-                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
+                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA (Zawsze widoczny napis) -->
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
-                        <span class="ml-2 text-[9px] text-gray-300 font-bold uppercase hidden sm:block">Dźwięk Klaw.</span>
+                        <span class="ml-1 sm:ml-2 text-[9px] text-gray-300 font-bold uppercase">DŹWIĘK</span>
                     </label>
 
                     <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm shrink-0">Zniszcz</button>
@@ -681,44 +681,39 @@
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
-        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy - Połączenie Systemów) ---
-        const audioStamp = new Audio('https://actions.google.com/sounds/v1/impacts/dumpster_door_hit.ogg');
+        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
+        // Stary dobry, drewniany urzędowy stempel bez pogłosu
+        const audioStamp = new Audio('https://actions.google.com/sounds/v1/foley/wood_block_drop.ogg');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
         
-        // Zmuszamy przeglądarkę do załadowania plików od razu, co likwiduje opóźnienie (lag)
         audioStamp.preload = "auto";
         audioTrash.preload = "auto";
         
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
-        // Zmienna do przełącznika dźwięku maszyny (domyślnie włączone)
         let isKeyboardSoundEnabled = true;
 
-        // Aby na 100% obudzić AudioContext na urządzeniach mobilnych
         document.addEventListener('click', () => {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
         }, { once: true });
         
-        // Funkcja do obsługi przełącznika w HTML
         function toggleKeyboardSound() {
             const cb = document.getElementById('keyboard-sound-toggle');
             if (cb) {
                 isKeyboardSoundEnabled = cb.checked;
                 state.keyboardSound = isKeyboardSoundEnabled;
                 saveState();
-                if (isKeyboardSoundEnabled) playKeySound(); // Krótki dźwięk testowy
             }
         }
 
         function playSound(type) {
             try {
                 if (type === 'stamp') {
-                    // "Przewinięcie do zera" uderza natychmiast, bez czekania na sklonowanie elementu
                     audioStamp.currentTime = 0;
-                    audioStamp.volume = 0.5; // Zmniejszono o kolejne ~10-15% 
+                    audioStamp.volume = 1.0; 
                     audioStamp.play().catch(()=>{});
                 } else if (type === 'trash') {
                     audioTrash.currentTime = 0;
@@ -729,14 +724,13 @@
         }
 
         function playKeySound() {
-            if (!isKeyboardSoundEnabled) return; // Jeśli przełącznik jest wyłączony, nie graj
+            if (!isKeyboardSoundEnabled) return; 
 
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const t = audioCtx.currentTime;
                 
-                // Tworzymy krótki strzał białego szumu (imitacja uderzenia plastiku)
-                const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
+                const bufferSize = audioCtx.sampleRate * 0.02; 
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
@@ -746,7 +740,6 @@
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 
-                // Filtr kształtujący dźwięk - JEDEN DŹWIĘK DLA WSZYSTKICH KLAWISZY
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'bandpass';
                 filter.frequency.value = 1200;
@@ -759,7 +752,6 @@
                 filter.connect(gain);
                 gain.connect(audioCtx.destination);
                 
-                // Dodatkowy oscylator dla "mechanicznego" stuknięcia
                 const osc = audioCtx.createOscillator();
                 const oscGain = audioCtx.createGain();
                 osc.type = 'square';
@@ -777,33 +769,30 @@
             } catch(e) {}
         }
 
-        // --- ZDARZENIE "INPUT" --- 
-        // Reaguje na KAŻDE wpisanie/skasowanie litery na nowoczesnych klawiaturach dotykowych
-        document.addEventListener('input', (e) => {
-            const active = document.activeElement;
-            if (active && active.id === 'task-input') return; // WYCISZENIE CZYNU SPOŁECZNEGO
+        // --- ZDARZENIE "INPUT" I "KEYDOWN" --- 
+        function checkAndPlayKeySound(active) {
+            if (!active) return;
+            if (active.id === 'task-input') return; 
             
-            const t = active ? active.tagName.toLowerCase() : '';
-            if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
+            const t = active.tagName.toLowerCase();
+            // Sprawdzamy czy element to prawdziwe pole tekstowe (omijamy checkboxy i radyjka)
+            const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(active.type)) 
+                                || t === 'textarea' 
+                                || active.isContentEditable;
+            
+            if (isTextField) {
                 playKeySound(); 
             }
+        }
+
+        document.addEventListener('input', (e) => {
+            checkAndPlayKeySound(document.activeElement);
         });
 
-        // --- ZDARZENIE "KEYDOWN" --- 
-        // Łapie czyste klawisze fizyczne (jak Enter na klawiaturze komputera)
         document.addEventListener('keydown', (e) => {
-            const active = document.activeElement;
-            if (active && active.id === 'task-input') return; 
-            
-            const t = active ? active.tagName.toLowerCase() : '';
-            if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
-                // Ignorujemy klawisze funkcyjne (żeby nie pikało przy wciskaniu samego Shift czy Alt)
-                if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
-                
-                // Jeśli klawisz to czysty Enter, odpalamy dźwięk (bo Enter nie zawsze odpala 'input')
-                if (e.key === 'Enter') {
-                    playKeySound(); 
-                }
+            if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
+            if (e.key === 'Enter') {
+                checkAndPlayKeySound(document.activeElement);
             }
         });
 
@@ -1162,12 +1151,11 @@
                     let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); 
                     t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; 
                     t.stampRotation = Math.floor(Math.random() * 20) - 10; 
-                    // DŹWIĘK PRZY ZAZNACZANIU
-                    playSound('stamp');
+                    playSound('stamp'); 
                 }
                 else { 
                     t.done = false; t.stamp = null; 
-                    // CISZA PRZY ODZNACZANIU (usunąłem playSound)
+                    // Brak dźwięku przy odznaczaniu
                 }
                 saveState(); renderTasks();
             }
