@@ -327,7 +327,7 @@
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
-                        <span class="ml-2 text-[9px] text-gray-300 font-bold uppercase hidden sm:block">Dźwięk</span>
+                        <span class="ml-2 text-[9px] text-gray-300 font-bold uppercase hidden sm:block">Dźwięk Klaw.</span>
                     </label>
 
                     <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm shrink-0">Zniszcz</button>
@@ -781,7 +781,7 @@
         // Reaguje na KAŻDE wpisanie/skasowanie litery na nowoczesnych klawiaturach dotykowych
         document.addEventListener('input', (e) => {
             const active = document.activeElement;
-            if (active && active.id === 'task-input') return; // Cisza przy Czynie Społecznym
+            if (active && active.id === 'task-input') return; // WYCISZENIE CZYNU SPOŁECZNEGO
             
             const t = active ? active.tagName.toLowerCase() : '';
             if (t === 'input' || t === 'textarea' || (active && active.isContentEditable)) {
@@ -1162,9 +1162,13 @@
                     let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); 
                     t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; 
                     t.stampRotation = Math.floor(Math.random() * 20) - 10; 
-                    // DEKRET: USUNIĘTO DŹWIĘK PIECZĄTKI Z CZYNU SPOŁECZNEGO
+                    // DŹWIĘK PRZY ZAZNACZANIU
+                    playSound('stamp');
                 }
-                else { t.done = false; t.stamp = null; }
+                else { 
+                    t.done = false; t.stamp = null; 
+                    // CISZA PRZY ODZNACZANIU (usunąłem playSound)
+                }
                 saveState(); renderTasks();
             }
         }
