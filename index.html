@@ -323,7 +323,7 @@
                 <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
                     <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
                     
-                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
+                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA (Zawsze widoczny napis) -->
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
@@ -682,21 +682,18 @@
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
         // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
-        // Własna pieczątka Obywatelki prosto z GitHuba!
         const audioStamp = new Audio('freesound_community-stamp-81635.mp3');
         const audioTrash = new Audio('https://actions.google.com/sounds/v1/foley/paper_crumple.ogg');
-        // Prawdziwy, krótki dźwięk klawiatury
         const audioKey = new Audio('https://actions.google.com/sounds/v1/office/typewriter_single_key.ogg');
         
         audioStamp.preload = "auto";
         audioTrash.preload = "auto";
         audioKey.preload = "auto";
-        
+
         let isKeyboardSoundEnabled = true;
 
         // BŁYSKAWICZNE ODBLOKOWANIE TAGÓW AUDIO NA TELEFONACH
         const unlockAudio = () => {
-            // Te funkcje gwarantują, że dźwięki będą potem grały z 0 opóźnieniem w przeglądarce mobilnej
             audioStamp.play().then(() => { audioStamp.pause(); audioStamp.currentTime = 0; }).catch(()=>{});
             audioTrash.play().then(() => { audioTrash.pause(); audioTrash.currentTime = 0; }).catch(()=>{});
             audioKey.play().then(() => { audioKey.pause(); audioKey.currentTime = 0; }).catch(()=>{});
@@ -720,7 +717,7 @@
             try {
                 if (type === 'stamp') {
                     audioStamp.currentTime = 0;
-                    audioStamp.volume = 1.0; 
+                    audioStamp.volume = 0.7; 
                     audioStamp.play().catch(()=>{});
                 } else if (type === 'trash') {
                     audioTrash.currentTime = 0;
@@ -732,9 +729,7 @@
 
         function playKeySound() {
             if (!isKeyboardSoundEnabled) return; 
-
             try {
-                // Szybki, bezlitosny klon żeby się nie ścinało
                 const k = audioKey.cloneNode();
                 k.volume = 0.4; 
                 k.play().catch(()=>{});
@@ -744,7 +739,7 @@
         // --- ZDARZENIE "INPUT" I "KEYDOWN" --- 
         function checkAndPlayKeySound(active) {
             if (!active) return;
-            if (active.id === 'task-input') return; // Cisza przy wpisywaniu czynu
+            if (active.id === 'task-input') return; // Cisza w Czynie Społecznym
             
             const t = active.tagName.toLowerCase();
             const isTextField = (t === 'input' && !['checkbox', 'radio', 'file', 'color', 'submit', 'button'].includes(active.type.toLowerCase())) 
