@@ -323,9 +323,17 @@
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
-                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0">
-                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span>
-                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm">Zniszcz</button>
+                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
+                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
+                    
+                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
+                    <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
+                        <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
+                        <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
+                        <span class="ml-1 sm:ml-2 text-[9px] sm:text-[10px] text-gray-300 font-bold uppercase whitespace-nowrap">DŹWIĘK KLAW.</span>
+                    </label>
+
+                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm shrink-0">Zniszcz</button>
                 </div>
                 
                 <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0">
@@ -403,14 +411,14 @@
                 <!-- 2. OBYWATEL (Wyśrodkowany pod tekstem "nadaje się obywatelce/obywatelowi:") -->
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#8c1c1c] font-['Special_Elite'] font-bold text-2xl sm:text-3xl md:text-4xl" style="top: 71%;"></div>
                 
-                <!-- 3. DATA NADANIA (Opuszczone na 16% od dołu obrazka) -->
-                <div class="absolute text-left text-[#1a1a1a] font-['Special_Elite']" style="bottom: 16%; left: 10%;">
+                <!-- 3. DATA NADANIA (Opuszczone na 15% od dołu obrazka) -->
+                <div class="absolute text-left text-[#1a1a1a] font-['Special_Elite']" style="bottom: 15%; left: 10%;">
                     <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
                     <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
                 </div>
                 
-                <!-- 4. Z RAMIENIA P.R.L (Opuszczone na 16% od dołu obrazka) -->
-                <div class="absolute text-right text-[#1a1a1a] font-['Special_Elite']" style="bottom: 16%; right: 10%;">
+                <!-- 4. Z RAMIENIA P.R.L (Opuszczone na 15% od dołu obrazka) -->
+                <div class="absolute text-right text-[#1a1a1a] font-['Special_Elite']" style="bottom: 15%; right: 10%;">
                     <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Z ramienia:</span>
                     <strong class="text-xs sm:text-sm md:text-base leading-tight block">P.R.L<br>Planer Robót Lokalnych</strong>
                 </div>
@@ -754,7 +762,7 @@
                         const source = audioCtx.createBufferSource();
                         source.buffer = stampBuffer;
                         const gain = audioCtx.createGain();
-                        gain.gain.value = 0.7; // Głośność pieczątki
+                        gain.gain.value = 0.7; // Ustawienie głośności
                         source.connect(gain);
                         gain.connect(audioCtx.destination);
                         source.start(0);
