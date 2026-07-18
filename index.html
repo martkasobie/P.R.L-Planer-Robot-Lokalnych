@@ -326,7 +326,7 @@
                 <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
                     <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
                     
-                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA -->
+                    <!-- PRZEŁĄCZNIK DŹWIĘKU MASZYNY DO PISANIA (Zawsze widoczny napis) -->
                     <label class="relative inline-flex items-center cursor-pointer ml-auto mr-1" title="Włącz/Wyłącz dźwięk klawiatury">
                         <input type="checkbox" id="keyboard-sound-toggle" class="sr-only peer" onchange="toggleKeyboardSound()">
                         <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#8c1c1c]"></div>
@@ -409,7 +409,7 @@
                 <div id="diploma-goal" class="absolute w-[80%] text-center left-1/2 -translate-x-1/2 text-[#103090] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
                 
                 <!-- 2. OBYWATEL (Wyśrodkowany pod tekstem "nadaje się obywatelce/obywatelowi:") -->
-                <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#8c1c1c] font-['Special_Elite'] font-bold text-2xl sm:text-3xl md:text-4xl" style="top: 71%;"></div>
+                <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#8c1c1c] font-['Special_Elite'] font-bold text-2xl sm:text-3xl md:text-4xl" style="top: 69.5%;"></div>
                 
                 <!-- 3. DATA NADANIA (Opuszczone na 15% od dołu obrazka) -->
                 <div class="absolute text-left text-[#1a1a1a] font-['Special_Elite']" style="bottom: 15%; left: 10%;">
@@ -762,7 +762,7 @@
                         const source = audioCtx.createBufferSource();
                         source.buffer = stampBuffer;
                         const gain = audioCtx.createGain();
-                        gain.gain.value = 0.7; // Ustawienie głośności
+                        gain.gain.value = 0.7; // Głośność pieczątki
                         source.connect(gain);
                         gain.connect(audioCtx.destination);
                         source.start(0);
