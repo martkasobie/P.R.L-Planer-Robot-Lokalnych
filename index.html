@@ -381,25 +381,35 @@
 
     <!-- NOWY: DYPLOM PRZODOWNIKA PRACY -->
     <div id="diploma-modal" class="app-modal-overlay">
-        <div class="app-modal-window" style="max-width: 95%; width: 420px; background-color: #f5eedc; border: 8px double #8c1c1c; padding: 15px; transform: rotate(-1deg); box-shadow: 15px 15px 30px rgba(0,0,0,0.8);">
-            <div style="border: 2px solid #8c1c1c; padding: 20px; position: relative; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 2px, transparent 2px, transparent 4px);">
-                <h2 style="font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: #8c1c1c; margin-bottom: 5px; line-height: 1.1; text-transform: uppercase;">DYPLOM<br><span style="font-size: 1.2rem; color: #1a1a1a;">PRZODOWNIKA PRACY</span></h2>
-                <div style="width: 50px; height: 2px; background-color: #1a1a1a; margin: 10px auto;"></div>
-                <p style="font-family: 'Special Elite', cursive; font-size: 0.8rem; margin-bottom: 15px; color: #333;">Za wybitne osiągnięcia, niezłomny hart ducha oraz wykonanie normy 100% w realizacji celu:</p>
-                <h3 id="diploma-goal" style="font-family: 'Courier Prime', monospace; font-size: 1.2rem; font-weight: bold; color: #103090; margin-bottom: 15px; border-bottom: 2px dashed #103090; display: inline-block; padding-bottom: 5px;"></h3>
-                <p style="font-family: 'Special Elite', cursive; font-size: 0.8rem; margin-bottom: 10px; color: #333;">Niniejszy dyplom nadaje się Obywatelowi/Obywatelce:</p>
-                <h2 id="diploma-citizen" style="font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #1a1a1a; margin-bottom: 20px; text-transform: uppercase;"></h2>
+        <!-- Zmieniony kontener: usunięto tło, dodano przezroczystość, by obrazek dyplomu robił całą robotę -->
+        <div class="app-modal-window p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center" style="transform: rotate(-1deg);">
+            
+            <!-- Kontener na grafikę i teksty -->
+            <div class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)]">
+                <!-- Twoja grafika w tle -->
+                <img src="diplomprl.jpg" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
                 
-                <div class="flex justify-between items-end mt-4 font-['Special_Elite'] text-[10px]">
-                    <div class="text-left"><span class="text-gray-500">Data nadania:</span><br><strong id="diploma-date" class="text-black"></strong></div>
-                    <div class="text-[#8c1c1c] rotate-[-15deg] font-bold border-[3px] border-dashed border-[#8c1c1c] rounded-full w-20 h-20 flex flex-col items-center justify-center text-[10px] shadow-[inset_0_0_8px_rgba(140,28,28,0.3)] opacity-90 z-10 leading-none">
-                        <span class="text-[16px] mb-1">100%</span>
-                        <span>NORMY</span>
-                    </div>
-                    <div class="text-right"><span class="text-gray-500">Z ramienia:</span><br><strong class="text-black">Centrali P.R.L</strong></div>
+                <!-- 1. CEL (Wyśrodkowany pod tekstem "w realizacji celu:") -->
+                <div id="diploma-goal" class="absolute w-[80%] text-center left-1/2 -translate-x-1/2 text-[#103090] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
+                
+                <!-- 2. OBYWATEL (Wyśrodkowany pod tekstem "nadaje się obywatelce/obywatelowi:") -->
+                <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#8c1c1c] font-['Special_Elite'] font-bold text-2xl sm:text-3xl md:text-4xl" style="top: 71%;"></div>
+                
+                <!-- 3. DATA NADANIA (Lewy dolny róg) -->
+                <div class="absolute text-left text-[#1a1a1a] font-['Special_Elite']" style="bottom: 8%; left: 10%;">
+                    <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
+                    <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
+                </div>
+                
+                <!-- 4. Z RAMIENIA P.R.L (Prawy dolny róg) -->
+                <div class="absolute text-right text-[#1a1a1a] font-['Special_Elite']" style="bottom: 8%; right: 10%;">
+                    <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Z ramienia:</span>
+                    <strong class="text-xs sm:text-sm md:text-base leading-tight block">P.R.L<br>Planer Robót Lokalnych</strong>
                 </div>
             </div>
-            <button onclick="closeModalUI('diploma-modal')" class="w-full mt-4 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">KU CHWALE OJCZYZNY! (ZAMKNIJ)</button>
+
+            <!-- Przycisk zamykania pod dyplomem -->
+            <button onclick="closeModalUI('diploma-modal')" class="w-full mt-6 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">ZAMKNIJ</button>
         </div>
     </div>
     
