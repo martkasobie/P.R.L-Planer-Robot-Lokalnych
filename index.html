@@ -123,18 +123,20 @@
         }
         .quote-banner:active { transform: scale(0.99); }
 
+        /* Ulepszona siatka i zaznaczenie weekendu */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; }
         .calendar-cell {
             aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2);
             position: relative; cursor: pointer; display: flex; flex-direction: column; padding: 1px; overflow: hidden;
             transition: background 0.1s;
         }
-        .calendar-cell.today { background-color: #fca5a5; border: 2px solid #8c1c1c; }
+        .calendar-cell.weekend { background-color: rgba(140, 28, 28, 0.08) !important; color: #631212; }
+        .calendar-cell.today { background-color: #fca5a5 !important; border: 2px solid #8c1c1c; }
         .calendar-cell.active { background-color: #bfdbfe; }
-        .calendar-cell.empty { background-color: transparent; border: none; cursor: default; pointer-events: none; }
+        .calendar-cell.empty { background-color: transparent !important; border: none; cursor: default; pointer-events: none; }
         
         .cal-header { text-align: center; font-weight: bold; background-color: #a8a29e; padding: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; color: #1c1917; }
-        .cal-event-text { font-size: 0.6rem; line-height: 1; word-break: break-word; flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: #1e3a8a; font-weight: bold; background-color: rgba(255, 255, 255, 0.7); margin-top: 1px; padding: 1px; }
+        .cal-event-text { font-size: 0.55rem; line-height: 1; word-break: break-word; text-align: center; color: #1e3a8a; font-weight: bold; background-color: rgba(255, 255, 255, 0.8); margin-top: 1px; padding: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .event-marker { width: 6px; height: 6px; background-color: #8c1c1c; border-radius: 50%; position: absolute; top: 2px; right: 2px; z-index: 5; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
 
         .wire-clip-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 60px; height: 80px; z-index: 20; pointer-events: none; }
@@ -144,7 +146,7 @@
 
         .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
         .app-modal-overlay.active { display: flex !important; }
-        #alert-modal, #confirm-modal, #diploma-modal { z-index: 100000; }
+        #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
         
         .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg); }
 
@@ -323,9 +325,9 @@
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 
-                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0">
-                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span>
-                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm ml-auto">Zniszcz</button>
+                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0 gap-1 sm:gap-2">
+                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase shrink-0">Spis Treści</span>
+                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm shrink-0 ml-auto">Zniszcz</button>
                 </div>
                 
                 <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0">
@@ -382,6 +384,23 @@
     
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
 
+    <!-- SZYBKI SKOK DO DATY W KALENDARZU (NOWE) -->
+    <div id="jump-date-modal" class="app-modal-overlay">
+        <div class="app-modal-window">
+            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3>
+            <div class="flex gap-2 mb-6">
+                <select id="jump-month" class="w-2/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner cursor-pointer">
+                    <option value="0">Styczeń</option><option value="1">Luty</option><option value="2">Marzec</option><option value="3">Kwiecień</option><option value="4">Maj</option><option value="5">Czerwiec</option><option value="6">Lipiec</option><option value="7">Sierpień</option><option value="8">Wrzesień</option><option value="9">Październik</option><option value="10">Listopad</option><option value="11">Grudzień</option>
+                </select>
+                <input type="number" id="jump-year" class="w-1/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center" value="2024">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button>
+                <button onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#103090] text-white font-bold uppercase hover:bg-blue-800 active:bg-blue-800 transition text-xs">Przenieś</button>
+            </div>
+        </div>
+    </div>
+
     <!-- NOWY: DYPLOM PRZODOWNIKA PRACY (Własna Grafika z Zapisem) -->
     <!-- DODANO ULEPSZONĄ RESPONSYWNOŚĆ, BY MOŻNA BYŁO PRZEWIJAĆ EKRAN I KLIKNĄĆ "ZAMKNIJ" -->
     <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding: 2rem 0;">
@@ -422,22 +441,29 @@
     
     <div id="event-modal" class="app-modal-overlay">
         <div class="app-modal-window">
-            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIE / NOTATKA</h3>
+            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3>
             <p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p>
-            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Treść zgłoszenia:</label>
-            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-4 outline-none text-lg shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="4" placeholder="Np. Urodziny Partii"></textarea>
+            
+            <!-- NOWE: LISTA ISTNIEJĄCYCH ZGŁOSZEŃ -->
+            <div id="existing-events-container" class="mb-4 max-h-32 overflow-y-auto custom-scrollbar border border-gray-400 bg-white/50 text-left p-1 hidden">
+                <ul id="existing-events-list" class="space-y-1"></ul>
+            </div>
+
+            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nowe zgłoszenie:</label>
+            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="2" placeholder="Treść zadania..."></textarea>
+            
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label>
-            <select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-6 outline-none text-sm shadow-inner cursor-pointer">
+            <select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-1 font-mono mb-4 outline-none text-xs shadow-inner cursor-pointer">
                 <option value="none">Nie powtarza się</option>
                 <option value="daily">Codziennie</option>
                 <option value="weekly">Co tydzień</option>
                 <option value="monthly">Co miesiąc</option>
                 <option value="yearly">Co rok</option>
             </select>
+            
             <div class="flex gap-2">
-                <button onclick="deleteEvent()" id="btn-delete-event" class="px-3 py-2 border-2 border-[#8c1c1c] text-[#8c1c1c] font-bold uppercase hover:bg-red-100 active:bg-red-100 transition hidden" title="Usuń"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
-                <button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
-                <button onclick="saveEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zapisz</button>
+                <button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Zamknij</button>
+                <button onclick="saveNewEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dodaj</button>
             </div>
         </div>
     </div>
@@ -572,10 +598,18 @@
 
             <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI, BEZPIECZEŃSTWO) -->
             <div class="lg:col-span-5 space-y-6 relative z-10">
-                <div class="bg-white/30 p-2 border border-gray-500 shadow-sm relative">
+                
+                <!-- NOWOŚĆ: Kalendarz obsługujący Swipe (Przesunięcie) w Strefie SwipeZone -->
+                <div id="calendar-swipe-zone" class="bg-white/30 p-2 border border-gray-500 shadow-sm relative touch-pan-y">
                     <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
-                    <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2"><button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button><h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3><button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button></div>
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2">
+                        <button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button>
+                        <!-- NOWOŚĆ: Klikalny nagłówek dla szybkiego wyboru miesiąca -->
+                        <h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs cursor-pointer hover:bg-gray-400 active:bg-gray-400 px-2 py-1 rounded transition" onclick="openJumpDateModal()" title="Zmień miesiąc/rok"></h3>
+                        <button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button>
+                    </div>
                     <div id="calendar-grid" class="calendar-grid"></div>
+                    <p class="text-[8px] text-center mt-2 text-gray-600 uppercase">Wskazówka: Możesz przewijać miesiące palcem ↔</p>
                 </div>
                 
                 <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
@@ -702,12 +736,9 @@
                 scale: 2, 
                 useCORS: true, 
                 backgroundColor: null,
-                scrollY: 0 // Gwarantuje prawidłowe zapisywanie po przewinięciu okna
+                scrollY: 0 
             }).then(canvas => {
-                // Pokazujemy przycisk z powrotem
                 if(btn) btn.style.display = 'flex';
-                
-                // Pobieranie obrazka
                 const link = document.createElement('a');
                 link.download = `Dyplom_Przodownika_${state.citizenName ? state.citizenName.replace(/\s+/g, '_') : 'Obywatel'}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -748,7 +779,7 @@
                         const source = audioCtx.createBufferSource();
                         source.buffer = stampBuffer;
                         const gain = audioCtx.createGain();
-                        gain.gain.value = 0.7; // Głośność pieczątki
+                        gain.gain.value = 0.7; // Ustawienie głośności
                         source.connect(gain);
                         gain.connect(audioCtx.destination);
                         source.start(0);
@@ -915,7 +946,10 @@
             reader.readAsText(file);
         }
 
-        // --- START APLIKACJI Z OBSŁUGĄ WIDŻETU (SKRÓTU) ---
+        // --- START APLIKACJI Z OBSŁUGĄ WIDŻETU I SWIPE ---
+        let touchstartX = 0;
+        let touchendX = 0;
+
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const akcja = urlParams.get('akcja');
@@ -933,7 +967,24 @@
                 initSplashScreen();
                 init();
             }
+
+            // GESTY SWIPE DLA KALENDARZA
+            const swipeZone = document.getElementById('calendar-swipe-zone');
+            if(swipeZone) {
+                swipeZone.addEventListener('touchstart', e => {
+                    touchstartX = e.changedTouches[0].screenX;
+                }, {passive: true});
+                swipeZone.addEventListener('touchend', e => {
+                    touchendX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, {passive: true});
+            }
         });
+
+        function handleSwipe() {
+            if (touchendX < touchstartX - 40) changeMonth(1); 
+            if (touchendX > touchstartX + 40) changeMonth(-1);
+        }
 
         function initSplashScreen() {
             const bar = document.getElementById('splash-progress'), status = document.getElementById('splash-status'), loading = document.getElementById('loading-container'), start = document.getElementById('start-container');
@@ -956,6 +1007,17 @@
             if (!state.events) state.events = {};
             if (!state.tasks) state.tasks = [];
             if (!state.plans) state.plans = [];
+
+            // MIGRACJA WYDARZEŃ DO TABLIC (aby dni mogły mieć więcej niż 1 zdarzenie)
+            for (let k in state.events) {
+                if (!Array.isArray(state.events[k])) {
+                    state.events[k] = [{
+                        id: Date.now() + Math.random(),
+                        text: state.events[k].text,
+                        recurrence: state.events[k].recurrence || 'none'
+                    }];
+                }
+            }
 
             state.viewDate = new Date(); 
             
@@ -1266,42 +1328,143 @@
             renderCalendar(); 
             if(document.activeElement) document.activeElement.blur();
         }
-        function getEventForDate(d, m, y) {
-            if (!state.events) return null;
+        
+        // NOWE: Funkcje do szybkiego przydziału czasu (Nawigacja Pięcioletnia)
+        function openJumpDateModal() {
+            const d = state.viewDate || new Date();
+            document.getElementById('jump-month').value = d.getMonth();
+            document.getElementById('jump-year').value = d.getFullYear();
+            openModalUI('jump-date-modal');
+        }
+        function executeJumpDate() {
+            const m = parseInt(document.getElementById('jump-month').value);
+            const y = parseInt(document.getElementById('jump-year').value);
+            const d = state.viewDate || new Date();
+            d.setMonth(m);
+            d.setFullYear(y);
+            state.viewDate = d;
+            renderCalendar();
+            closeModalUI('jump-date-modal');
+        }
+
+        // Zmieniona funkcja: teraz zwraca tablicę (wiele wydarzeń dla jednego dnia)
+        function getEventsForDate(d, m, y) {
+            if (!state.events) return [];
             const cur = new Date(y, m - 1, d);
+            let dayEvents = [];
             for (let k in state.events) {
-                const e = state.events[k];
-                if (!e) continue;
+                const evList = state.events[k];
+                if (!Array.isArray(evList)) continue;
                 const parts = k.split('-');
                 if (parts.length !== 3) continue;
                 const [aD, aM, aY] = parts.map(Number), anc = new Date(aY, aM - 1, aD);
-                if (cur < anc) continue;
-                const r = e.recurrence || 'none';
-                if ((r === 'none' && d === aD && m === aM && y === aY) || r === 'daily' || (r === 'weekly' && cur.getDay() === anc.getDay()) || (r === 'monthly' && cur.getDate() === anc.getDate()) || (r === 'yearly' && cur.getDate() === anc.getDate() && cur.getMonth() === anc.getMonth())) return { text: e.text, sourceKey: k };
+                if (cur < anc) continue; 
+                
+                evList.forEach(e => {
+                    const r = e.recurrence || 'none';
+                    if ((r === 'none' && d === aD && m === aM && y === aY) || 
+                        r === 'daily' || 
+                        (r === 'weekly' && cur.getDay() === anc.getDay()) || 
+                        (r === 'monthly' && cur.getDate() === anc.getDate()) || 
+                        (r === 'yearly' && cur.getDate() === anc.getDate() && cur.getMonth() === anc.getMonth())) {
+                        dayEvents.push({ ...e, sourceKey: k });
+                    }
+                });
             }
-            return null;
+            return dayEvents;
         }
+
         function renderCalendar() {
             const g = document.getElementById('calendar-grid'); if (!g) return; g.innerHTML = '';
             const d = state.viewDate || new Date(), y = d.getFullYear(), m = d.getMonth(), months = ["STYCZEŃ", "LUTY", "MARZEC", "KWIECIEŃ", "MAJ", "CZERWIEC", "LIPIEC", "SIERPIEŃ", "WRZESIEŃ", "PAŹDZIERNIK", "LISTOPAD", "GRUDZIEŃ"], hdr = document.getElementById('calendar-month-year');
             if(hdr) hdr.innerText = `${months[m]} ${y}`;
             ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; g.appendChild(el); });
             const first = new Date(y, m, 1).getDay(), off = first === 0 ? 6 : first - 1, days = new Date(y, m + 1, 0).getDate(), today = new Date();
+            
             for(let i=0; i<off; i++) g.appendChild(Object.assign(document.createElement('div'), {className: "calendar-cell empty"}));
+            
             for(let i=1; i<=days; i++) {
-                const evData = getEventForDate(i, m + 1, y), isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear()), c = document.createElement('div'); c.className = `calendar-cell ${isT ? 'today' : ''}`;
+                const evs = getEventsForDate(i, m + 1, y);
+                const isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear());
+                const isWknd = (new Date(y, m, i).getDay() === 0 || new Date(y, m, i).getDay() === 6); // Oznaczanie weekendów
+                
+                const c = document.createElement('div'); 
+                c.className = `calendar-cell ${isT ? 'today' : ''} ${isWknd ? 'weekend' : ''}`;
+                
                 let h = `<span style="font-weight: bold; margin-left: 2px;">${i}</span>`;
-                if(evData) { c.classList.add('active'); h += `<div class="event-marker"></div><div class="cal-event-text selectable-text">${evData.text}</div>`; }
-                c.innerHTML = h; c.onclick = () => openEventModal(evData ? evData.sourceKey : `${i}-${m+1}-${y}`); g.appendChild(c);
+                if(evs.length > 0) { 
+                    c.classList.add('active'); 
+                    h += `<div class="event-marker"></div>`; 
+                    
+                    // Renderowanie do max 2 etykietek wezwań
+                    evs.slice(0, 2).forEach(ev => {
+                        h += `<div class="cal-event-text selectable-text">${ev.text}</div>`;
+                    });
+                    if(evs.length > 2) {
+                        h += `<div class="cal-event-text selectable-text" style="font-size:7px; background: rgba(0,0,0,0.1);">+${evs.length - 2} więcej</div>`;
+                    }
+                }
+                c.innerHTML = h; c.onclick = () => openEventModal(`${i}-${m+1}-${y}`); g.appendChild(c);
             }
         }
+
         function openEventModal(k) {
-            currentEditingDateKey = k; const p = k.split('-'), mths = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"], ex = state.events[k], dDisp = document.getElementById('event-date-display'), i = document.getElementById('event-input'), r = document.getElementById('event-recurrence'), b = document.getElementById('btn-delete-event');
-            if(dDisp) dDisp.innerText = `${p[0]} ${mths[parseInt(p[1])-1]} ${p[2]}`; if(i) i.value = ex ? (ex.text || "") : ""; if(r) r.value = ex ? (ex.recurrence || "none") : "none"; if(b) b.classList.toggle('hidden', !ex);
+            currentEditingDateKey = k; 
+            const p = k.split('-');
+            const mths = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+            const dDisp = document.getElementById('event-date-display');
+            
+            if(dDisp) dDisp.innerText = `${p[0]} ${mths[parseInt(p[1])-1]} ${p[2]}`; 
+            
+            const evs = getEventsForDate(parseInt(p[0]), parseInt(p[1]), parseInt(p[2]));
+            const container = document.getElementById('existing-events-container');
+            const list = document.getElementById('existing-events-list');
+            
+            if(evs.length > 0) {
+                container.classList.remove('hidden');
+                list.innerHTML = evs.map(e => `
+                    <li class="flex justify-between items-center bg-gray-200 border border-gray-400 p-1">
+                        <div class="truncate flex-1 text-[10px]"><span class="font-bold text-[#1e3a8a]">${e.text}</span> ${e.recurrence !== 'none' ? '(cykl)' : ''}</div>
+                        <button onclick="deleteSpecificEvent('${e.sourceKey}', ${e.id})" class="text-red-600 font-bold px-2 py-1 text-[10px] border border-red-300 hover:bg-red-200 shrink-0 ml-1">X</button>
+                    </li>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+                list.innerHTML = '';
+            }
+            
+            document.getElementById('event-input').value = '';
+            document.getElementById('event-recurrence').value = 'none';
+
             openModalUI('event-modal');
         }
-        function saveEvent() { if(!currentEditingDateKey) return; const v = document.getElementById('event-input').value.trim(), r = document.getElementById('event-recurrence').value; if(v) state.events[currentEditingDateKey] = { text: v, recurrence: r }; else delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeModalUI('event-modal'); }
-        function deleteEvent() { if(!currentEditingDateKey) return; showConfirm("Usunąć całą serię wydarzeń?", () => { delete state.events[currentEditingDateKey]; saveState(); renderCalendar(); closeModalUI('event-modal'); }); }
+
+        // Zmieniony sposób zapisu (do tablicy)
+        function saveNewEvent() { 
+            if(!currentEditingDateKey) return; 
+            const v = document.getElementById('event-input').value.trim();
+            const r = document.getElementById('event-recurrence').value; 
+            
+            if(!v) return showAlert("Obywatelu! Puste wezwanie odrzucono.");
+            
+            if(!state.events[currentEditingDateKey]) state.events[currentEditingDateKey] = [];
+            state.events[currentEditingDateKey].push({ id: Date.now(), text: v, recurrence: r }); 
+            
+            saveState(); 
+            renderCalendar(); 
+            openEventModal(currentEditingDateKey); // Odświeżenie widoku modala
+        }
+
+        // Usuwanie konkretnego wezwania z danego dnia
+        function deleteSpecificEvent(sourceKey, eventId) {
+            if(state.events[sourceKey]) {
+                state.events[sourceKey] = state.events[sourceKey].filter(e => e.id !== eventId);
+                if(state.events[sourceKey].length === 0) delete state.events[sourceKey];
+                saveState();
+                renderCalendar();
+                openEventModal(currentEditingDateKey); 
+            }
+        }
 
         // --- SKŁADNICA AKT (ZARZĄDZANIE BOCZNYM MENU I PRZYCISKIEM WSTECZ) ---
         function switchArchivePane(paneId, pushToHistory = false) {
