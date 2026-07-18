@@ -384,7 +384,7 @@
     
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
 
-    <!-- SZYBKI SKOK DO DATY W KALENDARZU (NOWY GUZIK "DZIŚ") -->
+    <!-- SZYBKI SKOK DO DATY W KALENDARZU (NOWY GUZIK "DZIŚ" CZERWONY) -->
     <div id="jump-date-modal" class="app-modal-overlay">
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3>
@@ -396,7 +396,7 @@
             </div>
             <div class="flex gap-2">
                 <button onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button>
-                <button onclick="resetCalendarToToday(); closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 bg-[#15803d] text-white font-bold uppercase hover:bg-green-800 active:bg-green-800 transition text-xs">Dziś</button>
+                <button onclick="resetCalendarToToday(); closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button>
                 <button onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#103090] text-white font-bold uppercase hover:bg-blue-800 active:bg-blue-800 transition text-xs">Przenieś</button>
             </div>
         </div>
@@ -543,8 +543,8 @@
                     <div><label class="block text-[10px] uppercase font-bold text-gray-700">Obywatel(ka):</label><input type="text" id="citizen-name" value="Jan Kowalski" class="prl-input w-full font-bold text-lg"></div>
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-gray-700">Data sporządzenia:</label>
-                        <!-- NOWOŚĆ: Przycisk wywołujący przydział czasu -->
-                        <div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="openJumpDateModal()" title="Kliknij, aby zmienić przydział czasu"></div>
+                        <!-- Powrót do pierwotnego działania - reset do dzisiaj -->
+                        <div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="resetCalendarToToday()" title="Kliknij, aby wrócić do bieżącego miesiąca"></div>
                     </div>
                 </div>
             </div>
@@ -593,13 +593,13 @@
                     <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
                     <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2">
                         <button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button>
-                        <!-- Usunięto kliknięcie z miesiąca, powróciło do standardowego wyświetlania -->
-                        <h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs"></h3>
+                        <!-- Przycisk z miesiącem przenosi do zmiany miesiąca -->
+                        <h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs cursor-pointer hover:bg-gray-400 active:bg-gray-400 px-2 py-1 rounded transition" onclick="openJumpDateModal()" title="Zmień miesiąc/rok"></h3>
                         <button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button>
                     </div>
                     <div id="calendar-grid" class="calendar-grid"></div>
                     <!-- Zaktualizowana wskazówka -->
-                    <p class="text-[8px] text-center mt-2 text-gray-600 uppercase leading-tight">Wskazówka: Możesz przewijać miesiące palcem ↔<br>lub kliknąć w dzień miesiąca u góry, by zmienić przydział czasu.</p>
+                    <p class="text-[8px] text-center mt-2 text-gray-600 uppercase leading-tight">Wskazówka: Możesz przewijać miesiące palcem ↔<br>lub kliknąć w miesiąc u góry, by zmienić przydział czasu.</p>
                 </div>
                 
                 <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
