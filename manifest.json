@@ -1,47 +1,29 @@
 {
   "name": "P.R.L - Planer Robót Lokalnych",
-  "short_name": "Planer P.R.L",
-  "start_url": "./",
+  "short_name": "P.R.L",
+  "description": "Cyfrowy Dokument Ścisłego Zarachowania",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#262626",
-  "theme_color": "#8c1c1c",
-  "orientation": "portrait",
+  "theme_color": "#262626",
   "icons": [
-    {
-      "src": "icon-512.png",
-      "sizes": "192x192 512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
-      "name": "Nowa Notatka",
+      "name": "Nowa notatka",
       "short_name": "Notatka",
-      "url": "./?akcja=nowanotatka",
+      "description": "Zakłada nowe akta służbowe",
+      "url": "./index.html?akcja=nowanotatka",
       "icons": [
         {
           "src": "icon-512.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Otwórz Kartotekę",
-      "short_name": "Kartoteka",
-      "url": "./?akcja=kartoteka",
-      "icons": [
-        {
-          "src": "icon-512.png",
-          "sizes": "512x512",
-          "type": "image/png"
+          "sizes": "512x512"
         }
       ]
     }
