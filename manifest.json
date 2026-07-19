@@ -2,7 +2,7 @@
   "name": "P.R.L - Planer Robót Lokalnych",
   "short_name": "P.R.L",
   "description": "Cyfrowy Dokument Ścisłego Zarachowania",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#262626",
   "theme_color": "#262626",
@@ -19,7 +19,7 @@
       "name": "Nowa notatka",
       "short_name": "Notatka",
       "description": "Zakłada nowe akta służbowe",
-      "url": "./index.html?akcja=nowanotatka",
+      "url": "index.html?akcja=nowanotatka",
       "icons": [
         {
           "src": "icon-512.png",
@@ -29,7 +29,7 @@
     }
   ],
   "share_target": {
-    "action": "./index.html",
+    "action": "index.html",
     "method": "GET",
     "params": {
       "title": "title",
