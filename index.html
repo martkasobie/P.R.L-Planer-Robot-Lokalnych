@@ -623,6 +623,74 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
+        // --- INICJALIZACJA Z FUNKCJĄ PRZECHWYTYWANIA UDOSTĘPNIANIA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const akcja = urlParams.get('akcja');
+            const sharedTitle = urlParams.get('title');
+            const sharedText = urlParams.get('text');
+            const sharedUrl = urlParams.get('url');
+            
+            // Jeśli przyszły dane, wymuszamy start od razu i wyłączamy ekran startowy
+            if (akcja === 'nowanotatka' || sharedTitle || sharedText || sharedUrl) {
+                const splash = document.getElementById('splash-screen');
+                if (splash) splash.style.display = 'none';
+                
+                // Czekamy aż baza danych zostanie załadowana (await dla init)
+                init().then(() => {
+                    openModalUI('archive-fullscreen');
+                    createNewNoteMobile(); // To ustawi edytor na nowy
+                    
+                    let finalHtml = '';
+                    let textContent = sharedText || '';
+                    let urlContent = sharedUrl || '';
+                    
+                    if (sharedTitle) {
+                        const tInput = document.getElementById('note-title-input');
+                        if (tInput) tInput.value = sharedTitle.substring(0, 40);
+                        finalHtml += `<span style="font-weight:bold; font-size:1.1em;">${sharedTitle}</span><br><br>`;
+                    }
+
+                    // Rozpoznawanie linków wewnątrz przysłanego tekstu
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    textContent = textContent.replace(urlRegex, '<a href="$1" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">$1</a>');
+
+                    if (textContent) {
+                        finalHtml += `${textContent}<br><br>`;
+                    }
+                    
+                    // Jeśli jest osobny link i nie ma go w tekście
+                    if (urlContent && !textContent.includes(urlContent)) {
+                         finalHtml += `<a href="${urlContent}" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">${urlContent}</a><br>`;
+                    }
+
+                    const editor = document.getElementById('note-editor');
+                    if (editor) {
+                        editor.innerHTML = finalHtml;
+                        scheduleSave(); // Zapisujemy!
+                    }
+                    
+                    // Czyścimy pasek adresu z parametrów, żeby nie otworzyło tego drugi raz
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                });
+            } else {
+                initSplashScreen();
+                init();
+            }
+
+            // GESTY SWIPE DLA KALENDARZA
+            const swipeZone = document.getElementById('calendar-swipe-zone');
+            if(swipeZone) {
+                swipeZone.addEventListener('touchstart', e => {
+                    touchstartX = e.changedTouches[0].screenX;
+                }, {passive: true});
+                swipeZone.addEventListener('touchend', e => {
+                    touchendX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, {passive: true});
+            }
+        });
+
         // --- LIKWIDACJA "LEPKIEGO PALCA" (STICKY HOVER) NA TELEFONACH ---
         document.addEventListener('touchend', (e) => {
             const btn = e.target.closest('button');
@@ -786,7 +854,6 @@
             }
         }
 
-
         // --- DANE I STAN APLIKACJI ---
         const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
         
@@ -826,6 +893,8 @@
         let saveTimeout;
         let currentEditingEventId = null;
         let currentEditingEventSourceKey = null;
+        let touchstartX = 0;
+        let touchendX = 0;
 
         // --- BAZA DANYCH (INDEXED DB) ---
         function initDB() {
@@ -945,79 +1014,6 @@
             };
             reader.readAsText(file);
         }
-
-        // --- START APLIKACJI Z OBSŁUGĄ WIDŻETU, WEB SHARE TARGET I SWIPE ---
-        let touchstartX = 0;
-        let touchendX = 0;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const akcja = urlParams.get('akcja');
-            const sharedTitle = urlParams.get('title');
-            const sharedText = urlParams.get('text');
-            const sharedUrl = urlParams.get('url');
-            
-            // Reakcja na Web Share Target lub kliknięcie w widget
-            if(akcja === 'nowanotatka' || sharedTitle || sharedText || sharedUrl) {
-                document.getElementById('splash-screen').style.display = 'none';
-                init();
-                setTimeout(() => {
-                    openModalUI('archive-fullscreen');
-                    createNewNoteMobile();
-                    
-                    // Faza odbioru danych udostępnionych z innej aplikacji
-                    if (sharedTitle || sharedText || sharedUrl) {
-                        let finalHtml = '';
-                        
-                        // Zabezpieczenie na wypadek gdyby przeglądarka wrzuciła URL w pole tekstowe (częsty błąd Chrome)
-                        let textContent = sharedText || '';
-                        let urlContent = sharedUrl || '';
-                        
-                        if (sharedTitle) {
-                            finalHtml += `<span style="font-weight:bold; font-size:1.1em;">${sharedTitle}</span><br><br>`;
-                            const tInput = document.getElementById('note-title-input');
-                            if (tInput) tInput.value = sharedTitle.substring(0, 40);
-                        }
-
-                        // WYDZIAŁ SZYFRÓW: Przeczesujemy tekst w poszukiwaniu linków HTTP i automatycznie robimy z nich klikalne odnośniki
-                        const urlRegex = /(https?:\/\/[^\s]+)/g;
-                        textContent = textContent.replace(urlRegex, '<a href="$1" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">$1</a>');
-
-                        if (textContent) {
-                            finalHtml += `${textContent}<br><br>`;
-                        }
-                        
-                        // Jeżeli przekazano jawny URL (a nie było go w tekście)
-                        if (urlContent && !textContent.includes(urlContent)) {
-                             finalHtml += `<a href="${urlContent}" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">${urlContent}</a><br>`;
-                        }
-
-                        const editor = document.getElementById('note-editor');
-                        if (editor) {
-                            editor.innerHTML = finalHtml;
-                            scheduleSave();
-                        }
-                        // Oczyszczenie paska adresu, aby odświeżenie strony nie dublowało wpisu
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }
-                }, 100);
-            } else {
-                initSplashScreen();
-                init();
-            }
-
-            // GESTY SWIPE DLA KALENDARZA
-            const swipeZone = document.getElementById('calendar-swipe-zone');
-            if(swipeZone) {
-                swipeZone.addEventListener('touchstart', e => {
-                    touchstartX = e.changedTouches[0].screenX;
-                }, {passive: true});
-                swipeZone.addEventListener('touchend', e => {
-                    touchendX = e.changedTouches[0].screenX;
-                    handleSwipe();
-                }, {passive: true});
-            }
-        });
 
         function handleSwipe() {
             if (touchendX < touchstartX - 40) changeMonth(1); 
