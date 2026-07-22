@@ -313,7 +313,7 @@
                 <!-- NOWY PIONOWY PRZYCISK SKOROSZYTÓW -->
                 <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] active:bg-[#1a1a1a] transition active:scale-[0.98]">
                     <span>Dodaj akta</span>
-                    <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowe akta">+</button>
+                    <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowe akta">+</span>
                 </button>
                 
                 <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5] flex flex-col">
@@ -1637,7 +1637,7 @@
 
             let html = `<li onclick="selectFolder('all')" class="folder-item p-4 flex items-center gap-3 ${state.activeFolderId === 'all' ? 'active' : ''}">
                 <img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'">
-                <span class="truncate">WSZYSTKIE AKTA</span>
+                <span class="text-sm md:text-base break-words whitespace-normal leading-tight w-full pr-2">WSZYSTKIE AKTA</span>
             </li>`;
             
             state.folders.forEach(f => {
@@ -1647,7 +1647,7 @@
                 html += `<li onclick="selectFolder('${f.id}')" class="folder-item p-4 flex justify-between items-center group ${state.activeFolderId === f.id ? 'active' : ''}">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
                         ${iconPart}
-                        <span class="truncate">${f.name}</span>
+                        <span class="text-sm md:text-base break-words whitespace-normal leading-tight w-full pr-2">${f.name}</span>
                     </div>
                     ${!isMain ? `<button onclick="deleteFolder(event, '${f.id}')" class="text-red-500 hover:text-red-700 active:text-red-700 font-bold px-3 md:opacity-0 group-hover:opacity-100 transition shadow-sm border border-transparent hover:border-red-500 active:border-red-500 bg-white/20 shrink-0 ml-2">X</button>` : ''}
                 </li>`;
