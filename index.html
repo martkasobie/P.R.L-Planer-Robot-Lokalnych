@@ -409,7 +409,8 @@
                 <button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ
                 </button>
-                <img src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
+                <!-- Zmiana: Dodałem ID do obrazka z tłem dyplomu -->
+                <img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
                 <div id="diploma-goal" class="absolute w-[80%] text-center left-1/2 -translate-x-1/2 text-[#103090] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#8c1c1c] font-['Special_Elite'] font-bold text-2xl sm:text-3xl md:text-4xl" style="top: 69.5%;"></div>
                 <div class="absolute text-left text-[#1a1a1a] font-['Special_Elite']" style="bottom: 15%; left: 10%;">
@@ -1234,6 +1235,14 @@
             
             const d = new Date();
             document.getElementById('diploma-date').innerText = d.toLocaleDateString('pl-PL');
+            
+            // Losowanie tła dyplomu
+            const bgs = ['diplomprl.png', 'dyplomniebieskiblue.png'];
+            const randomBg = bgs[Math.floor(Math.random() * bgs.length)];
+            const imgEl = document.getElementById('diploma-bg-img');
+            if (imgEl) {
+                imgEl.src = randomBg;
+            }
             
             openModalUI('diploma-modal');
         }
