@@ -304,7 +304,8 @@
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
-            <button onclick="window.isExitingArchive = true; closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
+            <!-- ZMIANA: Przycisk WYJŚCIE teraz poprawnie i bezpiecznie wymusza zamknięcie okna bez psucia historii -->
+            <button onclick="exitArchive()" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
@@ -313,7 +314,6 @@
 
             <!-- PANE 1: SKOROSZYTY (MENU BOCZNE / LEWA KOLUMNA) -->
             <div id="pane-folders" class="w-full md:w-1/4 lg:w-1/5 border-r-2 border-[#57534e] bg-[#e5e5e5] shadow-[5px_0_15px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col">
-                <!-- NOWY PIONOWY PRZYCISK SKOROSZYTÓW -->
                 <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] active:bg-[#1a1a1a] transition active:scale-[0.98]">
                     <span>Dodaj akta</span>
                     <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowe akta">+</span>
@@ -407,7 +407,7 @@
 
     <!-- DYPLOM PRZODOWNIKA PRACY -->
     <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding: 2rem 0;">
-        <div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0" style="transform: rotate(-1deg);">
+        <div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0">
             <div id="diploma-capture-area" class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)] bg-white">
                 <button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ
@@ -431,8 +431,9 @@
         </div>
     </div>
     
+    <!-- ZMIANA: Szersze i bardziej proste okno wezwań -->
     <div id="event-modal" class="app-modal-overlay">
-        <div class="app-modal-window" style="max-width: 400px;">
+        <div class="app-modal-window" style="max-width: 400px; width: 95%;">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3>
             <p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p>
             
@@ -441,7 +442,7 @@
             </div>
 
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nowe zgłoszenie:</label>
-            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="4" placeholder="Treść zadania..."></textarea>
+            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="6" placeholder="Treść zadania..."></textarea>
             
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label>
             <select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-1 font-mono mb-4 outline-none text-xs shadow-inner cursor-pointer">
@@ -464,7 +465,8 @@
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <input type="text" id="goal-name" class="sc-input bg-white mb-2" placeholder="np. Radio">
+            <!-- ZMIANA: Textarea zamiast inputu, żeby pomieścić długi tekst -->
+            <textarea id="goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="2" placeholder="np. Radio"></textarea>
             <div class="flex gap-2">
                 <div class="flex-1">
                     <label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label>
@@ -490,7 +492,8 @@
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3>
             <input type="hidden" id="edit-goal-id">
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <input type="text" id="edit-goal-name" class="sc-input bg-white mb-2">
+            <!-- ZMIANA: Textarea zamiast inputu -->
+            <textarea id="edit-goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="2"></textarea>
             
             <div class="flex gap-2 mb-2">
                 <div class="flex-1">
@@ -773,25 +776,32 @@
                 } else if (id === 'folder-drawer') {
                     document.getElementById('pane-folders').classList.remove('open');
                     document.getElementById('folder-drawer-overlay').classList.remove('active');
-                } else if (id === 'archive-fullscreen') {
-                    // Blokada wychodzenia z aplikacji, jeśli jesteśmy w konkretnym folderze (wraca do "WSZYSTKIE AKTA")
-                    if (state.activeFolderId !== 'all' && !window.isExitingArchive) {
-                        state.activeFolderId = 'all';
-                        saveState();
-                        renderArchiveFolders();
-                        renderArchiveNotes();
-                        modalStack.push('archive-fullscreen');
-                        window.history.pushState({ modalId: 'archive-fullscreen' }, "");
-                    } else {
-                        window.isExitingArchive = false;
-                        forceCloseModal(id);
-                    }
+                } else if (id === 'archive-folder') {
+                    // Wciśnięto wstecz w folderze - wracamy do "Wszystkie Akta"
+                    state.activeFolderId = 'all';
+                    saveState();
+                    renderArchiveFolders();
+                    renderArchiveNotes();
                 } else {
                     forceCloseModal(id);
                 }
             }
             setTimeout(() => { if (document.activeElement) document.activeElement.blur(); }, 10);
         });
+
+        function exitArchive() {
+            // Bezpieczne zamknięcie archiwum bez zepsucia historii (usuwa ekrany archiwum ze stosu)
+            let steps = 0;
+            for(let i = modalStack.length - 1; i >= 0; i--) {
+                steps++;
+                if (modalStack[i] === 'archive-fullscreen') break;
+            }
+            if (steps > 0) {
+                window.history.go(-steps);
+            } else {
+                forceCloseModal('archive-fullscreen');
+            }
+        }
 
         let confirmCallback = null;
         function showAlert(text) { document.getElementById('alert-text').innerText = text; openModalUI('alert-modal'); }
@@ -1266,15 +1276,15 @@
                 
                 // Dostosowanie położenia tekstów do węższego dyplomu niebieskiego
                 if (randomBg === 'dyplomniebieskiblue.png') {
-                    if (leftText) leftText.style.left = '16%';
-                    if (rightText) rightText.style.right = '16%';
+                    if (leftText) leftText.style.left = '23%';
+                    if (rightText) rightText.style.right = '23%';
                 } else {
                     if (leftText) leftText.style.left = '10%';
                     if (rightText) rightText.style.right = '10%';
                 }
             }
 
-            // AUTO-SKALOWANIE NAZWY CELU (Zmniejszanie przy długich nazwach)
+            // AUTO-SKALOWANIE NAZWY CELU
             const dg = document.getElementById('diploma-goal');
             if (dg) {
                 dg.innerText = goalName;
@@ -1386,7 +1396,7 @@
                 label.title = p.text;
                 
                 track.appendChild(fill); 
-                track.appendChild(label); // Przepięte z fill do track - cel zawsze widoczny!
+                track.appendChild(label); // Zawsze pełna widoczność na tle tracka
                 
                 const val = document.createElement('div'); val.className = 'bar-value'; 
                 val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
@@ -1673,16 +1683,32 @@
         }
 
         function selectFolder(id) {
+            const previousFolder = state.activeFolderId;
+            if (id === previousFolder) return;
+
+            if (window.innerWidth < 768) {
+                if (modalStack[modalStack.length - 1] === 'folder-drawer') {
+                    window.history.back(); 
+                }
+                if (id === 'all' && previousFolder !== 'all') {
+                    if (modalStack[modalStack.length - 1] === 'archive-folder') {
+                        window.history.back(); 
+                        return;
+                    }
+                }
+            }
+
             state.activeFolderId = id;
             saveState();
             renderArchiveFolders();
             renderArchiveNotes();
+            
             if (window.innerWidth < 768) {
-                if (modalStack[modalStack.length - 1] === 'folder-drawer') {
-                    window.history.back();
-                } else {
-                    document.getElementById('pane-folders').classList.remove('open');
-                    document.getElementById('folder-drawer-overlay').classList.remove('active');
+                if (id !== 'all' && previousFolder === 'all') {
+                    setTimeout(() => {
+                        modalStack.push('archive-folder');
+                        window.history.pushState({ modalId: 'archive-folder' }, "");
+                    }, 50);
                 }
                 switchArchivePane('list', false);
             }
