@@ -37,7 +37,7 @@
             --paper-texture: repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 2px, transparent 2px, transparent 4px);
             --ink-color: #1a1a1a;
             --stamp-red: #8c1c1c; 
-            --stamp-blue: #103090; 
+            --stamp-blue: #4b7db8; /* ZMIANA: Wyblakły niebieski */
             --stamp-violet: #6020a0;
             --stamp-green: #15803d;
             --safe-bottom: env(safe-area-inset-bottom, 20px);
@@ -170,8 +170,8 @@
         .bar-fill { width: 100%; background-color: #8c1c1c; transition: height 0.5s ease-out; position: relative; border-top: 2px solid #000; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px); pointer-events: none; }
         .bar-fill.complete { background-color: #15803d; }
         
-        /* Zmodyfikowana etykieta - czyta z tracka a nie z filla */
-        .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 10px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 4px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: calc(100% - 30px); overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
+        /* ZMIANA: Powiększona czcionka z 10px na 14px */
+        .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 14px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 6px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: calc(100% - 30px); overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
         
         .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; pointer-events: none; }
         .chart-controls { position: absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
@@ -205,7 +205,8 @@
         .viewer-meta { font-size: 0.75rem; font-weight: bold; color: #444; margin-bottom: 0.5rem; }
         .viewer-title { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #8c1c1c; text-transform: uppercase; margin: 0; line-height: 1.1; }
         @media (min-width: 768px) { .viewer-title { font-size: 3rem; } }
-        .viewer-tags { font-size: 0.875rem; color: #103090; margin-top: 0.5rem; font-weight: bold; }
+        /* ZMIANA: Wyblakły niebieski (#4b7db8) */
+        .viewer-tags { font-size: 0.875rem; color: #4b7db8; margin-top: 0.5rem; font-weight: bold; }
         .viewer-content { font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; white-space: pre-wrap; word-break: break-word; position: relative; z-index: 2; }
         .viewer-footer { margin-top: 5rem; text-align: right; font-family: 'Special Elite', cursive; color: #8c1c1c; opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; text-transform: uppercase; position: relative; z-index: 2; }
         
@@ -304,8 +305,7 @@
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
-            <!-- ZMIANA: Przycisk WYJŚCIE teraz poprawnie i bezpiecznie wymusza zamknięcie okna bez psucia historii -->
-            <button onclick="exitArchive()" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
+            <button onclick="window.isExitingArchive = true; closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
@@ -355,7 +355,8 @@
                     <input type="text" id="note-title-input" placeholder="TYTUŁ DOKUMENTU..." class="w-full bg-transparent border-b-2 border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-xl md:text-2xl text-[#8c1c1c] placeholder-gray-500 pb-1">
                     
                     <div class="flex flex-col sm:flex-row gap-2 mt-1">
-                        <textarea id="note-tags-input" rows="1" placeholder="#tagi (np. #ważne)..." class="flex-1 bg-transparent border-none outline-none font-['Courier_Prime'] text-sm text-[#103090] placeholder-gray-500 resize-none overflow-hidden py-1"></textarea>
+                        <!-- ZMIANA: Wyblakły niebieski (#4b7db8) -->
+                        <textarea id="note-tags-input" rows="1" placeholder="#tagi (np. #ważne)..." class="flex-1 bg-transparent border-none outline-none font-['Courier_Prime'] text-sm text-[#4b7db8] placeholder-gray-500 resize-none overflow-hidden py-1"></textarea>
                         <select id="note-folder-select" class="bg-white border border-gray-400 font-mono text-xs p-1 outline-none h-8 min-w-[120px] shadow-sm">
                             <!-- Opcje generowane w JS -->
                         </select>
@@ -400,7 +401,8 @@
             <div class="flex gap-2">
                 <button type="button" onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button>
                 <button type="button" onclick="executeJumpToToday()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button>
-                <button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#103090] text-white font-bold uppercase hover:bg-blue-800 active:bg-blue-800 transition text-xs">Przenieś</button>
+                <!-- ZMIANA: Wyblakły niebieski (#4b7db8) -->
+                <button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition text-xs">Przenieś</button>
             </div>
         </div>
     </div>
@@ -414,7 +416,8 @@
                 </button>
                 <img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
                 
-                <div id="diploma-goal" class="absolute w-[80%] text-center left-1/2 -translate-x-1/2 text-[#103090] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
+                <!-- ZMIANA: Wyblakły niebieski (#4b7db8) -->
+                <div id="diploma-goal" class="absolute w-[80%] text-center left-1/2 -translate-x-1/2 text-[#4b7db8] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
                 
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div>
                 
@@ -431,7 +434,6 @@
         </div>
     </div>
     
-    <!-- ZMIANA: Szersze i bardziej proste okno wezwań -->
     <div id="event-modal" class="app-modal-overlay">
         <div class="app-modal-window" style="max-width: 400px; width: 95%;">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3>
@@ -465,7 +467,6 @@
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <!-- ZMIANA: Textarea zamiast inputu, żeby pomieścić długi tekst -->
             <textarea id="goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="2" placeholder="np. Radio"></textarea>
             <div class="flex gap-2">
                 <div class="flex-1">
@@ -492,7 +493,6 @@
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3>
             <input type="hidden" id="edit-goal-id">
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <!-- ZMIANA: Textarea zamiast inputu -->
             <textarea id="edit-goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="2"></textarea>
             
             <div class="flex gap-2 mb-2">
@@ -513,7 +513,8 @@
             
             <div class="flex gap-4">
                 <button onclick="closeModalUI('edit-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
-                <button onclick="saveEditedGoal()" class="flex-1 px-2 py-2 bg-[#103090] text-white font-bold uppercase hover:bg-blue-800 active:bg-blue-800 transition">Aktualizuj</button>
+                <!-- ZMIANA: Wyblakły niebieski (#4b7db8) -->
+                <button onclick="saveEditedGoal()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition">Aktualizuj</button>
             </div>
         </div>
     </div>
@@ -617,7 +618,8 @@
 
                 <!-- LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
                 <div class="border-2 border-gray-500 p-4 bg-white/30 relative shadow-sm">
-                    <h3 class="text-sm font-bold uppercase text-[#103090] mb-2 pl-2 border-l-4 border-[#103090]">Bezpieczeństwo Danych</h3>
+                    <!-- ZMIANA: Wyblakły niebieski (#4b7db8) w nagłówku Bezpieczeństwa -->
+                    <h3 class="text-sm font-bold uppercase text-[#4b7db8] mb-2 pl-2 border-l-4 border-[#4b7db8]">Bezpieczeństwo Danych</h3>
                     <div class="flex flex-row gap-2">
                         <button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">POBIERZ KOPIĘ</button>
                         <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button>
@@ -1276,8 +1278,8 @@
                 
                 // Dostosowanie położenia tekstów do węższego dyplomu niebieskiego
                 if (randomBg === 'dyplomniebieskiblue.png') {
-                    if (leftText) leftText.style.left = '23%';
-                    if (rightText) rightText.style.right = '23%';
+                    if (leftText) leftText.style.left = '29%';
+                    if (rightText) rightText.style.right = '29%';
                 } else {
                     if (leftText) leftText.style.left = '10%';
                     if (rightText) rightText.style.right = '10%';
@@ -1543,13 +1545,14 @@
                 container.classList.remove('hidden');
                 list.innerHTML = evs.map(e => `
                     <li class="flex justify-between items-start bg-gray-200 border border-gray-400 p-2">
-                        <div class="flex-1 text-[11px] break-words whitespace-normal font-mono leading-snug text-black mr-2 cursor-pointer hover:bg-gray-300 transition" onclick="editSpecificEvent('${e.sourceKey}', ${e.id})">
-                            <span class="font-bold text-[#1e3a8a]">${e.text}</span>
+                        <div class="flex-1 text-[11px] break-words whitespace-normal font-mono leading-snug text-black mr-2">
+                            <span class="font-bold text-[#4b7db8]">${e.text}</span>
                             ${e.recurrence !== 'none' ? '<span class="text-[9px] text-gray-600 block mt-1">(cykl)</span>' : ''}
                         </div>
                         <div class="flex flex-row gap-1 shrink-0 mt-0.5">
-                            <button onclick="editSpecificEvent('${e.sourceKey}', ${e.id})" class="text-[#103090] font-bold px-2 py-1 text-[10px] border border-[#103090] bg-white hover:bg-blue-100 transition shadow-sm">EDYTUJ</button>
-                            <button onclick="deleteSpecificEvent('${e.sourceKey}', ${e.id})" class="text-red-600 font-bold px-2 py-1 text-[10px] border border-red-300 bg-white hover:bg-red-200 transition shadow-sm">X</button>
+                            <!-- ZMIANA: Wyblakły niebieski (#4b7db8) -->
+                            <button onclick="editSpecificEvent('${e.sourceKey}', ${e.id})" class="text-[#4b7db8] font-bold px-2 py-1 text-[10px] border border-[#4b7db8] bg-white hover:bg-blue-50 transition shadow-sm">EDYTUJ</button>
+                            <button onclick="deleteSpecificEvent('${e.sourceKey}', ${e.id})" class="text-red-600 font-bold px-2 py-1 text-[10px] border border-red-300 bg-white hover:bg-red-50 transition shadow-sm">X</button>
                         </div>
                     </li>
                 `).join('');
@@ -1767,7 +1770,7 @@
                 <input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c] shrink-0 w-5 h-5" value="${x.id}" onclick="event.stopPropagation()">
                 <div class="min-w-0 flex-1 cursor-pointer pl-1" onclick="viewNoteInternal(${x.id})">
                     <div class="font-bold text-[#1a1a1a] truncate text-sm font-['Oswald'] tracking-wide">${x.title || 'Dokument bez tytułu'}</div>
-                    <div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#103090] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div>
+                    <div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#4b7db8] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div>
                 </div>
                 <button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-3 py-2 hover:bg-black active:bg-black font-bold border border-gray-600 uppercase shrink-0 shadow-sm transition">EDYTUJ</button>`; 
                 l.appendChild(li); 
