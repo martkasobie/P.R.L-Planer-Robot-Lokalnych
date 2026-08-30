@@ -170,7 +170,6 @@
         .bar-fill { width: 100%; background-color: #8c1c1c; transition: height 0.5s ease-out; position: relative; border-top: 2px solid #000; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px); pointer-events: none; }
         .bar-fill.complete { background-color: #15803d; }
         
-        /* ZMIANA: Skorygowany rozmiar na 12px (zamiast 14px) */
         .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 12px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 6px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: calc(100% - 30px); overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
         
         .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; pointer-events: none; }
@@ -354,7 +353,6 @@
                     <input type="text" id="note-title-input" placeholder="TYTUŁ DOKUMENTU..." class="w-full bg-transparent border-b-2 border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-xl md:text-2xl text-[#8c1c1c] placeholder-gray-500 pb-1">
                     
                     <div class="flex flex-col sm:flex-row gap-2 mt-1">
-                        <!-- ZMIANA: Wyblakły niebieski (#4b7db8) -->
                         <textarea id="note-tags-input" rows="1" placeholder="#tagi (np. #ważne)..." class="flex-1 bg-transparent border-none outline-none font-['Courier_Prime'] text-sm text-[#4b7db8] placeholder-gray-500 resize-none overflow-hidden py-1"></textarea>
                         <select id="note-folder-select" class="bg-white border border-gray-400 font-mono text-xs p-1 outline-none h-8 min-w-[120px] shadow-sm">
                             <!-- Opcje generowane w JS -->
@@ -414,11 +412,11 @@
                 </button>
                 <img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
                 
-                <!-- ZMIANA: Tytuł (Cel) wycentrowany, czarny, z zachowaniem miejsca po bokach -->
                 <div id="diploma-goal" class="absolute text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
                 
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div>
                 
+                <!-- ZMIANA: Zawsze margines 10% z lewej i z prawej (stare, poprawne ustawienie) -->
                 <div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;">
                     <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
                     <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
@@ -465,7 +463,6 @@
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <!-- ZMIANA: Obszerne okno do wpisywania celów (rows=4) -->
             <textarea id="goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4" placeholder="np. Radio"></textarea>
             <div class="flex gap-2">
                 <div class="flex-1">
@@ -492,7 +489,6 @@
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3>
             <input type="hidden" id="edit-goal-id">
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <!-- ZMIANA: Obszerne okno do wpisywania celów (rows=4) -->
             <textarea id="edit-goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4"></textarea>
             
             <div class="flex gap-2 mb-2">
@@ -1274,14 +1270,9 @@
             if (imgEl) {
                 imgEl.src = randomBg;
                 
-                // ZMIANA: Silniejsze ściśnięcie podpisów do środka dla niebieskiego dyplomu
-                if (randomBg === 'dyplomniebieskiblue.png') {
-                    if (leftText) leftText.style.left = '29%';
-                    if (rightText) rightText.style.right = '29%';
-                } else {
-                    if (leftText) leftText.style.left = '10%';
-                    if (rightText) rightText.style.right = '10%';
-                }
+                // ZMIANA: Zawsze 10% marginesów po bokach, niezależnie od dyplomu (zgodnie z rozkazem)
+                if (leftText) leftText.style.left = '10%';
+                if (rightText) rightText.style.right = '10%';
             }
 
             // AUTO-SKALOWANIE NAZWY CELU
@@ -1289,7 +1280,7 @@
             if (dg) {
                 dg.innerText = goalName;
                 
-                // ZMIANA: Utrzymanie węższej ramki na cel dla niebieskiego dyplomu
+                // ZMIANA: Utrzymanie węższej ramki tylko dla samej nazwy celu na niebieskim dyplomie (by omijać wzory po bokach)
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     dg.style.width = '66%';
                 } else {
