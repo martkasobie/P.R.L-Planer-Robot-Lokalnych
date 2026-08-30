@@ -303,7 +303,7 @@
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
-            <button onclick="window.isExitingArchive = true; closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
+            <button onclick="exitArchive()" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
@@ -416,7 +416,7 @@
                 
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div>
                 
-                <!-- ZMIANA: Zawsze margines 10% z lewej i z prawej, a jedynie ściskamy w razie potrzeby do 20% -->
+                <!-- ZMIANA: Zmiana logiki marginesów na 15% dla niebieskiego, 10% dla oryginału -->
                 <div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;">
                     <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
                     <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
@@ -1270,10 +1270,10 @@
             if (imgEl) {
                 imgEl.src = randomBg;
                 
-                // ZMIANA: Podpisy "Data nadania" i "Z ramienia" idealnie wyśrodkowane (Złoty Środek: 20% dla niebieskiego, 10% dla oryginalnego)
+                // ZMIANA: Dokładnie wyliczony złoty środek (15% dla niebieskiego)
                 if (randomBg === 'dyplomniebieskiblue.png') {
-                    if (leftText) leftText.style.left = '20%';
-                    if (rightText) rightText.style.right = '20%';
+                    if (leftText) leftText.style.left = '15%';
+                    if (rightText) rightText.style.right = '15%';
                 } else {
                     if (leftText) leftText.style.left = '10%';
                     if (rightText) rightText.style.right = '10%';
