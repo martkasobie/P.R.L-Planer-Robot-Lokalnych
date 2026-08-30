@@ -148,7 +148,7 @@
         .app-modal-overlay.active { display: flex !important; }
         #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
         
-        .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: rotate(1deg); }
+        .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: none; }
 
         .stamp-item { height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.1s; }
         .stamp-item.selected { border: 2px solid #1f2937; background-color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
@@ -169,7 +169,10 @@
         .bar-track { width: 100%; height: 100%; background: rgba(255,255,255,0.2); border: 2px solid #444; position: relative; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; transition: background 0.1s; }
         .bar-fill { width: 100%; background-color: #8c1c1c; transition: height 0.5s ease-out; position: relative; border-top: 2px solid #000; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px); pointer-events: none; }
         .bar-fill.complete { background-color: #15803d; }
-        .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 10px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 4px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: 80%; overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
+        
+        /* Zmodyfikowana etykieta - czyta z tracka a nie z filla */
+        .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 10px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 4px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: calc(100% - 30px); overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
+        
         .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; pointer-events: none; }
         .chart-controls { position: absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
         .chart-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; cursor: pointer; border: 2px solid rgba(0,0,0,0.3); user-select: none; font-family: monospace; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); border-radius: 4px; }
@@ -301,7 +304,7 @@
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
-            <button onclick="closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
+            <button onclick="window.isExitingArchive = true; closeModalUI('archive-fullscreen')" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
@@ -382,9 +385,9 @@
     <!-- MODALE SYSTEMOWE -->
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black active:bg-black transition">Zrozumiałem</button></div></div>
     
-    <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window" style="transform: rotate(-1deg);"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
+    <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
 
-    <!-- SZYBKI SKOK DO DATY W KALENDARZU (NOWY GUZIK "DZIŚ" CZERWONY) -->
+    <!-- SZYBKI SKOK DO DATY W KALENDARZU -->
     <div id="jump-date-modal" class="app-modal-overlay">
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3>
@@ -409,14 +412,12 @@
                 <button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ
                 </button>
-                <!-- Zmiana: Dodałem ID do obrazka z tłem dyplomu -->
                 <img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
+                
                 <div id="diploma-goal" class="absolute w-[80%] text-center left-1/2 -translate-x-1/2 text-[#103090] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
                 
-                <!-- ZMIANA: Zmniejszono rozmiar czcionki (text-xl sm:text-2xl md:text-3xl) oraz kolor na czarny -->
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div>
                 
-                <!-- ZMIANA: Dodane ID i animacje dla płynnego przesuwania bocznych tekstów -->
                 <div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;">
                     <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
                     <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
@@ -431,16 +432,16 @@
     </div>
     
     <div id="event-modal" class="app-modal-overlay">
-        <div class="app-modal-window">
+        <div class="app-modal-window" style="max-width: 400px;">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3>
             <p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p>
             
-            <div id="existing-events-container" class="mb-4 max-h-48 overflow-y-auto custom-scrollbar border border-gray-400 bg-white/50 text-left p-2 hidden shadow-inner">
+            <div id="existing-events-container" class="mb-4 max-h-60 overflow-y-auto custom-scrollbar border border-gray-400 bg-white/50 text-left p-2 hidden shadow-inner">
                 <ul id="existing-events-list" class="space-y-2"></ul>
             </div>
 
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nowe zgłoszenie:</label>
-            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="2" placeholder="Treść zadania..."></textarea>
+            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="4" placeholder="Treść zadania..."></textarea>
             
             <label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label>
             <select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-1 font-mono mb-4 outline-none text-xs shadow-inner cursor-pointer">
@@ -619,7 +620,7 @@
                         <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button>
                         <input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)">
                     </div>
-                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2 text-gray-700 italic">Ochrona państwowych akt to Twój obowiązek!</p>
+                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2 text-gray-700 italic">Ochrona akt to Twój obowiązek!</p>
                 </div>
             </div>
         </div>
@@ -675,7 +676,7 @@
                         scheduleSave(); // Zapisujemy!
                     }
                     
-                    // Czyścimy pasek adresu z parametrów, żeby nie openedzlo tego drugi raz
+                    // Czyścimy pasek adresu z parametrów, żeby nie otworzyło tego drugi raz
                     window.history.replaceState({}, document.title, window.location.pathname);
                 });
             } else {
@@ -772,6 +773,19 @@
                 } else if (id === 'folder-drawer') {
                     document.getElementById('pane-folders').classList.remove('open');
                     document.getElementById('folder-drawer-overlay').classList.remove('active');
+                } else if (id === 'archive-fullscreen') {
+                    // Blokada wychodzenia z aplikacji, jeśli jesteśmy w konkretnym folderze (wraca do "WSZYSTKIE AKTA")
+                    if (state.activeFolderId !== 'all' && !window.isExitingArchive) {
+                        state.activeFolderId = 'all';
+                        saveState();
+                        renderArchiveFolders();
+                        renderArchiveNotes();
+                        modalStack.push('archive-fullscreen');
+                        window.history.pushState({ modalId: 'archive-fullscreen' }, "");
+                    } else {
+                        window.isExitingArchive = false;
+                        forceCloseModal(id);
+                    }
                 } else {
                     forceCloseModal(id);
                 }
@@ -1234,7 +1248,6 @@
 
         // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
         function showDiploma(goalName) {
-            document.getElementById('diploma-goal').innerText = goalName;
             document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
             
             const d = new Date();
@@ -1258,6 +1271,25 @@
                 } else {
                     if (leftText) leftText.style.left = '10%';
                     if (rightText) rightText.style.right = '10%';
+                }
+            }
+
+            // AUTO-SKALOWANIE NAZWY CELU (Zmniejszanie przy długich nazwach)
+            const dg = document.getElementById('diploma-goal');
+            if (dg) {
+                dg.innerText = goalName;
+                if (goalName.length > 55) { 
+                    dg.style.fontSize = '0.75rem'; 
+                    dg.style.lineHeight = '1'; 
+                } else if (goalName.length > 40) { 
+                    dg.style.fontSize = '0.9rem'; 
+                    dg.style.lineHeight = '1.1'; 
+                } else if (goalName.length > 25) { 
+                    dg.style.fontSize = '1.2rem'; 
+                    dg.style.lineHeight = '1.1'; 
+                } else { 
+                    dg.style.fontSize = ''; 
+                    dg.style.lineHeight = ''; 
                 }
             }
             
@@ -1353,7 +1385,8 @@
                 label.innerText = p.text;
                 label.title = p.text;
                 
-                fill.appendChild(label); track.appendChild(fill);
+                track.appendChild(fill); 
+                track.appendChild(label); // Przepięte z fill do track - cel zawsze widoczny!
                 
                 const val = document.createElement('div'); val.className = 'bar-value'; 
                 val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
