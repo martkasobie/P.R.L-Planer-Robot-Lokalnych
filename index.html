@@ -55,7 +55,6 @@
             color: var(--ink-color);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            /* ZMIANA: Dynamiczna strefa ochrony przed notchem i paskiem domowym w iOS */
             padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
             padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
         }
@@ -205,7 +204,6 @@
         #archive-fullscreen { display: none; }
         #archive-fullscreen.active { display: flex; }
         
-        /* ZMIANA: Dynamiczna strefa ochrony dla widoku notatki */
         #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; }
         #note-viewer-overlay.active { display: flex; }
         .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 2rem; flex-shrink: 0; transform: translate3d(0,0,0); }
@@ -269,7 +267,6 @@
 <body class="flex flex-col items-center justify-start md:justify-center px-2 md:px-4 min-h-screen">
 
     <!-- EKRAN ŁADOWANIA -->
-    <!-- ZMIANA: Strefa ochrony dla ekranu ładowania -->
     <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-y-auto" style="padding-top: calc(2.5rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
@@ -309,12 +306,13 @@
 
     <!-- NOWE, PEŁNOEKRANOWE ARCHIWUM (Z BOCZNYM MENU) -->
     <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col">
-        <!-- ZMIANA: NAGŁÓWEK ARCHIWUM z odsunięciem chroniącym przed Notchem w iPhone (padding-top) -->
+        <!-- NAGŁÓWEK ARCHIWUM z ochroną przed Notchem w iPhone (padding-top) -->
         <div class="bg-[#1a1a1a] text-[#e7e5e4] px-3 pb-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20 shrink-0" style="padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));">
             <div class="flex items-center gap-3">
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
                 <h2 class="font-['Oswald'] text-xl md:text-3xl tracking-widest uppercase hidden md:block text-[#dcd0c0]">Notatnik Archiwalny</h2>
             </div>
+            <!-- NOWE NIEZAWODNE WYJŚCIE: Funkcja sprząta historię do zera -->
             <button onclick="exitArchive()" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
@@ -329,7 +327,6 @@
                     <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowe akta">+</span>
                 </button>
                 
-                <!-- ZMIANA: Strefa ochrony dolnej dla iPhone (padding-bottom) -->
                 <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5] flex flex-col" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
                     <!-- Foldery generowane w JS -->
                 </ul>
@@ -349,7 +346,6 @@
                     <input type="text" id="note-search" oninput="renderArchiveNotes()" placeholder="Szukaj w aktach..." class="w-full bg-white border border-gray-400 p-2 text-xs font-mono outline-none shadow-inner">
                 </div>
                 
-                <!-- ZMIANA: Strefa ochrony dolnej dla iPhone (padding-bottom) -->
                 <ul id="archive-notes-list" class="flex-1 overflow-y-auto custom-scrollbar p-1 text-xs font-mono space-y-1 z-10" style="padding-bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px));">
                     <!-- Notatki generowane w JS -->
                 </ul>
@@ -376,7 +372,7 @@
                 
                 <div id="note-editor" contenteditable="true" oninput="scheduleSave();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 md:p-6 outline-none font-['Courier_Prime'] text-base md:text-lg leading-relaxed text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto break-words whitespace-pre-wrap" placeholder="Tutaj wprowadź treść notatki służbowej..."></div>
                 
-                <!-- ZMIANA: Strefa ochrony dolnej dla iPhone (padding-bottom) zabezpiecza pasek narzedzi edytora przed home bar -->
+                <!-- Ochrona paska home w iPhone -->
                 <div class="border-t-2 border-[#57534e] px-3 pt-3 flex flex-wrap justify-between items-center bg-[#292524] z-10 gap-2 shrink-0" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="flex items-center shadow-[1px_1px_0px_#444]">
@@ -419,7 +415,6 @@
     </div>
 
     <!-- DYPLOM PRZODOWNIKA PRACY -->
-    <!-- ZMIANA: Strefa ochrony dyplomu zabezpiecza przed ucięciem nagłówka na telefonach z Notchem -->
     <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding-top: calc(2rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));">
         <div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0">
             <div id="diploma-capture-area" class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)] bg-white">
@@ -432,6 +427,7 @@
                 
                 <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div>
                 
+                <!-- ZMIANA: Złoty środek dla marginesów bocznych (15% na niebieskim, 10% na prl) -->
                 <div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;">
                     <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
                     <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
@@ -747,6 +743,7 @@
 
         // --- SYSTEM ZARZĄDZANIA OKNAMI Z OBSŁUGĄ COFANIA W TELEFONIE ---
         let modalStack = [];
+        window.ignorePopstate = false;
 
         function openModalUI(id) {
             const el = document.getElementById(id);
@@ -779,6 +776,8 @@
         }
 
         window.addEventListener('popstate', (e) => {
+            if (window.ignorePopstate) return;
+
             if (modalStack.length > 0) {
                 const id = modalStack.pop();
                 
@@ -793,6 +792,7 @@
                     saveState();
                     renderArchiveFolders();
                     renderArchiveNotes();
+                    switchArchivePane('list', false);
                 } else {
                     forceCloseModal(id);
                 }
@@ -801,17 +801,31 @@
         });
 
         function exitArchive() {
-            // Bezpieczne zamknięcie archiwum bez zepsucia historii (usuwa ekrany archiwum ze stosu)
-            let steps = 0;
-            for(let i = modalStack.length - 1; i >= 0; i--) {
-                steps++;
-                if (modalStack[i] === 'archive-fullscreen') break;
-            }
-            if (steps > 0) {
+            const index = modalStack.indexOf('archive-fullscreen');
+            if (index > -1) {
+                const steps = modalStack.length - index;
+                forceCloseModal('archive-fullscreen');
+                
+                // Obcięcie stosu
+                modalStack.length = index; 
+                
+                // Tymczasowo blokujemy listener popstate, żeby przeglądarka mogła cofnąć historię "po cichu" bez migania interfejsu
+                window.ignorePopstate = true;
                 window.history.go(-steps);
+                
+                setTimeout(() => { 
+                    window.ignorePopstate = false; 
+                }, 500); 
+                
             } else {
                 forceCloseModal('archive-fullscreen');
             }
+            
+            // Zawsze upewniamy się, że po wyjściu stan folderów wraca do domyślnego
+            state.activeFolderId = 'all';
+            saveState();
+            renderArchiveFolders();
+            renderArchiveNotes();
         }
 
         let confirmCallback = null;
@@ -1285,7 +1299,7 @@
             if (imgEl) {
                 imgEl.src = randomBg;
                 
-                // ZMIANA: Złoty Środek dla marginesów (15% na niebieskim, 10% na klasycznym)
+                // ZMIANA: Margines 15% na niebieskim dyplomie, 10% na klasycznym
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     if (leftText) leftText.style.left = '15%';
                     if (rightText) rightText.style.right = '15%';
@@ -1300,7 +1314,7 @@
             if (dg) {
                 dg.innerText = goalName;
                 
-                // ZMIANA: Zwężona ramka na nazwę celu TYLKO na niebieskim dyplomie, by tekst omijał brzegi (66%)
+                // Utrzymanie węższej ramki tylko dla samej nazwy celu na niebieskim dyplomie (by omijać wzory po bokach)
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     dg.style.width = '66%';
                 } else {
