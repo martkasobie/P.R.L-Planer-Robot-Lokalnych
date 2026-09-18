@@ -46,11 +46,6 @@
         * { box-sizing: border-box; touch-action: manipulation; }
         html, body { overflow-x: hidden; width: 100%; max-width: 100%; min-height: 100vh; }
 
-        /* ZMIANA: Prosta, natywna blokada tła dla urządzeń mobilnych */
-        body.body-locked {
-            overflow: hidden !important;
-        }
-
         body {
             background-color: #262626;
             background-image: radial-gradient(#333 15%, transparent 16%), radial-gradient(#333 15%, transparent 16%);
@@ -158,7 +153,7 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
+        .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); overscroll-behavior: contain; }
         .app-modal-overlay.active { display: flex !important; }
         #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
         
@@ -192,6 +187,9 @@
         .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
         .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
 
+        /* ZMIANA: Przywrócona krytyczna linijka, przez którą psuł się widok całego archiwum! */
+        .archive-pane { display: none; flex-direction: column; height: 100%; }
+        
         .archive-item { cursor: pointer; padding: 4px; border-bottom: 1px dashed #a8a29e; transition: background 0.1s; }
         .archive-item.active { background-color: #e7e5e4; font-weight: bold; border-left: 3px solid #8c1c1c; }
         .note-checkbox { margin-right: 6px; cursor: pointer; }
@@ -206,14 +204,14 @@
         .marked { background-color: #ffcccc !important; color: black !important; border-radius: 2px; padding: 0 2px; font-weight: bold; }
 
         /* PODGLĄD NOTATEK I ARCHIWUM PEŁNOEKRANOWE */
-        #archive-fullscreen { display: none; }
+        /* ZMIANA: Zablokowanie podwójnego scrollowania przez overscroll-behavior */
+        #archive-fullscreen { display: none; overscroll-behavior: contain; }
         #archive-fullscreen.active { display: flex; }
         
-        /* ZMIANA: Usunięcie webkit-overflow-scrolling które na nowym iOS gryzło się z historią */
-        #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
+        #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
         #note-viewer-overlay.active { display: flex; }
         
-        /* ZMIANA: Margines 2rem u dołu (przycisk wraca do normalnego wiersza) */
+        /* ZMIANA: Odpowiedni dolny margines, by przycisk "Zamknij" miał swoje stałe miejsce */
         .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 2rem; flex-shrink: 0; overflow-x: hidden; }
         @media (min-width: 768px) { .viewer-paper { padding: 4rem; } }
         .viewer-paper::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-texture); pointer-events: none; mix-blend-mode: multiply; z-index: 1; }
@@ -225,7 +223,7 @@
         .viewer-content { font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word; position: relative; z-index: 2; }
         .viewer-footer { margin-top: 5rem; text-align: right; font-family: 'Special Elite', cursive; color: #8c1c1c; opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; text-transform: uppercase; position: relative; z-index: 2; }
         
-        /* ZMIANA: Przycisk powrócił do naturalnego przepływu. Jest na samym dole (nie "lata"), działa idealnie! */
+        /* ZMIANA: Przycisk powrócił do naturalnego przepływu dokumentu (nie lata na wierzchu, działa na 1 klik) */
         .close-viewer-btn { background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s, box-shadow 0.1s; flex-shrink: 0; z-index: 99999; margin: 0 auto 4rem auto; display: block; width: 90%; max-width: 400px; text-align: center; }
         @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; width: auto; min-width: 300px; } }
         .close-viewer-btn:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
@@ -309,12 +307,12 @@
             <div id="viewer-content" class="viewer-content selectable-text"></div>
             <div class="viewer-footer">ZARCHIWIZOWANO<br>PRZEZ: <span id="viewer-citizen"></span></div>
         </div>
-        <!-- ZMIANA: Przycisk powędrował pod kartkę jako jej logiczne przedłużenie! -->
         <button class="close-viewer-btn" onclick="closeModalUI('note-viewer-overlay')">ZAMKNIJ I WRÓĆ DO PLANERA</button>
     </div>
 
     <!-- NOWE, PEŁNOEKRANOWE ARCHIWUM (Z BOCZNYM MENU) -->
-    <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col overflow-hidden">
+    <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col">
+        <!-- NAGŁÓWEK ARCHIWUM -->
         <div class="bg-[#1a1a1a] text-[#e7e5e4] px-3 pb-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20 shrink-0" style="padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));">
             <div class="flex items-center gap-3">
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
@@ -323,7 +321,7 @@
             <button onclick="exitArchive()" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
-        <div class="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
+        <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
             
             <div id="folder-drawer-overlay" onclick="toggleFolderDrawer()"></div>
 
@@ -749,7 +747,6 @@
         // --- SYSTEM ZARZĄDZANIA OKNAMI Z OBSŁUGĄ COFANIA W TELEFONIE ---
         let modalStack = [];
         window.ignorePopstate = false;
-        let scrollPosition = 0;
 
         function openModalUI(id) {
             const el = document.getElementById(id);
@@ -757,7 +754,7 @@
             el.classList.add('active');
             if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
             
-            // ZMIANA: Skuteczna, kompatybilna metoda usunięcia konfliktów z podwójnym paskiem bez wymuszania 'fixed' i 'top'
+            // ZMIANA: Skuteczna, kompatybilna metoda blokowania (klasa dodana na body)
             if (modalStack.length === 0) {
                 document.body.classList.add('body-locked');
             }
@@ -1312,6 +1309,7 @@
             if (imgEl) {
                 imgEl.src = randomBg;
                 
+                // Dostosowanie położenia tekstów
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     if (leftText) leftText.style.left = '15%';
                     if (rightText) rightText.style.right = '15%';
