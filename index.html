@@ -204,25 +204,27 @@
         #archive-fullscreen { display: none; }
         #archive-fullscreen.active { display: flex; }
         
-        /* ZMIANA: Usunięcie problematycznych efektów 3D, dodanie overflow-x: hidden i webkit smooth scrolling na telefony */
+        /* ZMIANA: Okno widza całkowicie izolowane od scrolla systemowego */
         #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
         #note-viewer-overlay.active { display: flex; }
-        /* ZMIANA: Usunięcie translate3D, które blokuje dotyk */
-        .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 1.5rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 2rem; flex-shrink: 0; overflow-x: hidden; }
+        
+        /* ZMIANA: Margines dla paper, żeby nie zasłaniał go dolny przycisk */
+        .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 8rem; flex-shrink: 0; overflow-x: hidden; }
         @media (min-width: 768px) { .viewer-paper { padding: 4rem; } }
         .viewer-paper::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-texture); pointer-events: none; mix-blend-mode: multiply; z-index: 1; }
         .viewer-header { border-bottom: 3px double #1a1a1a; margin-bottom: 2rem; padding-bottom: 1rem; position: relative; z-index: 2; }
         .viewer-meta { font-size: 0.75rem; font-weight: bold; color: #444; margin-bottom: 0.5rem; }
-        /* ZMIANA: Dodanie przymusowego łamania słów do tytułu, aby nie psuł szerokości okna */
+        /* ZMIANA: Tytuł twardo łamany, żeby nigdy nie poszerzył wirtualnego papieru */
         .viewer-title { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #8c1c1c; text-transform: uppercase; margin: 0; line-height: 1.1; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; hyphens: auto; width: 100%; }
         @media (min-width: 768px) { .viewer-title { font-size: 3rem; } }
         .viewer-tags { font-size: 0.875rem; color: #4b7db8; margin-top: 0.5rem; font-weight: bold; }
         .viewer-content { font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word; position: relative; z-index: 2; }
         .viewer-footer { margin-top: 5rem; text-align: right; font-family: 'Special Elite', cursive; color: #8c1c1c; opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; text-transform: uppercase; position: relative; z-index: 2; }
         
-        .close-viewer-btn { background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 4rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s; flex-shrink: 0; z-index: 99999; }
-        @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; } }
-        .close-viewer-btn:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
+        /* ZMIANA: Przycisk ZAMKNIJ zawieszony sztywno u dołu ekranu! Koniec z podwójnym klikaniem. */
+        .close-viewer-btn { position: fixed; bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s, box-shadow 0.1s; flex-shrink: 0; z-index: 99999; width: 90%; max-width: 400px; text-align: center; }
+        @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; width: auto; min-width: 300px; } }
+        .close-viewer-btn:active { transform: translateX(-50%) translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
 
         #install-button { display: none; }
         
@@ -257,7 +259,7 @@
             .bar-track:hover { background: rgba(255,255,255,0.5); border-color: #8c1c1c; }
             .archive-item:hover { background-color: rgba(255,255,255,0.5); }
             .folder-item:hover { background-color: rgba(0,0,0,0.05); }
-            .close-viewer-btn:hover { background-color: #631212; transform: scale(1.05); }
+            .close-viewer-btn:hover { background-color: #631212; transform: translateX(-50%) scale(1.02); }
         }
         /* Responsywne dotknięcia na telefony */
         .calendar-cell:active { background-color: rgba(255,255,255,0.5); }
@@ -374,7 +376,6 @@
                 
                 <div id="note-editor" contenteditable="true" oninput="scheduleSave();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 md:p-6 outline-none font-['Courier_Prime'] text-base md:text-lg leading-relaxed text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto break-words whitespace-pre-wrap" placeholder="Tutaj wprowadź treść notatki służbowej..."></div>
                 
-                <!-- Ochrona paska home w iPhone -->
                 <div class="border-t-2 border-[#57534e] px-3 pt-3 flex flex-wrap justify-between items-center bg-[#292524] z-10 gap-2 shrink-0" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="flex items-center shadow-[1px_1px_0px_#444]">
@@ -755,6 +756,9 @@
             modalStack.push(id);
             window.history.pushState({ modalId: id }, "");
             
+            // ZMIANA: Blokada przewijania tła (Double Scrollbar fix!)
+            document.body.style.overflow = 'hidden';
+            
             if(document.activeElement) document.activeElement.blur();
         }
 
@@ -773,6 +777,12 @@
                 if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'none';
             }
             modalStack = modalStack.filter(m => m !== id);
+            
+            // ZMIANA: Odblokowanie tła, jeśli żadne okno nie jest otwarte
+            if (modalStack.length === 0) {
+                document.body.style.overflow = '';
+            }
+            
             setTimeout(() => { if(document.activeElement) document.activeElement.blur(); }, 10);
         }
 
@@ -1300,7 +1310,7 @@
             if (imgEl) {
                 imgEl.src = randomBg;
                 
-                // ZMIANA: Dokładnie wyliczony złoty środek dla notatek (15% i 10%)
+                // ZMIANA: Złoty środek (15% i 10%) dla podpisów!
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     if (leftText) leftText.style.left = '15%';
                     if (rightText) rightText.style.right = '15%';
@@ -1315,7 +1325,6 @@
             if (dg) {
                 dg.innerText = goalName;
                 
-                // Utrzymanie węższej ramki tylko dla samej nazwy celu na niebieskim dyplomie (by omijać wzory po bokach)
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     dg.style.width = '66%';
                 } else {
