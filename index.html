@@ -187,6 +187,8 @@
         .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
         .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
 
+        /* ZMIANA: Zabezpieczenie przed scrollem samego panelu */
+        .archive-pane { display: none; flex-direction: column; height: 100%; overflow: hidden; }
         .archive-item { cursor: pointer; padding: 4px; border-bottom: 1px dashed #a8a29e; transition: background 0.1s; }
         .archive-item.active { background-color: #e7e5e4; font-weight: bold; border-left: 3px solid #8c1c1c; }
         .note-checkbox { margin-right: 6px; cursor: pointer; }
@@ -204,24 +206,20 @@
         #archive-fullscreen { display: none; }
         #archive-fullscreen.active { display: flex; }
         
-        /* ZMIANA: Okno widza całkowicie izolowane od scrolla systemowego */
         #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
         #note-viewer-overlay.active { display: flex; }
         
-        /* ZMIANA: Margines dla paper, żeby nie zasłaniał go dolny przycisk */
         .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 8rem; flex-shrink: 0; overflow-x: hidden; }
         @media (min-width: 768px) { .viewer-paper { padding: 4rem; } }
         .viewer-paper::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-texture); pointer-events: none; mix-blend-mode: multiply; z-index: 1; }
         .viewer-header { border-bottom: 3px double #1a1a1a; margin-bottom: 2rem; padding-bottom: 1rem; position: relative; z-index: 2; }
         .viewer-meta { font-size: 0.75rem; font-weight: bold; color: #444; margin-bottom: 0.5rem; }
-        /* ZMIANA: Tytuł twardo łamany, żeby nigdy nie poszerzył wirtualnego papieru */
         .viewer-title { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #8c1c1c; text-transform: uppercase; margin: 0; line-height: 1.1; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; hyphens: auto; width: 100%; }
         @media (min-width: 768px) { .viewer-title { font-size: 3rem; } }
         .viewer-tags { font-size: 0.875rem; color: #4b7db8; margin-top: 0.5rem; font-weight: bold; }
         .viewer-content { font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word; position: relative; z-index: 2; }
         .viewer-footer { margin-top: 5rem; text-align: right; font-family: 'Special Elite', cursive; color: #8c1c1c; opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; text-transform: uppercase; position: relative; z-index: 2; }
         
-        /* ZMIANA: Przycisk ZAMKNIJ zawieszony sztywno u dołu ekranu! Koniec z podwójnym klikaniem. */
         .close-viewer-btn { position: fixed; bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s, box-shadow 0.1s; flex-shrink: 0; z-index: 99999; width: 90%; max-width: 400px; text-align: center; }
         @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; width: auto; min-width: 300px; } }
         .close-viewer-btn:active { transform: translateX(-50%) translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
@@ -229,7 +227,6 @@
         #install-button { display: none; }
         
         /* MOBILNE ZARZĄDZANIE PANELEMI ARCHIWUM */
-        .archive-pane { display: none; flex-direction: column; height: 100%; }
         #pane-list.active-pane, #pane-editor.active-pane { display: flex; }
         
         /* BOCZNE MENU (DRAWER) DLA SKOROSZYTÓW NA TELEFONIE */
@@ -310,8 +307,8 @@
     </div>
 
     <!-- NOWE, PEŁNOEKRANOWE ARCHIWUM (Z BOCZNYM MENU) -->
-    <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col">
-        <!-- NAGŁÓWEK ARCHIWUM -->
+    <!-- ZMIANA: Zablokowano przewijanie samego kontenera modala (overflow-hidden) -->
+    <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col overflow-hidden">
         <div class="bg-[#1a1a1a] text-[#e7e5e4] px-3 pb-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20 shrink-0" style="padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));">
             <div class="flex items-center gap-3">
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
@@ -320,7 +317,8 @@
             <button onclick="exitArchive()" class="bg-[#8c1c1c] px-4 py-2 font-bold font-['Oswald'] tracking-wide uppercase hover:bg-[#631212] active:bg-[#631212] border border-[#dcd0c0] transition shadow-md">WYJŚCIE</button>
         </div>
         
-        <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
+        <!-- ZMIANA: Zablokowanie niepotrzebnego puchnięcia paneli w dół (min-h-0) -->
+        <div class="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
             
             <div id="folder-drawer-overlay" onclick="toggleFolderDrawer()"></div>
 
@@ -746,6 +744,7 @@
         // --- SYSTEM ZARZĄDZANIA OKNAMI Z OBSŁUGĄ COFANIA W TELEFONIE ---
         let modalStack = [];
         window.ignorePopstate = false;
+        let scrollPosition = 0; // ZMIANA: Zmienna trzymająca pozycję scrolla
 
         function openModalUI(id) {
             const el = document.getElementById(id);
@@ -753,11 +752,19 @@
             el.classList.add('active');
             if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
             
+            // ZMIANA: Perfekcyjne blokowanie tła przy otwarciu pierwszego okna
+            if (modalStack.length === 0) {
+                scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                document.body.style.setProperty('overflow', 'hidden', 'important');
+                document.body.style.setProperty('position', 'fixed', 'important');
+                document.body.style.setProperty('top', `-${scrollPosition}px`, 'important');
+                document.body.style.setProperty('width', '100%', 'important');
+                document.body.style.setProperty('left', '0', 'important');
+                document.body.style.setProperty('right', '0', 'important');
+            }
+
             modalStack.push(id);
             window.history.pushState({ modalId: id }, "");
-            
-            // ZMIANA: Blokada przewijania tła (Double Scrollbar fix!)
-            document.body.style.overflow = 'hidden';
             
             if(document.activeElement) document.activeElement.blur();
         }
@@ -778,9 +785,15 @@
             }
             modalStack = modalStack.filter(m => m !== id);
             
-            // ZMIANA: Odblokowanie tła, jeśli żadne okno nie jest otwarte
+            // ZMIANA: Odmrożenie tła, gdy nie ma już otwartych okien
             if (modalStack.length === 0) {
-                document.body.style.overflow = '';
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('position');
+                document.body.style.removeProperty('top');
+                document.body.style.removeProperty('width');
+                document.body.style.removeProperty('left');
+                document.body.style.removeProperty('right');
+                window.scrollTo(0, scrollPosition);
             }
             
             setTimeout(() => { if(document.activeElement) document.activeElement.blur(); }, 10);
@@ -798,7 +811,6 @@
                     document.getElementById('pane-folders').classList.remove('open');
                     document.getElementById('folder-drawer-overlay').classList.remove('active');
                 } else if (id === 'archive-folder') {
-                    // Wciśnięto wstecz w folderze - wracamy do "Wszystkie Akta"
                     state.activeFolderId = 'all';
                     saveState();
                     renderArchiveFolders();
@@ -817,10 +829,8 @@
                 const steps = modalStack.length - index;
                 forceCloseModal('archive-fullscreen');
                 
-                // Obcięcie stosu
                 modalStack.length = index; 
                 
-                // Tymczasowo blokujemy listener popstate, żeby przeglądarka mogła cofnąć historię "po cichu" bez migania interfejsu
                 window.ignorePopstate = true;
                 window.history.go(-steps);
                 
@@ -832,7 +842,6 @@
                 forceCloseModal('archive-fullscreen');
             }
             
-            // Zawsze upewniamy się, że po wyjściu stan folderów wraca do domyślnego
             state.activeFolderId = 'all';
             saveState();
             renderArchiveFolders();
@@ -1310,7 +1319,7 @@
             if (imgEl) {
                 imgEl.src = randomBg;
                 
-                // ZMIANA: Złoty środek (15% i 10%) dla podpisów!
+                // Dostosowanie położenia tekstów
                 if (randomBg === 'dyplomniebieskiblue.png') {
                     if (leftText) leftText.style.left = '15%';
                     if (rightText) rightText.style.right = '15%';
