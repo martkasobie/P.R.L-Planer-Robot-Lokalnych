@@ -45,10 +45,13 @@
 
         * { box-sizing: border-box; touch-action: manipulation; }
         
-        /* GŁÓWNY WIDOK: Standardowe przewijanie */
-        html, body { overflow-x: hidden; width: 100%; max-width: 100%; min-height: 100vh; }
+        /* GŁÓWNY WIDOK: Zapobiegamy podskakiwaniu całej aplikacji */
+        html, body { 
+            width: 100%; max-width: 100%; min-height: 100vh; 
+            overscroll-behavior: none; 
+        }
 
-        /* BLOKADA TŁA: Używamy tylko overflow: hidden, aby nie psuć dotyku na telefonach */
+        /* KLASA ZAMRAŻAJĄCA: Używana do zatrzymania tła przy otwartych małych oknach */
         .body-locked { overflow: hidden !important; }
 
         body {
@@ -60,12 +63,15 @@
             color: var(--ink-color);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* OPAKOWANIE PLANERA - paddingi przeniesione z body */
+        #main-app-container {
             padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
             padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
         }
-        
         @media (min-width: 768px) {
-            body {
+            #main-app-container {
                 padding-top: calc(1rem + env(safe-area-inset-top, 0px));
                 padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
             }
@@ -82,13 +88,13 @@
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        /* WŁASNE PASKI PRZEWIJANIA - TYLKO DLA KOMPUTERÓW (myszka).
-           Na telefonach będą natywne, ukrywające się paski systemowe! */
+        /* INTELIGENTNE PASKI PRZEWIJANIA */
+        /* Pasek pokazuje się TYLKO gdy jest dużo treści i tło jest przezroczyste, by nie szpecić pustego ekranu */
         @media (hover: hover) and (pointer: fine) {
             .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-            .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-            .custom-scrollbar::-webkit-scrollbar-thumb { background: #8c1c1c; border-radius: 3px; }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } 
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(140, 28, 28, 0.6); border-radius: 3px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(99, 18, 18, 0.9); }
         }
 
         .paper-sheet {
@@ -161,8 +167,8 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        /* MASKI I OKNA (MODALE) */
-        .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); overscroll-behavior: contain; }
+        /* MODALE SYSTEMOWE */
+        .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); overscroll-behavior: contain; }
         .app-modal-overlay.active { display: flex !important; }
         #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
         
@@ -211,8 +217,7 @@
         [contenteditable] { caret-color: #1a1a1a !important; outline: none; }
         .marked { background-color: #ffcccc !important; color: black !important; border-radius: 2px; padding: 0 2px; font-weight: bold; }
 
-        /* ARCHIWUM PEŁNOEKRANOWE */
-        /* overscroll-behavior: contain zapobiega ciągnięciu ekranu poza archiwum */
+        /* ARCHIWUM PEŁNOEKRANOWE ODDZIELONE FUNKCJONALNIE */
         #archive-fullscreen { display: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
         #archive-fullscreen.active { display: flex; }
         
@@ -266,6 +271,7 @@
             .folder-item:hover { background-color: rgba(0,0,0,0.05); }
             .close-viewer-btn:hover { background-color: #631212; }
         }
+        
         /* Responsywne dotknięcia na telefony */
         .calendar-cell:active { background-color: rgba(255,255,255,0.5); }
         .stamp-item:active { background-color: rgba(255,255,255,0.8); }
@@ -274,10 +280,10 @@
         .folder-item:active { background-color: rgba(0,0,0,0.05); }
     </style>
 </head>
-<body class="flex flex-col items-center justify-start md:justify-center px-2 md:px-4 min-h-screen">
+<body>
 
-    <!-- EKRAN ŁADOWANIA - usunięto overflow-y-auto, dodano overflow-hidden by usunąć niepotrzebny pasek -->
-    <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-hidden" style="padding-top: calc(2.5rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));">
+    <!-- EKRAN ŁADOWANIA - całkowicie zablokowane przewijanie -->
+    <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-hidden" style="touch-action: none;">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
             <p class="font-['Courier_Prime'] text-lg sm:text-xl mb-6 tracking-widest border-b border-[#dcd0c0] pb-2">PLANER ROBÓT LOKALNYCH</p>
@@ -399,6 +405,120 @@
         </div>
     </div>
 
+    <!-- ODDZIELNY GŁÓWNY KONTENER APLIKACJI (Znikanie przy Archiwum) -->
+    <main id="main-app-container" class="flex flex-col items-center justify-start md:justify-center px-2 md:px-4 min-h-screen w-full">
+        <!-- GŁÓWNA KARTA PLANERA -->
+        <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative">
+            <div class="paper-dirt"></div>
+            <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
+
+            <header class="flex flex-col md:flex-row gap-8 mb-6 border-b-2 border-dashed border-[#57534e] pb-4 relative z-10">
+                <div class="relative shrink-0 mx-auto md:mx-0 mt-4">
+                    <div class="wire-clip-container">
+                        <div class="wire-clip-part clip-outer"></div>
+                        <div class="wire-clip-part clip-inner"></div>
+                    </div>
+                    <div class="w-32 h-40 bg-[#d1d5db] border border-gray-600 shadow-md relative rotate-[-2deg] flex items-center justify-center overflow-hidden cursor-pointer group" onclick="document.getElementById('photo-upload').click()">
+                        <img id="user-photo" src="" class="w-full h-full object-cover hidden">
+                        <div id="photo-placeholder" class="text-center p-2 opacity-60 group-hover:opacity-100 transition"><span class="text-xs font-bold block mb-1">FOTOGRAFIA</span><span class="text-[10px] uppercase">(kliknij aby wkleić)</span></div>
+                        <input type="file" id="photo-upload" class="hidden" accept="image/*" onchange="loadPhoto(this)">
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-end border-b border-gray-500 pb-2 mb-4">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1c1917] tracking-tight">P.R.L</h1>
+                        <div class="flex flex-col items-end">
+                            <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
+                            <div class="flex flex-row gap-2 mt-2">
+                                <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 active:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
+                                <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] active:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">WŁĄCZ POWIADOMIENIA</button>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-xl font-bold text-[#292524] mb-6">Planer Robót Lokalnych</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm font-mono">
+                        <div><label class="block text-[10px] uppercase font-bold text-gray-700">Obywatel(ka):</label><input type="text" id="citizen-name" value="Jan Kowalski" class="prl-input w-full font-bold text-lg"></div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-700">Data sporządzenia:</label>
+                            <div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="resetCalendarToToday()" title="Kliknij, aby wrócić do bieżącego miesiąca"></div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-7 space-y-6 relative z-10">
+                    
+                    <!-- CZYN SPOŁECZNY (ZADANIA) -->
+                    <div>
+                        <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
+                        <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black active:bg-black transition">Zatwierdź</button></div>
+                        <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"><div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div></ul>
+                        <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
+                    </div>
+                    
+                    <!-- PLAN DŁUGOTERMINOWY (WYKRESY) -->
+                    <div class="border-t-4 double border-gray-500 pt-4 bg-[#fefce840] p-4 shadow-inner relative">
+                        <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
+                            <div class="flex flex-col w-full sm:w-2/3"><span class="text-[9px] font-bold uppercase text-gray-800">WARTOŚĆ WSADU (Dodaj/Odejmij):</span><div class="flex items-center"><input type="number" id="global-increment-input" class="w-full h-8 bg-white border border-gray-500 p-1 font-bold text-center font-mono outline-none" value="10"></div></div>
+                            <button onclick="openModalUI('add-goal-modal')" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] active:bg-[#631212] transition w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">+ NOWY CEL</button>
+                        </div>
+                        <div id="chart-area" class="bg-graph-paper chart-container custom-scrollbar"><div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div></div>
+                        <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu! <br><span class="font-bold text-black">(Kliknij w tło słupka, aby go edytować)</span></p>
+                    </div>
+                    
+                    <!-- PRZYCISK DO NOWEGO ARCHIWUM -->
+                    <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-6 pb-2">
+                        <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-3 pl-2 border-l-4 border-[#8c1c1c]">Zarządzanie Aktami</h3>
+                        <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer mb-4">
+                            <img src="tablicanotatek.png" alt="Notatnik Archiwalny" class="w-full h-auto block">
+                        </button>
+                    </div>
+
+                    <!-- PROTOKÓŁ SAMOKRYTYKI -->
+                    <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] active:bg-[#631212] transition mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
+                    <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
+                </div>
+
+                <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI, BEZPIECZEŃSTWO) -->
+                <div class="lg:col-span-5 space-y-6 relative z-10">
+                    
+                    <!-- Kalendarz obsługujący Swipe -->
+                    <div id="calendar-swipe-zone" class="bg-white/30 p-2 border border-gray-500 shadow-sm relative touch-pan-y">
+                        <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
+                        <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2">
+                            <button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button>
+                            <h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs cursor-pointer hover:bg-gray-400 active:bg-gray-400 px-2 py-1 rounded transition" onclick="openJumpDateModal()" title="Zmień miesiąc/rok"></h3>
+                            <button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button>
+                        </div>
+                        <div id="calendar-grid" class="calendar-grid"></div>
+                        <p class="text-[8px] text-center mt-2 text-gray-600 uppercase leading-tight">Wskazówka: Możesz przewijać miesiące palcem ↔<br>lub kliknąć w miesiąc u góry, by zmienić przydział czasu.</p>
+                    </div>
+                    
+                    <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
+                        <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2"><span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span><div class="flex gap-2"><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Inicjatywa Własna</span></label><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Przydział Centralny</span></label></div></div>
+                        <div class="flex justify-between items-center bg-[#292524] text-[#e7e5e4] px-2 py-1 mb-3"><h3 class="text-xs font-bold uppercase">Pieczątki:</h3></div>
+                        <div class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar transition-opacity duration-300" id="stamps-gallery"></div>
+                        <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.</p>
+                    </div>
+
+                    <!-- LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
+                    <div class="border-2 border-gray-500 p-4 bg-white/30 relative shadow-sm">
+                        <h3 class="text-sm font-bold uppercase text-[#4b7db8] mb-2 pl-2 border-l-4 border-[#4b7db8]">Bezpieczeństwo Danych</h3>
+                        <div class="flex flex-row gap-2">
+                            <button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">POBIERZ KOPIĘ</button>
+                            <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button>
+                            <input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)">
+                        </div>
+                        <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2 text-gray-700 italic">Ochrona akt to Twój obowiązek!</p>
+                    </div>
+                </div>
+            </div>
+            <footer class="mt-8 text-center border-t border-gray-500 pt-4 opacity-60"><p class="text-[10px] font-mono uppercase">Ministerstwo Administracji Publicznej • Wzór zatwierdzony w 1978r.</p></footer>
+        </div>
+    </main>
+
     <!-- MODALE SYSTEMOWE -->
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black active:bg-black transition">Zrozumiałem</button></div></div>
     
@@ -422,32 +542,6 @@
         </div>
     </div>
 
-    <!-- DYPLOM PRZODOWNIKA PRACY -->
-    <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding-top: calc(2rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));">
-        <div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0">
-            <div id="diploma-capture-area" class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)] bg-white">
-                <button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ
-                </button>
-                <img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]">
-                
-                <div id="diploma-goal" class="absolute text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div>
-                
-                <div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div>
-                
-                <div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;">
-                    <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span>
-                    <strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong>
-                </div>
-                <div id="diploma-right-text" class="absolute text-right text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; right: 10%;">
-                    <span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Z ramienia:</span>
-                    <strong class="text-xs sm:text-sm md:text-base leading-tight block">P.R.L<br>Planer Robót Lokalnych</strong>
-                </div>
-            </div>
-            <button onclick="closeModalUI('diploma-modal')" class="w-full mt-6 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">ZAMKNIJ</button>
-        </div>
-    </div>
-    
     <div id="event-modal" class="app-modal-overlay">
         <div class="app-modal-window" style="max-width: 400px; width: 95%;">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3>
@@ -476,7 +570,6 @@
         </div>
     </div>
 
-    <!-- DODAWANIE CELU -->
     <div id="add-goal-modal" class="app-modal-overlay">
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
@@ -501,7 +594,6 @@
         </div>
     </div>
 
-    <!-- EDYCJA CELU -->
     <div id="edit-goal-modal" class="app-modal-overlay">
         <div class="app-modal-window">
             <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3>
@@ -533,120 +625,9 @@
     </div>
 
 
-    <!-- GŁÓWNA KARTA PLANERA -->
-    <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative">
-        <div class="paper-dirt"></div>
-        <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
-
-        <header class="flex flex-col md:flex-row gap-8 mb-6 border-b-2 border-dashed border-[#57534e] pb-4 relative z-10">
-            <div class="relative shrink-0 mx-auto md:mx-0 mt-4">
-                <div class="wire-clip-container">
-                    <div class="wire-clip-part clip-outer"></div>
-                    <div class="wire-clip-part clip-inner"></div>
-                </div>
-                <div class="w-32 h-40 bg-[#d1d5db] border border-gray-600 shadow-md relative rotate-[-2deg] flex items-center justify-center overflow-hidden cursor-pointer group" onclick="document.getElementById('photo-upload').click()">
-                    <img id="user-photo" src="" class="w-full h-full object-cover hidden">
-                    <div id="photo-placeholder" class="text-center p-2 opacity-60 group-hover:opacity-100 transition"><span class="text-xs font-bold block mb-1">FOTOGRAFIA</span><span class="text-[10px] uppercase">(kliknij aby wkleić)</span></div>
-                    <input type="file" id="photo-upload" class="hidden" accept="image/*" onchange="loadPhoto(this)">
-                </div>
-            </div>
-            <div class="flex-1">
-                <div class="flex justify-between items-end border-b border-gray-500 pb-2 mb-4">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1c1917] tracking-tight">P.R.L</h1>
-                    <div class="flex flex-col items-end">
-                        <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
-                        <div class="flex flex-row gap-2 mt-2">
-                            <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 active:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
-                            <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] active:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">WŁĄCZ POWIADOMIENIA</button>
-                        </div>
-                    </div>
-                </div>
-                <h2 class="text-xl font-bold text-[#292524] mb-6">Planer Robót Lokalnych</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm font-mono">
-                    <div><label class="block text-[10px] uppercase font-bold text-gray-700">Obywatel(ka):</label><input type="text" id="citizen-name" value="Jan Kowalski" class="prl-input w-full font-bold text-lg"></div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-gray-700">Data sporządzenia:</label>
-                        <div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="resetCalendarToToday()" title="Kliknij, aby wrócić do bieżącego miesiąca"></div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-7 space-y-6 relative z-10">
-                
-                <!-- CZYN SPOŁECZNY (ZADANIA) -->
-                <div>
-                    <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
-                    <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black active:bg-black transition">Zatwierdź</button></div>
-                    <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"><div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div></ul>
-                    <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
-                </div>
-                
-                <!-- PLAN DŁUGOTERMINOWY (WYKRESY) -->
-                <div class="border-t-4 double border-gray-500 pt-4 bg-[#fefce840] p-4 shadow-inner relative">
-                    <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
-                        <div class="flex flex-col w-full sm:w-2/3"><span class="text-[9px] font-bold uppercase text-gray-800">WARTOŚĆ WSADU (Dodaj/Odejmij):</span><div class="flex items-center"><input type="number" id="global-increment-input" class="w-full h-8 bg-white border border-gray-500 p-1 font-bold text-center font-mono outline-none" value="10"></div></div>
-                        <button onclick="openModalUI('add-goal-modal')" class="bg-[#8c1c1c] text-white border border-[#3d0808] px-3 py-2 font-bold uppercase text-xs hover:bg-[#631212] active:bg-[#631212] transition w-full sm:w-auto flex items-center justify-center h-8 sm:h-auto">+ NOWY CEL</button>
-                    </div>
-                    <div id="chart-area" class="bg-graph-paper chart-container custom-scrollbar"><div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div></div>
-                    <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu! <br><span class="font-bold text-black">(Kliknij w tło słupka, aby go edytować)</span></p>
-                </div>
-                
-                <!-- PRZYCISK DO NOWEGO ARCHIWUM -->
-                <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-6 pb-2">
-                    <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-3 pl-2 border-l-4 border-[#8c1c1c]">Zarządzanie Aktami</h3>
-                    <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer mb-4">
-                        <img src="tablicanotatek.png" alt="Notatnik Archiwalny" class="w-full h-auto block">
-                    </button>
-                </div>
-
-                <!-- PROTOKÓŁ SAMOKRYTYKI -->
-                <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] active:bg-[#631212] transition mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
-                <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
-            </div>
-
-            <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI, BEZPIECZEŃSTWO) -->
-            <div class="lg:col-span-5 space-y-6 relative z-10">
-                
-                <!-- Kalendarz obsługujący Swipe (Przesunięcie) w Strefie SwipeZone -->
-                <div id="calendar-swipe-zone" class="bg-white/30 p-2 border border-gray-500 shadow-sm relative touch-pan-y">
-                    <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
-                    <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2">
-                        <button onclick="changeMonth(-1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&lt;</button>
-                        <h3 id="calendar-month-year" class="text-center font-bold uppercase text-xs cursor-pointer hover:bg-gray-400 active:bg-gray-400 px-2 py-1 rounded transition" onclick="openJumpDateModal()" title="Zmień miesiąc/rok"></h3>
-                        <button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button>
-                    </div>
-                    <div id="calendar-grid" class="calendar-grid"></div>
-                    <p class="text-[8px] text-center mt-2 text-gray-600 uppercase leading-tight">Wskazówka: Możesz przewijać miesiące palcem ↔<br>lub kliknąć w miesiąc u góry, by zmienić przydział czasu.</p>
-                </div>
-                
-                <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
-                    <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2"><span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span><div class="flex gap-2"><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Inicjatywa Własna</span></label><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Przydział Centralny</span></label></div></div>
-                    <div class="flex justify-between items-center bg-[#292524] text-[#e7e5e4] px-2 py-1 mb-3"><h3 class="text-xs font-bold uppercase">Pieczątki:</h3></div>
-                    <div class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar transition-opacity duration-300" id="stamps-gallery"></div>
-                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.</p>
-                </div>
-
-                <!-- LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
-                <div class="border-2 border-gray-500 p-4 bg-white/30 relative shadow-sm">
-                    <h3 class="text-sm font-bold uppercase text-[#4b7db8] mb-2 pl-2 border-l-4 border-[#4b7db8]">Bezpieczeństwo Danych</h3>
-                    <div class="flex flex-row gap-2">
-                        <button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">POBIERZ KOPIĘ</button>
-                        <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button>
-                        <input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)">
-                    </div>
-                    <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2 text-gray-700 italic">Ochrona akt to Twój obowiązek!</p>
-                </div>
-            </div>
-        </div>
-        <footer class="mt-8 text-center border-t border-gray-500 pt-4 opacity-60"><p class="text-[10px] font-mono uppercase">Ministerstwo Administracji Publicznej • Wzór zatwierdzony w 1978r.</p></footer>
-    </div>
-
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        // --- INICJALIZACJA Z FUNKCJĄ PRZECHWYTYWANIA UDOSTĘPNIANIA ---
+        // --- INICJALIZACJA ---
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const akcja = urlParams.get('akcja');
@@ -654,15 +635,13 @@
             const sharedText = urlParams.get('text');
             const sharedUrl = urlParams.get('url');
             
-            // Jeśli przyszły dane, wymuszamy start od razu i wyłączamy ekran startowy
             if (akcja === 'nowanotatka' || sharedTitle || sharedText || sharedUrl) {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.style.display = 'none';
                 
-                // Czekamy aż baza danych zostanie załadowana (await dla init)
                 init().then(() => {
                     openModalUI('archive-fullscreen');
-                    createNewNoteMobile(); // To ustawi edytor na nowy
+                    createNewNoteMobile(); 
                     
                     let finalHtml = '';
                     let textContent = sharedText || '';
@@ -674,15 +653,10 @@
                         finalHtml += `<span style="font-weight:bold; font-size:1.1em;">${sharedTitle}</span><br><br>`;
                     }
 
-                    // Rozpoznawanie linków wewnątrz przysłanego tekstu
                     const urlRegex = /(https?:\/\/[^\s]+)/g;
                     textContent = textContent.replace(urlRegex, '<a href="$1" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">$1</a>');
 
-                    if (textContent) {
-                        finalHtml += `${textContent}<br><br>`;
-                    }
-                    
-                    // Jeśli jest osobny link i nie ma go w tekście
+                    if (textContent) { finalHtml += `${textContent}<br><br>`; }
                     if (urlContent && !textContent.includes(urlContent)) {
                          finalHtml += `<a href="${urlContent}" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">${urlContent}</a><br>`;
                     }
@@ -690,10 +664,8 @@
                     const editor = document.getElementById('note-editor');
                     if (editor) {
                         editor.innerHTML = finalHtml;
-                        scheduleSave(); // Zapisujemy!
+                        scheduleSave();
                     }
-                    
-                    // Czyścimy pasek adresu z parametrów, żeby nie otworzyło tego drugi raz
                     window.history.replaceState({}, document.title, window.location.pathname);
                 });
             } else {
@@ -701,35 +673,21 @@
                 init();
             }
 
-            // GESTY SWIPE DLA KALENDARZA
             const swipeZone = document.getElementById('calendar-swipe-zone');
             if(swipeZone) {
-                swipeZone.addEventListener('touchstart', e => {
-                    touchstartX = e.changedTouches[0].screenX;
-                }, {passive: true});
-                swipeZone.addEventListener('touchend', e => {
-                    touchendX = e.changedTouches[0].screenX;
-                    handleSwipe();
-                }, {passive: true});
+                swipeZone.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+                swipeZone.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
             }
         });
 
-        // --- LIKWIDACJA "LEPKIEGO PALCA" (STICKY HOVER) NA TELEFONACH ---
-        document.addEventListener('touchend', (e) => {
-            const btn = e.target.closest('button');
-            if(btn) { setTimeout(() => btn.blur(), 150); }
-        });
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if(btn) { setTimeout(() => btn.blur(), 150); }
-        });
+        // --- LIKWIDACJA "LEPKIEGO PALCA" ---
+        document.addEventListener('touchend', (e) => { const btn = e.target.closest('button'); if(btn) { setTimeout(() => btn.blur(), 150); } });
+        document.addEventListener('click', (e) => { const btn = e.target.closest('button'); if(btn) { setTimeout(() => btn.blur(), 150); } });
 
         // --- REJESTRACJA SERVICE WORKERA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => { console.log('Service Worker zameldował się z sukcesem.'); })
-                    .catch(error => { console.log('Błąd meldunku Service Workera:', error); });
+                navigator.serviceWorker.register('./sw.js').then(registration => { console.log('SW ok'); }).catch(error => { console.log('SW error'); });
             });
         }
 
@@ -748,21 +706,26 @@
             }
         }
 
-        // --- SYSTEM ZARZĄDZANIA OKNAMI Z OBSŁUGĄ COFANIA W TELEFONIE ---
+        // --- SYSTEM ZARZĄDZANIA OKNAMI ---
         let modalStack = [];
         window.ignorePopstate = false;
 
         function openModalUI(id) {
             const el = document.getElementById(id);
             if (!el) return;
+            
+            // UKRYWANIE GŁÓWNEGO WIDOKU PRZY ARCHIWUM
+            if (id === 'archive-fullscreen') {
+                document.getElementById('main-app-container').style.display = 'none';
+            } else {
+                if (modalStack.length === 0) {
+                    document.body.classList.add('body-locked');
+                }
+            }
+
             el.classList.add('active');
             if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
             
-            // Zablokowanie scrollowania tła
-            if (modalStack.length === 0) {
-                document.body.classList.add('body-locked');
-            }
-
             modalStack.push(id);
             window.history.pushState({ modalId: id }, "");
             
@@ -785,8 +748,14 @@
             }
             modalStack = modalStack.filter(m => m !== id);
             
-            // Odblokowanie scrollowania tła
-            if (modalStack.length === 0) {
+            // PRZYWRACANIE GŁÓWNEGO WIDOKU
+            if (id === 'archive-fullscreen') {
+                document.getElementById('main-app-container').style.display = 'flex';
+            }
+            
+            // ODBLOKOWANIE TŁA DLA ZWYKŁYCH MODALI
+            const hasRegularModals = modalStack.some(m => m !== 'archive-fullscreen');
+            if (!hasRegularModals) {
                 document.body.classList.remove('body-locked');
             }
             
@@ -824,22 +793,15 @@
                 forceCloseModal('archive-fullscreen');
                 
                 modalStack.length = index; 
-                
                 window.ignorePopstate = true;
                 window.history.go(-steps);
-                
-                setTimeout(() => { 
-                    window.ignorePopstate = false; 
-                }, 500); 
-                
+                setTimeout(() => { window.ignorePopstate = false; }, 500); 
             } else {
                 forceCloseModal('archive-fullscreen');
             }
             
             state.activeFolderId = 'all';
-            saveState();
-            renderArchiveFolders();
-            renderArchiveNotes();
+            saveState(); renderArchiveFolders(); renderArchiveNotes();
         }
 
         let confirmCallback = null;
@@ -847,106 +809,49 @@
         function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
         function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
 
-        // --- APARAT DO ZDJĘĆ DYPLOMU ---
         function downloadDiploma() {
             const captureArea = document.getElementById('diploma-capture-area');
             const btn = document.getElementById('btn-download-diploma');
-            
             if(btn) btn.style.display = 'none';
 
-            html2canvas(captureArea, {
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: null,
-                scrollY: 0 
-            }).then(canvas => {
+            html2canvas(captureArea, { scale: 2, useCORS: true, backgroundColor: null, scrollY: 0 }).then(canvas => {
                 if(btn) btn.style.display = 'flex';
                 const link = document.createElement('a');
-                link.download = `Dyplom_Przodownika_${state.citizenName ? state.citizenName.replace(/\s+/g, '_') : 'Obywatel'}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                link.download = `Dyplom_${state.citizenName ? state.citizenName.replace(/\s+/g, '_') : 'Obywatel'}.png`;
+                link.href = canvas.toDataURL('image/png'); link.click();
             }).catch(err => {
-                console.error("Błąd podczas generowania dyplomu:", err);
                 if(btn) btn.style.display = 'flex';
-                showAlert("Obywatelu! Błąd aparatu. Nie udało się zapisać dyplomu.");
+                showAlert("Błąd aparatu.");
             });
         }
 
-        // --- SYSTEM DŹWIĘKOWY (Wydział Radiowy) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
-
         let stampBuffer = null;
-        fetch('freesound_community-stamp-81635.mp3')
-            .then(res => res.arrayBuffer())
-            .then(data => audioCtx.decodeAudioData(data))
-            .then(buffer => { stampBuffer = buffer; })
-            .catch(e => console.log("Błąd ładowania dźwięku pieczątki:", e));
+        fetch('freesound_community-stamp-81635.mp3').then(res => res.arrayBuffer()).then(data => audioCtx.decodeAudioData(data)).then(buffer => { stampBuffer = buffer; }).catch(e => console.log(e));
 
-        const unlockAudio = () => {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
-        };
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio);
+        const unlockAudio = () => { if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } document.removeEventListener('click', unlockAudio); document.removeEventListener('touchstart', unlockAudio); };
+        document.addEventListener('click', unlockAudio); document.addEventListener('touchstart', unlockAudio);
 
         function playSound(type) {
-            try {
-                if (type === 'stamp') {
-                    if (stampBuffer) {
-                        if (audioCtx.state === 'suspended') audioCtx.resume();
-                        const source = audioCtx.createBufferSource();
-                        source.buffer = stampBuffer;
-                        const gain = audioCtx.createGain();
-                        gain.gain.value = 0.7; // Głośność pieczątki
-                        source.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        source.start(0);
-                    }
-                }
-            } catch(e) {}
+            try { if (type === 'stamp' && stampBuffer) { if (audioCtx.state === 'suspended') audioCtx.resume(); const source = audioCtx.createBufferSource(); source.buffer = stampBuffer; const gain = audioCtx.createGain(); gain.gain.value = 0.7; source.connect(gain); gain.connect(audioCtx.destination); source.start(0); } } catch(e) {}
         }
 
-        // Aktualizacja znaczka aplikacji (czerwona kropka) dla niewykonanych zadań
         function updateAppBadge() {
             if ('setAppBadge' in navigator) {
                 const incomplete = state.tasks ? state.tasks.filter(t => !t.done).length : 0;
-                if (incomplete > 0) {
-                    navigator.setAppBadge(incomplete).catch(e => console.error("Badge error:", e));
-                } else {
-                    navigator.clearAppBadge().catch(e => console.error("Badge clear error:", e));
-                }
+                if (incomplete > 0) navigator.setAppBadge(incomplete).catch(e => e);
+                else navigator.clearAppBadge().catch(e => e);
             }
         }
 
-        // --- DANE I STAN APLIKACJI ---
-        const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
-        
-        // KOMPLETNA LISTA PIECZĄTEK Z MAGAZYNU GŁÓWNEGO
+        const quotes = ["Zmęczenie to plotka nierobów!", "Myślałeś, że to koniec? To wstęp do nadgodzin!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 101, text: "", shape: "none", color: "custom", icon: '<img src="ziemniaki.png" alt="Ziemniaki" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 102, text: "", shape: "none", color: "custom", icon: '<img src="Ogórek1.png" alt="Ogórek" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 103, text: "", shape: "none", color: "custom", icon: '<img src="1zł.png" alt="1zł" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 104, text: "", shape: "none", color: "custom", icon: '<img src="karp.png" alt="Karp" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 105, text: "", shape: "none", color: "custom", icon: '<img src="Kaseta.png" alt="Kaseta" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 106, text: "", shape: "none", color: "custom", icon: '<img src="Kawa.png" alt="Kawa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 107, text: "", shape: "none", color: "custom", icon: '<img src="krzyzyk.png" alt="Krzyżyk" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 108, text: "", shape: "none", color: "custom", icon: '<img src="Kupon.png" alt="Kupon" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 109, text: "", shape: "none", color: "custom", icon: '<img src="kura.png" alt="Kura" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 110, text: "", shape: "none", color: "custom", icon: '<img src="Maluch.png" alt="Maluch" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 111, text: "", shape: "none", color: "custom", icon: '<img src="mandarynka.png" alt="Mandarynka" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 112, text: "", shape: "none", color: "custom", icon: '<img src="mis.png" alt="Miś" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 113, text: "", shape: "none", color: "custom", icon: '<img src="Pierog1.png" alt="Pieróg" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 114, text: "", shape: "none", color: "custom", icon: '<img src="TURBOGUMA.png" alt="Turbo Guma" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 115, text: "", shape: "none", color: "custom", icon: '<img src="waga.png" alt="Waga" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 116, text: "", shape: "none", color: "custom", icon: '<img src="Zupa1.png" alt="Zupa" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 117, text: "", shape: "none", color: "custom", icon: '<img src="Bilet.png" alt="Bilet" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
-            { id: 118, text: "", shape: "none", color: "custom", icon: '<img src="termometr.png" alt="Termometr" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true }
+            { id: 103, text: "", shape: "none", color: "custom", icon: '<img src="1zł.png" alt="1zł" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true }
         ];
 
         let state = { 
@@ -957,181 +862,65 @@
             notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "",
             folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ]
         };
-        let currentEditingDateKey = null, currentQuoteIndex = 0;
-        let saveTimeout;
-        let currentEditingEventId = null;
-        let currentEditingEventSourceKey = null;
-        let touchstartX = 0;
-        let touchendX = 0;
+        let currentEditingDateKey = null, currentQuoteIndex = 0; let saveTimeout; let currentEditingEventId = null; let currentEditingEventSourceKey = null; let touchstartX = 0; let touchendX = 0;
 
-        // --- BAZA DANYCH (INDEXED DB) ---
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('PRL_Database', 1);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains('appState')) db.createObjectStore('appState');
-                };
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function saveToDB(stateObj) {
-            const db = await initDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction('appState', 'readwrite');
-                const store = tx.objectStore('appState');
-                const req = store.put(stateObj, 'masterState');
-                req.onsuccess = () => resolve(); req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function loadFromDB() {
-            const db = await initDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction('appState', 'readonly');
-                const store = tx.objectStore('appState');
-                const req = store.get('masterState');
-                req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error);
-            });
-        }
+        function initDB() { return new Promise((resolve, reject) => { const request = indexedDB.open('PRL_Database', 1); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains('appState')) db.createObjectStore('appState'); }; request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+        async function saveToDB(stateObj) { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction('appState', 'readwrite'); const store = tx.objectStore('appState'); const req = store.put(stateObj, 'masterState'); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); }); }
+        async function loadFromDB() { const db = await initDB(); return new Promise((resolve, reject) => { const tx = db.transaction('appState', 'readonly'); const store = tx.objectStore('appState'); const req = store.get('masterState'); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
         
         async function loadState() { 
             try {
                 let loadedState = await loadFromDB();
-                if (!loadedState) {
-                    const oldS = localStorage.getItem('prl_planer_v10');
-                    if (oldS) { loadedState = JSON.parse(oldS); }
-                }
+                if (!loadedState) { const oldS = localStorage.getItem('prl_planer_v10'); if (oldS) { loadedState = JSON.parse(oldS); } }
                 if (loadedState) { 
                     state = { ...state, ...loadedState }; 
-                    if (state.photo) { 
-                        const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); 
-                        if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); 
-                    }
+                    if (state.photo) { const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); }
                     saveToDB(state);
                 }
-            } catch (e) {
-                console.error("Błąd archiwisty podczas czytania akt:", e);
-            }
+            } catch (e) { console.error("Błąd bazy:", e); }
         }
 
-        function scheduleSave() {
-            clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500);
-        }
+        function scheduleSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500); }
 
-        // --- KOPIA ZAPASOWA DANYCH (EKSPORT / IMPORT) ---
         function exportData() {
             if(document.activeElement) document.activeElement.blur();
-            const dataStr = JSON.stringify(state);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            const dObj = new Date();
-            const dStr = dObj.getFullYear() + String(dObj.getMonth()+1).padStart(2,'0') + String(dObj.getDate()).padStart(2,'0');
-            link.download = `PRL_Akta_Zapasowe_${dStr}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showAlert("Kopia zapasowa pobrana! Zapisz ten plik w bezpiecznym miejscu na swoim urządzeniu.");
+            const dataStr = JSON.stringify(state); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob); const link = document.createElement('a'); link.href = url; const dObj = new Date(); const dStr = dObj.getFullYear() + String(dObj.getMonth()+1).padStart(2,'0') + String(dObj.getDate()).padStart(2,'0'); link.download = `PRL_Akta_${dStr}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); showAlert("Pobrano plik!");
         }
 
         function importData(input) {
-            if (!input.files || input.files.length === 0) return;
-            const file = input.files[0];
-            const reader = new FileReader();
+            if (!input.files || input.files.length === 0) return; const file = input.files[0]; const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const importedState = JSON.parse(e.target.result);
-                    if (importedState && typeof importedState === 'object') {
-                        showConfirm("UWAGA! Wgranie kopii trwale usunie obecnie widoczne akta i zastąpi je danymi z pliku. Kontynuować?", async () => {
-                            state = { ...state, ...importedState };
-                            await saveToDB(state);
-                            
-                            const pI = document.getElementById('user-photo');
-                            const pP = document.getElementById('photo-placeholder');
-                            if(state.photo && pI) { pI.src = state.photo; pI.classList.remove('hidden'); if(pP) pP.classList.add('hidden'); }
-                            
-                            const cn = document.getElementById('citizen-name'); 
-                            if (cn && state.citizenName) cn.value = state.citizenName;
-                            
-                            const rm = document.querySelector(`input[name="stampMode"][value="manual"]`);
-                            const rr = document.querySelector(`input[name="stampMode"][value="random"]`);
-                            if (state.stampSelectionMode === 'random') { if (rr) rr.checked = true; } else { if (rm) rm.checked = true; }
-                            
-                            renderTasks();
-                            renderPlans();
-                            renderCalendar();
-                            renderStampsGallery();
-                            renderSelfCriticismHistory();
-                            renderArchiveFolders();
-                            renderArchiveNotes();
-                            
-                            showAlert("System zresetowany. Akta przywrócone pomyślnie z kopii zapasowej!");
+                    if (importedState) {
+                        showConfirm("Trwale usunąć obecne i wgrać nowe?", async () => {
+                            state = { ...state, ...importedState }; await saveToDB(state);
+                            location.reload(); 
                         });
-                    } else {
-                        showAlert("Błąd: Wybrany plik nie zawiera prawidłowych akt.");
                     }
-                } catch (err) {
-                    showAlert("Błąd odczytu: Plik jest uszkodzony lub to nie są akta PRL.");
-                }
-                input.value = ''; // Reset inputa
-            };
-            reader.readAsText(file);
+                } catch (err) { showAlert("Plik uszkodzony."); } input.value = '';
+            }; reader.readAsText(file);
         }
 
-        function handleSwipe() {
-            if (touchendX < touchstartX - 40) changeMonth(1); 
-            if (touchendX > touchstartX + 40) changeMonth(-1);
-        }
+        function handleSwipe() { if (touchendX < touchstartX - 40) changeMonth(1); if (touchendX > touchstartX + 40) changeMonth(-1); }
 
         function initSplashScreen() {
             const bar = document.getElementById('splash-progress'), status = document.getElementById('splash-status'), loading = document.getElementById('loading-container'), start = document.getElementById('start-container');
-            setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100);
-            setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600);
-            setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów z serwera..."; }, 1200);
-            setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800);
-            setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200);
+            setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100); setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600); setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów z serwera..."; }, 1200); setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800); setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200);
         }
 
-        function enterApp() { 
-            const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); 
-        }
+        function enterApp() { const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); }
         
         async function init() {
-            try { await loadState(); } catch(e) { console.error("Blad wczytywania bazy:", e); }
+            try { await loadState(); } catch(e) { }
             
-            if (!state.folders) state.folders = [{id: 'main', name: 'GŁÓWNE AKTA'}];
-            if (!state.activeFolderId) state.activeFolderId = 'all';
-            if (!state.events) state.events = {};
-            if (!state.tasks) state.tasks = [];
-            if (!state.plans) state.plans = [];
+            if (!state.folders) state.folders = [{id: 'main', name: 'GŁÓWNE AKTA'}]; if (!state.activeFolderId) state.activeFolderId = 'all'; if (!state.events) state.events = {}; if (!state.tasks) state.tasks = []; if (!state.plans) state.plans = [];
 
-            // MIGRACJA WYDARZEŃ DO TABLIC (aby dni mogły mieć więcej niż 1 zdarzenie)
-            for (let k in state.events) {
-                if (!Array.isArray(state.events[k])) {
-                    state.events[k] = [{
-                        id: Date.now() + Math.random(),
-                        text: state.events[k].text,
-                        recurrence: state.events[k].recurrence || 'none'
-                    }];
-                }
-            }
+            for (let k in state.events) { if (!Array.isArray(state.events[k])) { state.events[k] = [{ id: Date.now() + Math.random(), text: state.events[k].text, recurrence: state.events[k].recurrence || 'none' }]; } }
 
             state.viewDate = new Date(); 
             
-            try { initQuote(); } catch(e) { console.error("Motto error:", e); }
-            try { renderDate(); setInterval(renderDate, 60000); } catch(e) { console.error("Date error:", e); }
-            try { renderTasks(); } catch(e) { console.error("Tasks error:", e); }
-            try { renderPlans(); } catch(e) { console.error("Plans error:", e); }
-            try { renderCalendar(); } catch(e) { console.error("Calendar error:", e); }
-            try { renderStampsGallery(); } catch(e) { console.error("Stamps error:", e); }
-            try { renderSelfCriticismHistory(); } catch(e) { console.error("SelfCriticism error:", e); }
-            try { renderArchiveFolders(); } catch(e) { console.error("Folders error:", e); }
-            try { renderArchiveNotes(); } catch(e) { console.error("Notes error:", e); }
+            initQuote(); renderDate(); setInterval(renderDate, 60000); renderTasks(); renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderArchiveFolders(); renderArchiveNotes();
             
             const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
             if(e && !state.activeNoteId) { e.innerHTML = state.scratchpad || "<div><br></div>"; if (t) t.value = state.scratchpadTitle || ""; if (tg) tg.value = state.scratchpadTags || ""; }
@@ -1146,39 +935,26 @@
             if (e) { 
                 e.addEventListener('input', scheduleSave); 
                 e.addEventListener('paste', function(ev) {
-                    if (ev.clipboardData && ev.clipboardData.items) {
-                        for (let i = 0; i < ev.clipboardData.items.length; i++) {
-                            if (ev.clipboardData.items[i].type.indexOf("image") !== -1) {
-                                ev.preventDefault(); 
-                                let file = ev.clipboardData.items[i].getAsFile();
-                                processImageFile(file); 
-                                return;
-                            }
-                        }
-                    }
+                    if (ev.clipboardData && ev.clipboardData.items) { for (let i = 0; i < ev.clipboardData.items.length; i++) { if (ev.clipboardData.items[i].type.indexOf("image") !== -1) { ev.preventDefault(); let file = ev.clipboardData.items[i].getAsFile(); processImageFile(file); return; } } }
                 });
             }
             if (t) t.addEventListener('input', scheduleSave); if (tg) tg.addEventListener('input', scheduleSave);
             const ti = document.getElementById('task-input'); if (ti) ti.addEventListener('keypress', (ev) => { if(ev.key === 'Enter') addTask(); });
         }
 
-        // --- FUNKCJE POMOCNICZE (EDYCJA, WSTAWIANIE ZDJĘĆ, ZAKREŚLACZ) ---
         function sanitizeEditor(e) { if (e.innerText.trim() === "" && e.querySelectorAll('img').length === 0) e.innerHTML = '<div><br></div>'; const s = e.querySelectorAll('span:empty'); s.forEach(x => x.remove()); }
         
         function applyZakreslacz() {
-            const e = document.getElementById('note-editor'), sel = window.getSelection();
-            if (!sel.rangeCount || sel.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst myszką.");
+            const e = document.getElementById('note-editor'), sel = window.getSelection(); if (!sel.rangeCount || sel.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst myszką.");
             const r = sel.getRangeAt(0); if (!e.contains(r.commonAncestorContainer)) return;
             const span = document.createElement('span'); span.className = 'marked';
-            try { span.appendChild(r.extractContents()); r.insertNode(span); const z = document.createTextNode('\u200B'); span.after(z); const nr = document.createRange(); nr.setStartAfter(z); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); e.focus(); scheduleSave(); } catch (err) { console.error(err); }
+            try { span.appendChild(r.extractContents()); r.insertNode(span); const z = document.createTextNode('\u200B'); span.after(z); const nr = document.createRange(); nr.setStartAfter(z); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); e.focus(); scheduleSave(); } catch (err) { }
         }
         
         function forceCleanEditor() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return showAlert("Obywatelu! Najpierw kliknij na zakreślony tekst.");
+            const sel = window.getSelection(); if (!sel.rangeCount) return showAlert("Obywatelu! Najpierw kliknij na zakreślony tekst.");
             const editor = document.getElementById('note-editor'); if (!editor.contains(sel.anchorNode)) return;
-            let removed = false;
-            const isBadNode = (n) => { if (n.nodeType !== 1) return false; const t = n.tagName.toUpperCase(); return (t === 'SPAN' || t === 'B' || t === 'STRONG' || t === 'FONT' || t === 'I' || t === 'U' || t === 'MARK'); };
+            let removed = false; const isBadNode = (n) => { if (n.nodeType !== 1) return false; const t = n.tagName.toUpperCase(); return (t === 'SPAN' || t === 'B' || t === 'STRONG' || t === 'FONT' || t === 'I' || t === 'U' || t === 'MARK'); };
             const unwrap = (el) => { const parent = el.parentNode; if (!parent) return; while (el.firstChild) { parent.insertBefore(el.firstChild, el); } parent.removeChild(el); removed = true; };
             if (!sel.isCollapsed) { const range = sel.getRangeAt(0); const elements = Array.from(editor.querySelectorAll('*')); elements.forEach(el => { if (isBadNode(el) && (sel.containsNode(el, true) || range.intersectsNode(el))) { unwrap(el); } }); document.execCommand('removeFormat', false, null); removed = true; }
             let node = sel.anchorNode; if (node === editor && editor.childNodes[sel.anchorOffset]) { node = editor.childNodes[sel.anchorOffset]; }
@@ -1190,96 +966,51 @@
         function processImageFile(file) {
             const rd = new FileReader();
             rd.onload = (ev) => {
-                const img = new Image();
-                img.onload = function() {
-                    const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 1200, MAX_H = 1200; 
-                    let w = img.width, h = img.height;
+                const img = new Image(); img.onload = function() {
+                    const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 1200, MAX_H = 1200; let w = img.width, h = img.height;
                     if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
-                    cvs.width = w; cvs.height = h; 
-                    ctx.drawImage(img, 0, 0, w, h);
-                    const dataUrl = cvs.toDataURL('image/jpeg', 0.85); 
-                    const editor = document.getElementById('note-editor'); editor.focus();
+                    cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = cvs.toDataURL('image/jpeg', 0.85); const editor = document.getElementById('note-editor'); editor.focus();
                     const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`;
-                    if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) {
-                        const range = window.getSelection().getRangeAt(0);
-                        if (editor.contains(range.commonAncestorContainer)) { document.execCommand('insertHTML', false, imgHtml); } else { editor.innerHTML += imgHtml; }
-                    } else { editor.innerHTML += imgHtml; }
+                    if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) { const range = window.getSelection().getRangeAt(0); if (editor.contains(range.commonAncestorContainer)) { document.execCommand('insertHTML', false, imgHtml); } else { editor.innerHTML += imgHtml; } } else { editor.innerHTML += imgHtml; }
                     scheduleSave();
-                };
-                img.src = ev.target.result;
-            };
-            rd.readAsDataURL(file);
+                }; img.src = ev.target.result;
+            }; rd.readAsDataURL(file);
         }
         function insertPhotoToNote(inp) { if(inp.files && inp.files[0]) { processImageFile(inp.files[0]); inp.value = ''; } }
 
         function loadPhoto(inp) { 
             if(inp.files && inp.files[0]) { 
-                const rd = new FileReader(); 
-                rd.onload = (ev) => { 
-                    const img = new Image(); 
-                    img.onload = function() { 
-                        const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; 
-                        let w = img.width, h = img.height; 
+                const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { 
+                        const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; 
                         if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } 
-                        cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); 
-                        state.photo = cvs.toDataURL('image/jpeg', 0.85); 
-                        const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); 
-                        if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); 
-                        saveState(); 
-                    }; 
-                    img.src = ev.target.result; 
-                }; 
-                rd.readAsDataURL(inp.files[0]); 
+                        cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.85); 
+                        const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); 
+                }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); 
             } 
         }
 
-        // --- CYTATY I CZAS ---
         function initQuote() { currentQuoteIndex = Math.floor(Math.random() * quotes.length); renderQuote(); }
         function renderQuote() { const b = document.getElementById('quote-banner'); if (b) b.innerText = `"${quotes[currentQuoteIndex]}"`; }
         function cycleQuote() { currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length; renderQuote(); }
         
-        function renderDate() { 
-            const d = document.getElementById('date-display'); 
-            if (!d) return;
-            try {
-                d.innerText = new Date().toLocaleDateString('pl-PL', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase(); 
-            } catch(e) {
-                const now = new Date();
-                d.innerText = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
-            }
-        }
+        function renderDate() { const d = document.getElementById('date-display'); if (!d) return; try { d.innerText = new Date().toLocaleDateString('pl-PL', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase(); } catch(e) { const now = new Date(); d.innerText = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`; } }
 
-        // --- CZYN SPOŁECZNY (ZADANIA) ---
-        function addTask() { 
-            const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
-            state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0 }); i.value = ''; saveState(); renderTasks(); 
-            if(document.activeElement) document.activeElement.blur();
-        }
+        function addTask() { const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0 }); i.value = ''; saveState(); renderTasks(); if(document.activeElement) document.activeElement.blur(); }
         function toggleTask(id) {
             const t = state.tasks.find(x => x.id === id);
             if (t) {
-                if (!t.done) { 
-                    t.done = true; state.credits += 1; 
-                    let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); 
-                    t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; 
-                    t.stampRotation = Math.floor(Math.random() * 20) - 10; 
-                    playSound('stamp'); 
-                }
-                else { 
-                    t.done = false; t.stamp = null; 
-                }
+                if (!t.done) { t.done = true; state.credits += 1; let sid = state.stampSelectionMode === 'random' ? stampDefinitions[Math.floor(Math.random() * stampDefinitions.length)].id : (state.selectedStampIds[Math.floor(Math.random() * state.selectedStampIds.length)] || 2); t.stamp = stampDefinitions.find(s => s.id === sid) || stampDefinitions[0]; t.stampRotation = Math.floor(Math.random() * 20) - 10; playSound('stamp'); }
+                else { t.done = false; t.stamp = null; }
                 saveState(); renderTasks();
             }
         }
-        function deleteTask(id) { 
-            state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); 
-        }
+        function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); }
         function startEditingTask(id, el) {
             const t = state.tasks.find(x => x.id === id); if (!t || t.done) return;
             const i = document.createElement('input'); i.type = 'text'; i.value = t.text; i.className = 'task-edit-input z-10';
             const finish = () => { const txt = i.value.trim(); if (txt && txt !== t.text) { t.text = txt; saveState(); } renderTasks(); };
-            i.onblur = finish; i.onkeydown = (ev) => { if (ev.key === 'Enter') finish(); if (ev.key === 'Escape') renderTasks(); };
-            el.parentNode.replaceChild(i, el); i.focus();
+            i.onblur = finish; i.onkeydown = (ev) => { if (ev.key === 'Enter') finish(); if (ev.key === 'Escape') renderTasks(); }; el.parentNode.replaceChild(i, el); i.focus();
         }
         function renderTasks() {
             const l = document.getElementById('task-list'); if (!l) return; l.innerHTML = '';
@@ -1287,185 +1018,44 @@
             else state.tasks.forEach(t => { l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 active:border-[#8c1c1c] active:bg-red-100 transition uppercase text-xs">USUŃ</button></li>`; });
             updateTaskProgress();
         }
-        
-        function updateTaskProgress() { 
-            const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); 
-            document.getElementById('task-progress-text').innerText = p + "%"; 
-            document.getElementById('task-progress-bar').style.width = p + "%"; 
-            updateAppBadge(); // Aktualizacja czerwonego znaczka powiadomień
-        }
+        function updateTaskProgress() { const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; updateAppBadge(); }
 
-        // --- DYPLOM PRZODOWNIKA PRACY (Wydział Odznaczeń) ---
-        function showDiploma(goalName) {
-            document.getElementById('diploma-citizen').innerText = state.citizenName || 'OBYWATEL';
-            
-            const d = new Date();
-            document.getElementById('diploma-date').innerText = d.toLocaleDateString('pl-PL');
-            
-            // Losowanie tła dyplomu
-            const bgs = ['diplomprl.png', 'dyplomniebieskiblue.png'];
-            const randomBg = bgs[Math.floor(Math.random() * bgs.length)];
-            const imgEl = document.getElementById('diploma-bg-img');
-            
-            const leftText = document.getElementById('diploma-left-text');
-            const rightText = document.getElementById('diploma-right-text');
-
-            if (imgEl) {
-                imgEl.src = randomBg;
-                
-                // Dostosowanie położenia tekstów
-                if (randomBg === 'dyplomniebieskiblue.png') {
-                    if (leftText) leftText.style.left = '15%';
-                    if (rightText) rightText.style.right = '15%';
-                } else {
-                    if (leftText) leftText.style.left = '10%';
-                    if (rightText) rightText.style.right = '10%';
-                }
-            }
-
-            // AUTO-SKALOWANIE NAZWY CELU
-            const dg = document.getElementById('diploma-goal');
-            if (dg) {
-                dg.innerText = goalName;
-                
-                if (randomBg === 'dyplomniebieskiblue.png') {
-                    dg.style.width = '66%';
-                } else {
-                    dg.style.width = '80%';
-                }
-
-                if (goalName.length > 55) { 
-                    dg.style.fontSize = '0.75rem'; 
-                    dg.style.lineHeight = '1'; 
-                } else if (goalName.length > 40) { 
-                    dg.style.fontSize = '0.9rem'; 
-                    dg.style.lineHeight = '1.1'; 
-                } else if (goalName.length > 25) { 
-                    dg.style.fontSize = '1.2rem'; 
-                    dg.style.lineHeight = '1.1'; 
-                } else { 
-                    dg.style.fontSize = ''; 
-                    dg.style.lineHeight = ''; 
-                }
-            }
-            
-            openModalUI('diploma-modal');
-        }
-
-        // --- PLAN DŁUGOTERMINOWY (WYKRES I SŁUPKI) ---
         function saveNewGoal() {
             const n = document.getElementById('goal-name').value.trim(), t = parseFloat(document.getElementById('goal-target').value), u = document.getElementById('goal-unit').value.trim();
             if (!n || isNaN(t) || t <= 0 || !u) return showAlert("Obywatelu! Formularz niekompletny!");
             if(!state.plans) state.plans = []; state.plans.push({ id: Date.now(), text: n, targetValue: t, unit: u, currentValue: 0 });
             document.getElementById('goal-name').value = ''; document.getElementById('goal-target').value = ''; saveState(); renderPlans(); closeModalUI('add-goal-modal');
         }
-        
-        function openEditGoalModal(id) {
-            const g = state.plans.find(p => p.id === id);
-            if (!g) return;
-            document.getElementById('edit-goal-id').value = g.id;
-            document.getElementById('edit-goal-name').value = g.text;
-            document.getElementById('edit-goal-target').value = g.targetValue;
-            document.getElementById('edit-goal-unit').value = g.unit;
-            document.getElementById('edit-goal-current').value = g.currentValue;
-            openModalUI('edit-goal-modal');
-        }
-
+        function openEditGoalModal(id) { const g = state.plans.find(p => p.id === id); if (!g) return; document.getElementById('edit-goal-id').value = g.id; document.getElementById('edit-goal-name').value = g.text; document.getElementById('edit-goal-target').value = g.targetValue; document.getElementById('edit-goal-unit').value = g.unit; document.getElementById('edit-goal-current').value = g.currentValue; openModalUI('edit-goal-modal'); }
         function saveEditedGoal() {
-            const id = parseInt(document.getElementById('edit-goal-id').value);
-            const n = document.getElementById('edit-goal-name').value.trim();
-            const t = parseFloat(document.getElementById('edit-goal-target').value);
-            const u = document.getElementById('edit-goal-unit').value.trim();
-            const c = parseFloat(document.getElementById('edit-goal-current').value) || 0;
-
+            const id = parseInt(document.getElementById('edit-goal-id').value); const n = document.getElementById('edit-goal-name').value.trim(); const t = parseFloat(document.getElementById('edit-goal-target').value); const u = document.getElementById('edit-goal-unit').value.trim(); const c = parseFloat(document.getElementById('edit-goal-current').value) || 0;
             if (!n || isNaN(t) || t <= 0 || !u) return showAlert("Obywatelu! Puste rubryki w dokumentacji korekty!");
             const gIndex = state.plans.findIndex(p => p.id === id);
-            if (gIndex > -1) {
-                const wasComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue;
-                
-                state.plans[gIndex].text = n;
-                state.plans[gIndex].targetValue = t;
-                state.plans[gIndex].unit = u;
-                state.plans[gIndex].currentValue = Math.max(0, c);
-                
-                const isComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue;
-                
-                saveState(); renderPlans(); closeModalUI('edit-goal-modal');
-                
-                if (!wasComplete && isComplete) {
-                    setTimeout(() => showDiploma(n), 300);
-                }
-            }
+            if (gIndex > -1) { const wasComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue; state.plans[gIndex].text = n; state.plans[gIndex].targetValue = t; state.plans[gIndex].unit = u; state.plans[gIndex].currentValue = Math.max(0, c); const isComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue; saveState(); renderPlans(); closeModalUI('edit-goal-modal'); if (!wasComplete && isComplete) { setTimeout(() => showDiploma(n), 300); } }
         }
-
         function changeGoalProgress(ev, id, dir) {
-            ev.stopPropagation();
-            const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10;
-            if (g) { 
-                const wasComplete = g.currentValue >= g.targetValue;
-                g.currentValue = Math.max(0, g.currentValue + (i * dir)); 
-                const isComplete = g.currentValue >= g.targetValue;
-                
-                saveState(); renderPlans(); 
-                
-                if (!wasComplete && isComplete) {
-                    showDiploma(g.text);
-                }
-            }
+            ev.stopPropagation(); const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10;
+            if (g) { const wasComplete = g.currentValue >= g.targetValue; g.currentValue = Math.max(0, g.currentValue + (i * dir)); const isComplete = g.currentValue >= g.targetValue; saveState(); renderPlans(); if (!wasComplete && isComplete) { showDiploma(g.text); } }
             if(document.activeElement) document.activeElement.blur();
         }
-
-        function deleteGoal(ev, id) { 
-            ev.stopPropagation();
-            showConfirm("Zakończyć plan wykonania tego celu?", () => { 
-                state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); 
-            }); 
-            if(document.activeElement) document.activeElement.blur();
-        }
-
+        function deleteGoal(ev, id) { ev.stopPropagation(); showConfirm("Zakończyć plan wykonania tego celu?", () => { state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); }); if(document.activeElement) document.activeElement.blur(); }
         function renderPlans() {
             const c = document.getElementById('chart-area'); if (!c) return; c.innerHTML = '';
             if (!state.plans || state.plans.length === 0) c.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-gray-500 opacity-50">BRAK DANYCH</div>';
             else state.plans.forEach(p => {
-                let pct = p.targetValue > 0 ? (p.currentValue / p.targetValue) * 100 : 0;
-                const col = document.createElement('div'); col.className = 'chart-col';
-                
-                const track = document.createElement('div'); 
-                track.className = 'bar-track group'; 
-                track.onclick = () => openEditGoalModal(p.id);
-                track.title = `Edytuj parametry: ${p.text}`;
-
+                let pct = p.targetValue > 0 ? (p.currentValue / p.targetValue) * 100 : 0; const col = document.createElement('div'); col.className = 'chart-col';
+                const track = document.createElement('div'); track.className = 'bar-track group'; track.onclick = () => openEditGoalModal(p.id); track.title = `Edytuj parametry: ${p.text}`;
                 const fill = document.createElement('div'); fill.className = `bar-fill ${pct >= 100 ? 'complete' : ''}`; fill.style.height = `${Math.min(100, Math.max(5, pct))}%`;
-                
-                const label = document.createElement('div'); label.className = 'bar-label-vertical'; 
-                label.innerText = p.text;
-                label.title = p.text;
-                
-                track.appendChild(fill); 
-                track.appendChild(label); // Zawsze pełna widoczność na tle tracka
-                
-                const val = document.createElement('div'); val.className = 'bar-value'; 
-                val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
-                val.title = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
-
-                track.appendChild(val); col.appendChild(track);
-                
-                const ctrl = document.createElement('div'); ctrl.className = 'chart-controls';
-                
-                const bp = document.createElement('div'); bp.className = 'chart-btn btn-plus'; bp.innerText = '+'; 
-                bp.onclick = (e) => changeGoalProgress(e, p.id, 1);
-                
-                const bm = document.createElement('div'); bm.className = 'chart-btn btn-minus'; bm.innerText = '-'; 
-                bm.onclick = (e) => changeGoalProgress(e, p.id, -1);
-                
-                const bd = document.createElement('div'); bd.className = 'chart-btn btn-del'; bd.innerText = 'x'; 
-                bd.onclick = (e) => deleteGoal(e, p.id);
-                
+                const label = document.createElement('div'); label.className = 'bar-label-vertical'; label.innerText = p.text; label.title = p.text; track.appendChild(fill); track.appendChild(label); 
+                const val = document.createElement('div'); val.className = 'bar-value'; val.innerText = `${p.currentValue} / ${p.targetValue} ${p.unit}`; val.title = `${p.currentValue} / ${p.targetValue} ${p.unit}`;
+                track.appendChild(val); col.appendChild(track); const ctrl = document.createElement('div'); ctrl.className = 'chart-controls';
+                const bp = document.createElement('div'); bp.className = 'chart-btn btn-plus'; bp.innerText = '+'; bp.onclick = (e) => changeGoalProgress(e, p.id, 1);
+                const bm = document.createElement('div'); bm.className = 'chart-btn btn-minus'; bm.innerText = '-'; bm.onclick = (e) => changeGoalProgress(e, p.id, -1);
+                const bd = document.createElement('div'); bd.className = 'chart-btn btn-del'; bd.innerText = 'x'; bd.onclick = (e) => deleteGoal(e, p.id);
                 ctrl.appendChild(bp); ctrl.appendChild(bm); ctrl.appendChild(bd); col.appendChild(ctrl); c.appendChild(col);
             });
         }
 
-        // --- TRYB PIECZĄTEK ---
         function setStampMode(m) { state.stampSelectionMode = m; saveState(); renderStampsGallery(); }
         function selectStamp(id) { if (state.stampSelectionMode === 'random') return; const idx = state.selectedStampIds.indexOf(id); if (idx > -1) state.selectedStampIds.splice(idx, 1); else state.selectedStampIds.push(id); renderStampsGallery(); saveState(); }
         function renderStampsGallery() {
@@ -1473,66 +1063,18 @@
             stampDefinitions.forEach(s => { const sel = state.selectedStampIds.includes(s.id); el.innerHTML += `<div class="stamp-item ${sel ? 'selected' : ''}" onclick="selectStamp(${s.id})"><div class="stamp-container" style="position: relative; transform: scale(0.6);"><div class="stamp-border shape-${s.shape} col-${s.color}"></div><div class="stamp-inner col-${s.color}"><div class="stamp-icon">${s.icon}</div><div style="margin-top:2px;">${s.text}</div></div></div>${sel ? `<div style="position: absolute; top: 0; right: 0; font-weight: bold; padding: 2px;">✓</div>` : ''}</div>`; });
         }
 
-        // --- KALENDARZ I WEZWANIA ---
         function resetCalendarToToday() { state.viewDate = new Date(); renderCalendar(); }
-        function changeMonth(dir) { 
-            const d = state.viewDate || new Date(); 
-            d.setMonth(d.getMonth() + dir); 
-            state.viewDate = d; 
-            renderCalendar(); 
-            if(document.activeElement) document.activeElement.blur();
-        }
-        
-        // NOWE: Funkcje do szybkiego przydziału czasu (Nawigacja Pięcioletnia)
-        function openJumpDateModal() {
-            const d = state.viewDate || new Date();
-            document.getElementById('jump-month').value = d.getMonth();
-            document.getElementById('jump-year').value = d.getFullYear();
-            openModalUI('jump-date-modal');
-        }
-        
-        function executeJumpToToday() {
-            state.viewDate = new Date();
-            renderCalendar();
-            closeModalUI('jump-date-modal');
-        }
+        function changeMonth(dir) { const d = state.viewDate || new Date(); d.setMonth(d.getMonth() + dir); state.viewDate = d; renderCalendar(); if(document.activeElement) document.activeElement.blur(); }
+        function openJumpDateModal() { const d = state.viewDate || new Date(); document.getElementById('jump-month').value = d.getMonth(); document.getElementById('jump-year').value = d.getFullYear(); openModalUI('jump-date-modal'); }
+        function executeJumpToToday() { state.viewDate = new Date(); renderCalendar(); closeModalUI('jump-date-modal'); }
+        function executeJumpDate() { const m = parseInt(document.getElementById('jump-month').value); const y = parseInt(document.getElementById('jump-year').value); const d = state.viewDate || new Date(); d.setMonth(m); d.setFullYear(y); state.viewDate = d; renderCalendar(); closeModalUI('jump-date-modal'); }
 
-        function executeJumpDate() {
-            const m = parseInt(document.getElementById('jump-month').value);
-            const y = parseInt(document.getElementById('jump-year').value);
-            const d = state.viewDate || new Date();
-            d.setMonth(m);
-            d.setFullYear(y);
-            state.viewDate = d;
-            renderCalendar();
-            closeModalUI('jump-date-modal');
-        }
-
-        // Zmieniona funkcja: teraz zwraca tablicę (wiele wydarzeń dla jednego dnia)
         function getEventsForDate(d, m, y) {
-            if (!state.events) return [];
-            const cur = new Date(y, m - 1, d);
-            let dayEvents = [];
+            if (!state.events) return []; const cur = new Date(y, m - 1, d); let dayEvents = [];
             for (let k in state.events) {
-                const evList = state.events[k];
-                if (!Array.isArray(evList)) continue;
-                const parts = k.split('-');
-                if (parts.length !== 3) continue;
-                const [aD, aM, aY] = parts.map(Number), anc = new Date(aY, aM - 1, aD);
-                if (cur < anc) continue; 
-                
-                evList.forEach(e => {
-                    const r = e.recurrence || 'none';
-                    if ((r === 'none' && d === aD && m === aM && y === aY) || 
-                        r === 'daily' || 
-                        (r === 'weekly' && cur.getDay() === anc.getDay()) || 
-                        (r === 'monthly' && cur.getDate() === anc.getDate()) || 
-                        (r === 'yearly' && cur.getDate() === anc.getDate() && cur.getMonth() === anc.getMonth())) {
-                        dayEvents.push({ ...e, sourceKey: k });
-                    }
-                });
-            }
-            return dayEvents;
+                const evList = state.events[k]; if (!Array.isArray(evList)) continue; const parts = k.split('-'); if (parts.length !== 3) continue; const [aD, aM, aY] = parts.map(Number), anc = new Date(aY, aM - 1, aD); if (cur < anc) continue; 
+                evList.forEach(e => { const r = e.recurrence || 'none'; if ((r === 'none' && d === aD && m === aM && y === aY) || r === 'daily' || (r === 'weekly' && cur.getDay() === anc.getDay()) || (r === 'monthly' && cur.getDate() === anc.getDate()) || (r === 'yearly' && cur.getDate() === anc.getDate() && cur.getMonth() === anc.getMonth())) { dayEvents.push({ ...e, sourceKey: k }); } });
+            } return dayEvents;
         }
 
         function renderCalendar() {
@@ -1541,463 +1083,94 @@
             if(hdr) hdr.innerText = `${months[m]} ${y}`;
             ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; g.appendChild(el); });
             const first = new Date(y, m, 1).getDay(), off = first === 0 ? 6 : first - 1, days = new Date(y, m + 1, 0).getDate(), today = new Date();
-            
             for(let i=0; i<off; i++) g.appendChild(Object.assign(document.createElement('div'), {className: "calendar-cell empty"}));
-            
             for(let i=1; i<=days; i++) {
-                const evs = getEventsForDate(i, m + 1, y);
-                const isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear());
-                const isWknd = (new Date(y, m, i).getDay() === 0 || new Date(y, m, i).getDay() === 6); // Oznaczanie weekendów
-                
-                const c = document.createElement('div'); 
-                c.className = `calendar-cell ${isT ? 'today' : ''} ${isWknd ? 'weekend' : ''}`;
-                
+                const evs = getEventsForDate(i, m + 1, y); const isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear()); const isWknd = (new Date(y, m, i).getDay() === 0 || new Date(y, m, i).getDay() === 6); 
+                const c = document.createElement('div'); c.className = `calendar-cell ${isT ? 'today' : ''} ${isWknd ? 'weekend' : ''}`;
                 let h = `<span style="font-weight: bold; margin-left: 2px;">${i}</span>`;
-                if(evs.length > 0) { 
-                    c.classList.add('active'); 
-                    h += `<div class="event-marker"></div>`; 
-                    
-                    // Renderowanie do max 2 etykietek wezwań
-                    evs.slice(0, 2).forEach(ev => {
-                        h += `<div class="cal-event-text selectable-text">${ev.text}</div>`;
-                    });
-                    if(evs.length > 2) {
-                        h += `<div class="cal-event-text selectable-text" style="font-size:7px; background: rgba(0,0,0,0.1);">+${evs.length - 2} więcej</div>`;
-                    }
-                }
+                if(evs.length > 0) { c.classList.add('active'); h += `<div class="event-marker"></div>`; evs.slice(0, 2).forEach(ev => { h += `<div class="cal-event-text selectable-text">${ev.text}</div>`; }); if(evs.length > 2) { h += `<div class="cal-event-text selectable-text" style="font-size:7px; background: rgba(0,0,0,0.1);">+${evs.length - 2} więcej</div>`; } }
                 c.innerHTML = h; c.onclick = () => openEventModal(`${i}-${m+1}-${y}`); g.appendChild(c);
             }
         }
 
-        // --- EDYCJA POZYCJI W KALENDARZU ---
         function openEventModal(k) {
-            currentEditingDateKey = k; 
-            currentEditingEventId = null;
-            currentEditingEventSourceKey = null;
-
-            const p = k.split('-');
-            const mths = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
-            const dDisp = document.getElementById('event-date-display');
-            
-            if(dDisp) dDisp.innerText = `${p[0]} ${mths[parseInt(p[1])-1]} ${p[2]}`; 
-            
-            const evs = getEventsForDate(parseInt(p[0]), parseInt(p[1]), parseInt(p[2]));
-            const container = document.getElementById('existing-events-container');
-            const list = document.getElementById('existing-events-list');
-            
-            if(evs.length > 0) {
-                container.classList.remove('hidden');
-                list.innerHTML = evs.map(e => `
+            currentEditingDateKey = k; currentEditingEventId = null; currentEditingEventSourceKey = null;
+            const p = k.split('-'); const mths = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+            const dDisp = document.getElementById('event-date-display'); if(dDisp) dDisp.innerText = `${p[0]} ${mths[parseInt(p[1])-1]} ${p[2]}`; 
+            const evs = getEventsForDate(parseInt(p[0]), parseInt(p[1]), parseInt(p[2])); const container = document.getElementById('existing-events-container'); const list = document.getElementById('existing-events-list');
+            if(evs.length > 0) { container.classList.remove('hidden'); list.innerHTML = evs.map(e => `
                     <li class="flex justify-between items-start bg-gray-200 border border-gray-400 p-2">
-                        <!-- ZMIANA: Usunięto onClick z samego tekstu zadania, dodano cursor-default -->
-                        <div class="flex-1 text-[11px] break-words whitespace-normal font-mono leading-snug text-black mr-2 cursor-default">
-                            <span class="font-bold text-[#4b7db8]">${e.text}</span>
-                            ${e.recurrence !== 'none' ? '<span class="text-[9px] text-gray-600 block mt-1">(cykl)</span>' : ''}
-                        </div>
-                        <div class="flex flex-row gap-1 shrink-0 mt-0.5">
-                            <button onclick="editSpecificEvent('${e.sourceKey}', ${e.id})" class="text-[#4b7db8] font-bold px-2 py-1 text-[10px] border border-[#4b7db8] bg-white hover:bg-blue-50 transition shadow-sm">EDYTUJ</button>
-                            <button onclick="deleteSpecificEvent('${e.sourceKey}', ${e.id})" class="text-red-600 font-bold px-2 py-1 text-[10px] border border-red-300 bg-white hover:bg-red-50 transition shadow-sm">X</button>
-                        </div>
-                    </li>
-                `).join('');
-            } else {
-                container.classList.add('hidden');
-                list.innerHTML = '';
-            }
-            
-            document.getElementById('event-input').value = '';
-            document.getElementById('event-recurrence').value = 'none';
-            document.getElementById('btn-save-event').innerText = 'Dodaj'; // Domyślnie dodawanie
-
+                        <div class="flex-1 text-[11px] break-words whitespace-normal font-mono leading-snug text-black mr-2 cursor-default"><span class="font-bold text-[#4b7db8]">${e.text}</span>${e.recurrence !== 'none' ? '<span class="text-[9px] text-gray-600 block mt-1">(cykl)</span>' : ''}</div>
+                        <div class="flex flex-row gap-1 shrink-0 mt-0.5"><button onclick="editSpecificEvent('${e.sourceKey}', ${e.id})" class="text-[#4b7db8] font-bold px-2 py-1 text-[10px] border border-[#4b7db8] bg-white hover:bg-blue-50 transition shadow-sm">EDYTUJ</button><button onclick="deleteSpecificEvent('${e.sourceKey}', ${e.id})" class="text-red-600 font-bold px-2 py-1 text-[10px] border border-red-300 bg-white hover:bg-red-50 transition shadow-sm">X</button></div>
+                    </li>`).join('');
+            } else { container.classList.add('hidden'); list.innerHTML = ''; }
+            document.getElementById('event-input').value = ''; document.getElementById('event-recurrence').value = 'none'; document.getElementById('btn-save-event').innerText = 'Dodaj'; 
             openModalUI('event-modal');
         }
 
-        function editSpecificEvent(sourceKey, eventId) {
-            const evList = state.events[sourceKey];
-            if(!evList) return;
-            const ev = evList.find(e => e.id === eventId);
-            if(!ev) return;
-
-            currentEditingEventId = eventId;
-            currentEditingEventSourceKey = sourceKey;
-
-            document.getElementById('event-input').value = ev.text;
-            document.getElementById('event-recurrence').value = ev.recurrence;
-            document.getElementById('btn-save-event').innerText = 'Zapisz'; // Zmiana na Zapisz w trybie edycji
-            document.getElementById('event-input').focus();
-        }
-
+        function editSpecificEvent(sourceKey, eventId) { const evList = state.events[sourceKey]; if(!evList) return; const ev = evList.find(e => e.id === eventId); if(!ev) return; currentEditingEventId = eventId; currentEditingEventSourceKey = sourceKey; document.getElementById('event-input').value = ev.text; document.getElementById('event-recurrence').value = ev.recurrence; document.getElementById('btn-save-event').innerText = 'Zapisz'; document.getElementById('event-input').focus(); }
         function saveNewEvent() { 
-            const v = document.getElementById('event-input').value.trim();
-            const r = document.getElementById('event-recurrence').value; 
-            
-            if(!v) return showAlert("Obywatelu! Puste wezwanie odrzucono.");
-            
-            if (currentEditingEventId && currentEditingEventSourceKey) {
-                // Tryb edycji już istniejącego wydarzenia
-                const evList = state.events[currentEditingEventSourceKey];
-                if(evList) {
-                    const evIdx = evList.findIndex(e => e.id === currentEditingEventId);
-                    if(evIdx > -1) {
-                        evList[evIdx].text = v;
-                        evList[evIdx].recurrence = r;
-                    }
-                }
-            } else {
-                // Tryb dodawania nowego wydarzenia
-                if(!currentEditingDateKey) return; 
-                if(!state.events[currentEditingDateKey]) state.events[currentEditingDateKey] = [];
-                state.events[currentEditingDateKey].push({ id: Date.now(), text: v, recurrence: r }); 
-            }
-            
-            saveState(); 
-            renderCalendar(); 
-            openEventModal(currentEditingDateKey); // Odświeżenie widoku modala i reset formularza
+            const v = document.getElementById('event-input').value.trim(); const r = document.getElementById('event-recurrence').value; if(!v) return showAlert("Obywatelu! Puste wezwanie odrzucono.");
+            if (currentEditingEventId && currentEditingEventSourceKey) { const evList = state.events[currentEditingEventSourceKey]; if(evList) { const evIdx = evList.findIndex(e => e.id === currentEditingEventId); if(evIdx > -1) { evList[evIdx].text = v; evList[evIdx].recurrence = r; } } } else { if(!currentEditingDateKey) return; if(!state.events[currentEditingDateKey]) state.events[currentEditingDateKey] = []; state.events[currentEditingDateKey].push({ id: Date.now(), text: v, recurrence: r }); }
+            saveState(); renderCalendar(); openEventModal(currentEditingDateKey); 
         }
+        function deleteSpecificEvent(sourceKey, eventId) { if(state.events[sourceKey]) { state.events[sourceKey] = state.events[sourceKey].filter(e => e.id !== eventId); if(state.events[sourceKey].length === 0) delete state.events[sourceKey]; saveState(); renderCalendar(); openEventModal(currentEditingDateKey); } }
 
-        // Usuwanie konkretnego wezwania z danego dnia
-        function deleteSpecificEvent(sourceKey, eventId) {
-            if(state.events[sourceKey]) {
-                state.events[sourceKey] = state.events[sourceKey].filter(e => e.id !== eventId);
-                if(state.events[sourceKey].length === 0) delete state.events[sourceKey];
-                saveState();
-                renderCalendar();
-                openEventModal(currentEditingDateKey); 
-            }
-        }
-
-        // --- SKŁADNICA AKT (ZARZĄDZANIE BOCZNYM MENU I PRZYCISKIEM WSTECZ) ---
-        function switchArchivePane(paneId, pushToHistory = false) {
-            document.querySelectorAll('.archive-pane').forEach(p => p.classList.remove('active-pane'));
-            document.getElementById('pane-' + paneId).classList.add('active-pane');
-            
-            if (window.innerWidth < 768 && pushToHistory && paneId === 'editor') {
-                modalStack.push('archive-pane-editor');
-                window.history.pushState({ modalId: 'archive-pane-editor' }, "");
-            }
-        }
-
-        function goBackFromEditor() {
-            if (modalStack[modalStack.length - 1] === 'archive-pane-editor') {
-                window.history.back();
-            } else {
-                switchArchivePane('list', false);
-            }
-        }
-
-        function toggleFolderDrawer() {
-            if(document.activeElement) document.activeElement.blur();
-            
-            const drawer = document.getElementById('pane-folders');
-            const overlay = document.getElementById('folder-drawer-overlay');
-            const isOpen = drawer.classList.contains('open');
-            
-            if (!isOpen) {
-                drawer.classList.add('open');
-                overlay.classList.add('active');
-                modalStack.push('folder-drawer');
-                window.history.pushState({ modalId: 'folder-drawer' }, "");
-            } else {
-                if (modalStack[modalStack.length - 1] === 'folder-drawer') {
-                    window.history.back(); 
-                } else {
-                    drawer.classList.remove('open');
-                    overlay.classList.remove('active');
-                }
-            }
-        }
-
-        function createNewFolder() {
-            if(document.activeElement) document.activeElement.blur();
-            const name = prompt("Podaj nazwę dla nowej teczki akt:");
-            if(name && name.trim()) {
-                const newId = 'folder_' + Date.now();
-                state.folders.push({ id: newId, name: name.trim().toUpperCase() });
-                saveState(); renderArchiveFolders();
-            }
-        }
-
-        function deleteFolder(ev, id) {
-            ev.stopPropagation();
-            showConfirm("Zlikwidować tę teczkę? Notatki w niej zawarte powrócą do GŁÓWNYCH AKT.", () => {
-                state.folders = state.folders.filter(f => f.id !== id);
-                state.notes.forEach(n => { if (n.folderId === id) n.folderId = 'main'; });
-                if (state.activeFolderId === id) state.activeFolderId = 'all';
-                saveState();
-                renderArchiveFolders();
-                renderArchiveNotes();
-            });
-        }
-
-        function selectFolder(id) {
-            const previousFolder = state.activeFolderId;
-            if (id === previousFolder) return;
-
-            if (window.innerWidth < 768) {
-                if (modalStack[modalStack.length - 1] === 'folder-drawer') {
-                    window.history.back(); 
-                }
-                if (id === 'all' && previousFolder !== 'all') {
-                    if (modalStack[modalStack.length - 1] === 'archive-folder') {
-                        window.history.back(); 
-                        return;
-                    }
-                }
-            }
-
-            state.activeFolderId = id;
-            saveState();
-            renderArchiveFolders();
-            renderArchiveNotes();
-            
-            if (window.innerWidth < 768) {
-                if (id !== 'all' && previousFolder === 'all') {
-                    setTimeout(() => {
-                        modalStack.push('archive-folder');
-                        window.history.pushState({ modalId: 'archive-folder' }, "");
-                    }, 50);
-                }
-                switchArchivePane('list', false);
-            }
-        }
-
-        // --- DODAWANIE WŁASNYCH IKON DO SKOROSZYTÓW ---
+        function switchArchivePane(paneId, pushToHistory = false) { document.querySelectorAll('.archive-pane').forEach(p => p.classList.remove('active-pane')); document.getElementById('pane-' + paneId).classList.add('active-pane'); if (window.innerWidth < 768 && pushToHistory && paneId === 'editor') { modalStack.push('archive-pane-editor'); window.history.pushState({ modalId: 'archive-pane-editor' }, ""); } }
+        function goBackFromEditor() { if (modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); } }
+        function toggleFolderDrawer() { if(document.activeElement) document.activeElement.blur(); const drawer = document.getElementById('pane-folders'); const overlay = document.getElementById('folder-drawer-overlay'); const isOpen = drawer.classList.contains('open'); if (!isOpen) { drawer.classList.add('open'); overlay.classList.add('active'); modalStack.push('folder-drawer'); window.history.pushState({ modalId: 'folder-drawer' }, ""); } else { if (modalStack[modalStack.length - 1] === 'folder-drawer') { window.history.back(); } else { drawer.classList.remove('open'); overlay.classList.remove('active'); } } }
+        function createNewFolder() { if(document.activeElement) document.activeElement.blur(); const name = prompt("Podaj nazwę dla nowej teczki akt:"); if(name && name.trim()) { const newId = 'folder_' + Date.now(); state.folders.push({ id: newId, name: name.trim().toUpperCase() }); saveState(); renderArchiveFolders(); } }
+        function deleteFolder(ev, id) { ev.stopPropagation(); showConfirm("Zlikwidować tę teczkę? Notatki w niej zawarte powrócą do GŁÓWNYCH AKT.", () => { state.folders = state.folders.filter(f => f.id !== id); state.notes.forEach(n => { if (n.folderId === id) n.folderId = 'main'; }); if (state.activeFolderId === id) state.activeFolderId = 'all'; saveState(); renderArchiveFolders(); renderArchiveNotes(); }); }
+        function selectFolder(id) { const previousFolder = state.activeFolderId; if (id === previousFolder) return; if (window.innerWidth < 768) { if (modalStack[modalStack.length - 1] === 'folder-drawer') { window.history.back(); } if (id === 'all' && previousFolder !== 'all') { if (modalStack[modalStack.length - 1] === 'archive-folder') { window.history.back(); return; } } } state.activeFolderId = id; saveState(); renderArchiveFolders(); renderArchiveNotes(); if (window.innerWidth < 768) { if (id !== 'all' && previousFolder === 'all') { setTimeout(() => { modalStack.push('archive-folder'); window.history.pushState({ modalId: 'archive-folder' }, ""); }, 50); } switchArchivePane('list', false); } }
         function renderArchiveFolders() {
-            const list = document.getElementById('archive-folder-list');
-            const select = document.getElementById('note-folder-select');
-            if(!list || !select) return;
-
-            let html = `<li onclick="selectFolder('all')" class="folder-item p-4 flex items-center gap-3 ${state.activeFolderId === 'all' ? 'active' : ''}">
-                <img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'">
-                <span class="text-sm md:text-base break-words whitespace-normal leading-tight w-full pr-2">WSZYSTKIE AKTA</span>
-            </li>`;
-            
-            state.folders.forEach(f => {
-                const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'">`;
-                const isMain = f.id === 'main';
-
-                html += `<li onclick="selectFolder('${f.id}')" class="folder-item p-4 flex justify-between items-center group ${state.activeFolderId === f.id ? 'active' : ''}">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                        ${iconPart}
-                        <span class="text-sm md:text-base break-words whitespace-normal leading-tight w-full pr-2">${f.name}</span>
-                    </div>
-                    ${!isMain ? `<button onclick="deleteFolder(event, '${f.id}')" class="text-red-500 hover:text-red-700 active:text-red-700 font-bold px-3 md:opacity-0 group-hover:opacity-100 transition shadow-sm border border-transparent hover:border-red-500 active:border-red-500 bg-white/20 shrink-0 ml-2">X</button>` : ''}
-                </li>`;
-            });
-            list.innerHTML = html;
-
-            let selHtml = '';
-            state.folders.forEach(f => { selHtml += `<option value="${f.id}">${f.name}</option>`; });
-            select.innerHTML = selHtml;
+            const list = document.getElementById('archive-folder-list'); const select = document.getElementById('note-folder-select'); if(!list || !select) return;
+            let html = `<li onclick="selectFolder('all')" class="folder-item p-4 flex items-center gap-3 ${state.activeFolderId === 'all' ? 'active' : ''}"><img src="wszystkieakta.png" alt="Wszystkie Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'"><span class="text-sm md:text-base break-words whitespace-normal leading-tight w-full pr-2">WSZYSTKIE AKTA</span></li>`;
+            state.folders.forEach(f => { const iconPart = `<img src="glowneakta.png" alt="Akta" class="w-[75px] h-[75px] object-contain shrink-0" onerror="this.style.display='none'">`; const isMain = f.id === 'main'; html += `<li onclick="selectFolder('${f.id}')" class="folder-item p-4 flex justify-between items-center group ${state.activeFolderId === f.id ? 'active' : ''}"><div class="flex items-center gap-3 min-w-0 flex-1">${iconPart}<span class="text-sm md:text-base break-words whitespace-normal leading-tight w-full pr-2">${f.name}</span></div>${!isMain ? `<button onclick="deleteFolder(event, '${f.id}')" class="text-red-500 hover:text-red-700 active:text-red-700 font-bold px-3 md:opacity-0 group-hover:opacity-100 transition shadow-sm border border-transparent hover:border-red-500 active:border-red-500 bg-white/20 shrink-0 ml-2">X</button>` : ''}</li>`; });
+            list.innerHTML = html; let selHtml = ''; state.folders.forEach(f => { selHtml += `<option value="${f.id}">${f.name}</option>`; }); select.innerHTML = selHtml;
         }
 
-        function createNewNoteMobile() {
-            clearEditor(); 
-            switchArchivePane('editor', true);
-            document.getElementById('note-title-input').focus();
-        }
-
+        function createNewNoteMobile() { clearEditor(); switchArchivePane('editor', true); document.getElementById('note-title-input').focus(); }
         function renderArchiveNotes() {
-            const l = document.getElementById('archive-notes-list'); if (!l) return; l.innerHTML = '';
-            const s = document.getElementById('note-search'), term = s ? s.value.toLowerCase().trim() : "";
-            
-            let fn = state.notes || []; 
-            if (state.activeFolderId !== 'all') { fn = fn.filter(n => n.folderId === state.activeFolderId || (!n.folderId && state.activeFolderId === 'main')); }
-            
+            const l = document.getElementById('archive-notes-list'); if (!l) return; l.innerHTML = ''; const s = document.getElementById('note-search'), term = s ? s.value.toLowerCase().trim() : "";
+            let fn = state.notes || []; if (state.activeFolderId !== 'all') { fn = fn.filter(n => n.folderId === state.activeFolderId || (!n.folderId && state.activeFolderId === 'main')); }
             if (term) fn = fn.filter(x => (x.title && x.title.toLowerCase().includes(term)) || (x.content && x.content.toLowerCase().includes(term)) || (x.tags && x.tags.toLowerCase().includes(term)) || (x.date && x.date.toLowerCase().includes(term)));
-            
             if (!fn || fn.length === 0) l.innerHTML = '<li class="text-center text-gray-500 italic p-4 font-bold bg-white/50 border border-dashed border-gray-400 mt-2 mx-2">Teczka jest pusta.</li>';
-            else fn.forEach(x => { 
-                const li = document.createElement('li'); 
-                li.className = `archive-item flex items-center gap-2 p-3 bg-white/70 mb-1 border border-gray-300 shadow-sm ${state.activeNoteId === x.id ? 'active border-l-4 border-[#8c1c1c]' : ''}`; 
-                li.innerHTML = `
-                <input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c] shrink-0 w-5 h-5" value="${x.id}" onclick="event.stopPropagation()">
-                <div class="min-w-0 flex-1 cursor-pointer pl-1" onclick="viewNoteInternal(${x.id})">
-                    <div class="font-bold text-[#1a1a1a] truncate text-sm font-['Oswald'] tracking-wide">${x.title || 'Dokument bez tytułu'}</div>
-                    <div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#4b7db8] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div>
-                </div>
-                <button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-3 py-2 hover:bg-black active:bg-black font-bold border border-gray-600 uppercase shrink-0 shadow-sm transition">EDYTUJ</button>`; 
-                l.appendChild(li); 
-            });
+            else fn.forEach(x => { const li = document.createElement('li'); li.className = `archive-item flex items-center gap-2 p-3 bg-white/70 mb-1 border border-gray-300 shadow-sm ${state.activeNoteId === x.id ? 'active border-l-4 border-[#8c1c1c]' : ''}`; li.innerHTML = `<input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c] shrink-0 w-5 h-5" value="${x.id}" onclick="event.stopPropagation()"><div class="min-w-0 flex-1 cursor-pointer pl-1" onclick="viewNoteInternal(${x.id})"><div class="font-bold text-[#1a1a1a] truncate text-sm font-['Oswald'] tracking-wide">${x.title || 'Dokument bez tytułu'}</div><div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#4b7db8] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div></div><button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-3 py-2 hover:bg-black active:bg-black font-bold border border-gray-600 uppercase shrink-0 shadow-sm transition">EDYTUJ</button>`; l.appendChild(li); });
             const cb = document.getElementById('btn-cancel-edit'); if(cb) cb.classList.toggle('hidden', !state.activeNoteId);
         }
-
-        function viewNoteInternal(id) {
-            const n = state.notes.find(x => x.id === id); if (!n) return;
-            document.getElementById('viewer-date').innerText = n.date; document.getElementById('viewer-title').innerText = n.title || 'DOKUMENT POUFNY';
-            document.getElementById('viewer-tags').innerText = n.tags || ''; document.getElementById('viewer-content').innerHTML = n.content;
-            document.getElementById('viewer-citizen').innerText = state.citizenName || "OBYWATEL(KA)";
-            openModalUI('note-viewer-overlay');
-        }
-
-        function loadNoteForEdit(id) {
-            const n = state.notes.find(x => x.id === id); if (!n) return;
-            const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select'), c = e.innerText.trim();
-            const load = (note) => { 
-                e.innerHTML = note.content; 
-                if(t) t.value = note.title || ""; 
-                if(tg) tg.value = note.tags || ""; 
-                if(fs) fs.value = note.folderId || 'main';
-                state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; 
-                renderArchiveNotes(); e.focus(); 
-                switchArchivePane('editor', true);
-            };
-            if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n);
-        }
-
-        function clearEditor() { 
-            state.activeNoteId = null; 
-            const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); 
-            if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; 
-            saveState(); renderArchiveNotes(); 
-            
-            if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') {
-                window.history.back();
-            } else {
-                switchArchivePane('list', false);
-            }
-        }
-        
+        function viewNoteInternal(id) { const n = state.notes.find(x => x.id === id); if (!n) return; document.getElementById('viewer-date').innerText = n.date; document.getElementById('viewer-title').innerText = n.title || 'DOKUMENT POUFNY'; document.getElementById('viewer-tags').innerText = n.tags || ''; document.getElementById('viewer-content').innerHTML = n.content; document.getElementById('viewer-citizen').innerText = state.citizenName || "OBYWATEL(KA)"; openModalUI('note-viewer-overlay'); }
+        function loadNoteForEdit(id) { const n = state.notes.find(x => x.id === id); if (!n) return; const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select'), c = e.innerText.trim(); const load = (note) => { e.innerHTML = note.content; if(t) t.value = note.title || ""; if(tg) tg.value = note.tags || ""; if(fs) fs.value = note.folderId || 'main'; state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; renderArchiveNotes(); e.focus(); switchArchivePane('editor', true); }; if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n); }
+        function clearEditor() { state.activeNoteId = null; const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; saveState(); renderArchiveNotes(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); } }
         function saveCurrentNote() {
             const ed = document.getElementById('note-editor'), tI = document.getElementById('note-title-input'), tgI = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select');
             if (!ed) return; const c = ed.innerHTML.trim(), pt = ed.innerText.trim(), ct = tI ? tI.value.trim() : "", tg = tgI ? tgI.value.trim() : "", fId = fs ? fs.value : 'main';
             if (!pt && !ct && ed.querySelectorAll('img').length === 0) return showAlert("Obywatelu! Pustych akt nie archiwizujemy.");
             const t = ct || (pt ? pt.split('\n')[0].substring(0, 25) + (pt.length > 25 ? '...' : '') : 'Dokument ze zdjęciem'); 
             const dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = dObj.getFullYear() + "-" + String(dObj.getMonth()+1).padStart(2,'0') + "-" + String(dObj.getDate()).padStart(2,'0') + " | [" + dys[dObj.getDay()] + "]";
-            
-            if (state.activeNoteId) { 
-                const i = state.notes.findIndex(x => x.id === state.activeNoteId); 
-                if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; state.notes[i].folderId = fId; } 
-                showAlert("Dokument zaktualizowany."); 
-            } else { 
-                if(!state.notes) state.notes = [];
-                state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg, folderId: fId }); 
-                showAlert("Dokument przyjęto do Składnicy Akt."); 
-            }
-            
-            ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; 
-            saveState(); renderArchiveNotes();
-            
-            if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') {
-                window.history.back();
-            } else {
-                switchArchivePane('list', false);
-            }
+            if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; state.notes[i].folderId = fId; } showAlert("Dokument zaktualizowany."); } else { if(!state.notes) state.notes = []; state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg, folderId: fId }); showAlert("Dokument przyjęto do Składnicy Akt."); }
+            ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderArchiveNotes(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); }
         }
-        
-        function deleteMarkedNotes() {
-            const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia.");
-            const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?";
-            showConfirm(msg, () => { 
-                const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderArchiveNotes(); 
-            });
-        }
+        function deleteMarkedNotes() { const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia."); const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?"; showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderArchiveNotes(); }); }
 
-        // ZAPIS GŁÓWNY W TLE
         async function saveState() {
             const s = document.getElementById('sc-subject'), d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), c = document.getElementById('citizen-name'), ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
             if (s && d && r && f) state.selfCriticism = { subject: s.value, desc: d.value, reason: r.value, fix: f.value }; if (c) state.citizenName = c.value; 
             if (ed && !state.activeNoteId) { state.scratchpad = ed.innerHTML; state.scratchpadTitle = t ? t.value : ""; state.scratchpadTags = tg ? tg.value : ""; }
-            try { await saveToDB(state); } catch (e) { console.error("Błąd zapisu:", e); }
+            try { await saveToDB(state); } catch (e) {}
         }
 
-        // --- PROTOKÓŁ SAMOKRYTYKI ---
         function submitSelfCriticism() {
             const d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), s = document.getElementById('sc-subject');
             if (!d || !d.value.trim()) return showAlert("Raport bez opisu czynu jest nieważny!");
-            if (!state.reports) state.reports = [];
-            state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: s.options[s.selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
-            d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); 
-            showAlert("Raport przyjęty.");
-            if(document.activeElement) document.activeElement.blur();
+            if (!state.reports) state.reports = []; state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: s.options[s.selectedIndex].text, desc: d.value, reason: r.value, fix: f.value });
+            d.value = ''; r.value = ''; f.value = ''; saveState(); renderSelfCriticismHistory(); showAlert("Raport przyjęty."); if(document.activeElement) document.activeElement.blur();
         }
-        function deleteReport(id) { 
-            state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); 
-        }
+        function deleteReport(id) { state.reports = state.reports.filter(r => r.id !== id); saveState(); renderSelfCriticismHistory(); }
         function renderSelfCriticismHistory() {
             const l = document.getElementById('sc-history-list'); if (!l) return; l.innerHTML = '';
             if (!state.reports || state.reports.length === 0) l.innerHTML = '<li class="text-[10px] text-gray-500 italic text-center">Kartoteka czysta... na razie.</li>';
             else state.reports.forEach(r => { const i = document.createElement('li'); i.className = "relative text-[10px] font-mono border-b border-dashed border-gray-400 pb-2 mb-2 pr-6 selectable-text"; i.innerHTML = `<div class="font-bold text-[#b91c1c] mb-1">${r.date} - ${r.subject}</div><div><span class="font-bold">Czyn:</span> ${r.desc}</div>${r.reason ? `<div><span class="font-bold">Uzasadnienie:</span> ${r.reason}</div>` : ''} <div class="italic"><span class="font-bold">Poprawa:</span> ${r.fix}</div><button onclick="deleteReport(${r.id})" class="absolute top-0 right-0 text-red-700 font-bold hover:text-red-900 active:text-red-900 transition text-lg px-1">X</button>`; l.appendChild(i); });
         }
-    </script>
-
-    <!-- POŁĄCZENIE Z CENTRALĄ (FIREBASE) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBp7RWF-GWZ0-AuGAjwyI5x0FecuzzODec",
-            authDomain: "planer-robot-lokalnych.firebaseapp.com",
-            projectId: "planer-robot-lokalnych",
-            storageBucket: "planer-robot-lokalnych.firebasestorage.app",
-            messagingSenderId: "807809303313",
-            appId: "1:807809303313:web:b6d84d65f14a0ec60902b0",
-            databaseURL: "https://planer-robot-lokalnych-default-rtdb.europe-west1.firebasedatabase.app"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const messaging = getMessaging(app);
-        const db = getDatabase(app);
-
-        window.silentTokenRefresh = async () => {
-            if (Notification.permission === 'granted') {
-                try {
-                    const registration = await navigator.serviceWorker.ready;
-                    const token = await getToken(messaging, { vapidKey: 'BFb0rdnc2ZtYsa7z0bmhLM7xmROrTEcVhBSIknCvL6J5DB0DjvxBoiG0jo99SZio1685jE2ZEzVvdVmEHTKfEHY', serviceWorkerRegistration: registration });
-                    if (token) {
-                        const citizenName = state.citizenName && state.citizenName.trim() !== '' ? state.citizenName : "Obywatel Anonim";
-                        const safeTokenKey = token.replace(/\./g, '_');
-                        await set(ref(db, 'tokens/' + safeTokenKey), { token: token, name: citizenName, lastActive: new Date().toLocaleString() });
-                    }
-                } catch (error) {}
-            }
-        };
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(() => { setTimeout(() => { window.silentTokenRefresh(); }, 2000); });
-        }
-
-        window.requestFCMToken = async () => {
-            const citizenNameInput = document.getElementById('citizen-name');
-            const citizenName = citizenNameInput && citizenNameInput.value.trim() !== '' ? citizenNameInput.value : "Obywatel Anonim";
-            try {
-                // 1. ZAWSZE na samym początku, od razu po kliknięciu pytamy o zgodę (Wymóg Chrome!)
-                const permission = await Notification.requestPermission();
-
-                if (permission === 'granted') {
-                    // 2. Dopiero jak mamy zgodę, budzimy Service Workera i Firebase
-                    const registration = await navigator.serviceWorker.ready;
-                    const token = await getToken(messaging, { 
-                        vapidKey: 'BFb0rdnc2ZtYsa7z0bmhLM7xmROrTEcVhBSIknCvL6J5DB0DjvxBoiG0jo99SZio1685jE2ZEzVvdVmEHTKfEHY', 
-                        serviceWorkerRegistration: registration 
-                    });
-                    
-                    if (token) {
-                        const safeTokenKey = token.replace(/\./g, '_');
-                        await set(ref(db, 'tokens/' + safeTokenKey), { token: token, name: citizenName, lastActive: new Date().toLocaleString() });
-                        showAlert("POWIADOMIENIA AKTYWNE!\n\nTwój identyfikator został automatycznie i bezpiecznie przekazany do Centrali.");
-                    } else { 
-                        showAlert("Błąd: Centrala odmówiła wydania tokenu. Skontaktuj się z Naczelnikiem."); 
-                    }
-                } else {
-                    showAlert("Odmowa. Centrala milczy. Udziel zgody w ustawieniach witryn w przeglądarce!"); 
-                }
-            } catch (error) { 
-                showAlert("Awaria systemu łączności!\n\nPowód błędu: " + error.message); 
-            }
-        };
-
-        onMessage(messaging, (payload) => {
-            const title = payload.notification?.title || payload.data?.title || 'SYRENA PORANNA!';
-            const options = { body: payload.notification?.body || payload.data?.body || 'Zgłoś gotowość do Czynu Społecznego!', icon: 'icon-512.png', badge: 'icon-512.png' };
-            
-            // Wymuszenie wyświetlenia na Androidzie przez Service Workera
-            navigator.serviceWorker.ready.then(registration => {
-                registration.showNotification(title, options);
-            });
-        });
     </script>
 </body>
 </html>
