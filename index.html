@@ -45,11 +45,11 @@
 
         * { box-sizing: border-box; touch-action: manipulation; }
         
-        /* ZMIANA: Dodane wyłączenie gumki/sprężyny na iOS */
-        html, body { overflow-x: hidden; width: 100%; max-width: 100%; min-height: 100vh; overscroll-behavior-y: none; }
+        /* GŁÓWNY WIDOK: Standardowe przewijanie */
+        html, body { overflow-x: hidden; width: 100%; max-width: 100%; min-height: 100vh; }
 
-        /* ZMIANA: Dodana brakująca klasa zamrażająca tło podczas działania modali */
-        .body-locked { overflow: hidden !important; overscroll-behavior: none !important; touch-action: none !important; }
+        /* BLOKADA TŁA: Używamy tylko overflow: hidden, aby nie psuć dotyku na telefonach */
+        .body-locked { overflow: hidden !important; }
 
         body {
             background-color: #262626;
@@ -82,10 +82,14 @@
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8c1c1c; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
+        /* WŁASNE PASKI PRZEWIJANIA - TYLKO DLA KOMPUTERÓW (myszka).
+           Na telefonach będą natywne, ukrywające się paski systemowe! */
+        @media (hover: hover) and (pointer: fine) {
+            .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: #8c1c1c; border-radius: 3px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
+        }
 
         .paper-sheet {
             background-color: var(--paper-bg);
@@ -137,7 +141,6 @@
         }
         .quote-banner:active { transform: scale(0.99); }
 
-        /* Ulepszona siatka i zaznaczenie weekendu */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; }
         .calendar-cell {
             aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2);
@@ -158,6 +161,7 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
+        /* MASKI I OKNA (MODALE) */
         .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); overscroll-behavior: contain; }
         .app-modal-overlay.active { display: flex !important; }
         #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
@@ -207,12 +211,12 @@
         [contenteditable] { caret-color: #1a1a1a !important; outline: none; }
         .marked { background-color: #ffcccc !important; color: black !important; border-radius: 2px; padding: 0 2px; font-weight: bold; }
 
-        /* PODGLĄD NOTATEK I ARCHIWUM PEŁNOEKRANOWE */
-        /* ZMIANA: Zablokowanie podwójnego scrollowania przez ustawienie overscroll-behavior: none */
-        #archive-fullscreen { display: none; overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
+        /* ARCHIWUM PEŁNOEKRANOWE */
+        /* overscroll-behavior: contain zapobiega ciągnięciu ekranu poza archiwum */
+        #archive-fullscreen { display: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
         #archive-fullscreen.active { display: flex; }
         
-        #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: none; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
+        #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
         #note-viewer-overlay.active { display: flex; }
         
         .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 2rem; flex-shrink: 0; overflow-x: hidden; }
@@ -255,7 +259,6 @@
         }
 
         @media (hover: hover) {
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #631212; }
             .calendar-cell:hover { background-color: rgba(255,255,255,0.5); }
             .stamp-item:hover { background-color: rgba(255,255,255,0.8); }
             .bar-track:hover { background: rgba(255,255,255,0.5); border-color: #8c1c1c; }
@@ -273,8 +276,8 @@
 </head>
 <body class="flex flex-col items-center justify-start md:justify-center px-2 md:px-4 min-h-screen">
 
-    <!-- EKRAN ŁADOWANIA -->
-    <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-y-auto" style="padding-top: calc(2.5rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));">
+    <!-- EKRAN ŁADOWANIA - usunięto overflow-y-auto, dodano overflow-hidden by usunąć niepotrzebny pasek -->
+    <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-hidden" style="padding-top: calc(2.5rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
             <p class="font-['Courier_Prime'] text-lg sm:text-xl mb-6 tracking-widest border-b border-[#dcd0c0] pb-2">PLANER ROBÓT LOKALNYCH</p>
@@ -755,7 +758,7 @@
             el.classList.add('active');
             if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
             
-            // ZMIANA: Skuteczna, kompatybilna metoda blokowania (klasa dodana na body)
+            // Zablokowanie scrollowania tła
             if (modalStack.length === 0) {
                 document.body.classList.add('body-locked');
             }
@@ -782,7 +785,7 @@
             }
             modalStack = modalStack.filter(m => m !== id);
             
-            // ZMIANA: Odblokowanie tła
+            // Odblokowanie scrollowania tła
             if (modalStack.length === 0) {
                 document.body.classList.remove('body-locked');
             }
