@@ -14,19 +14,11 @@
     <link rel="icon" type="image/png" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-512.png">
     
-    <!-- Silnik graficzny z poprawką na telefony dotykowe -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            future: {
-                hoverOnlyWhenSupported: true,
-            }
-        }
+        tailwind.config = { future: { hoverOnlyWhenSupported: true, } }
     </script>
-
-    <!-- Aparat Fotograficzny do zapisywania Dyplomu -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Oswald:wght@500;700&family=Special+Elite&family=Rye&family=VT323&display=swap" rel="stylesheet">
@@ -37,59 +29,39 @@
             --paper-texture: repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 2px, transparent 2px, transparent 4px);
             --ink-color: #1a1a1a;
             --stamp-red: #8c1c1c; 
-            --stamp-blue: #4b7db8; /* Wyblakły niebieski */
+            --stamp-blue: #4b7db8; 
             --stamp-violet: #6020a0;
             --stamp-green: #15803d;
-            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; }
-        
-        /* GŁÓWNY WIDOK: Zapobiegamy podskakiwaniu całej aplikacji */
-        html, body { 
-            width: 100%; max-width: 100%; min-height: 100vh; 
-            overscroll-behavior: none; 
-        }
-
-        /* KLASA ZAMRAŻAJĄCA: Używana do zatrzymania tła przy otwartych małych oknach */
+        html, body { width: 100%; max-width: 100%; min-height: 100vh; overscroll-behavior: none; }
         .body-locked { overflow: hidden !important; }
 
         body {
             background-color: #262626;
             background-image: radial-gradient(#333 15%, transparent 16%), radial-gradient(#333 15%, transparent 16%);
-            background-size: 60px 60px;
-            background-position: 0 0, 30px 30px;
-            font-family: 'Courier Prime', monospace;
-            color: var(--ink-color);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            background-size: 60px 60px; background-position: 0 0, 30px 30px;
+            font-family: 'Courier Prime', monospace; color: var(--ink-color);
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
         
-        /* OPAKOWANIE PLANERA - paddingi przeniesione z body */
         #main-app-container {
             padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
             padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
         }
         @media (min-width: 768px) {
-            #main-app-container {
-                padding-top: calc(1rem + env(safe-area-inset-top, 0px));
-                padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-            }
+            #main-app-container { padding-top: calc(1rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
         }
         
         button { outline: none !important; -webkit-tap-highlight-color: transparent; }
         button:focus { outline: none !important; }
-        
         .selectable-text { user-select: text !important; -webkit-user-select: text !important; }
         img, video, svg { max-width: 100%; height: auto; }
         input, textarea, select { user-select: text; }
-
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        /* INTELIGENTNE PASKI PRZEWIJANIA */
-        /* Pasek pokazuje się TYLKO gdy jest dużo treści i tło jest przezroczyste, by nie szpecić pustego ekranu */
         @media (hover: hover) and (pointer: fine) {
             .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
             .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } 
@@ -97,24 +69,9 @@
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(99, 18, 18, 0.9); }
         }
 
-        .paper-sheet {
-            background-color: var(--paper-bg);
-            box-shadow: 2px 3px 25px rgba(0,0,0,0.8);
-            position: relative; overflow: hidden;
-            border: 1px solid #8c8680;
-        }
-        .paper-sheet::before {
-            content: ""; position: absolute; inset: 0; background-image: var(--paper-texture);
-            pointer-events: none; z-index: 0; mix-blend-mode: multiply;
-        }
-        
-        .paper-dirt {
-            position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.4; mix-blend-mode: multiply;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 0%, transparent 20%),
-                radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 25%),
-                repeating-conic-gradient(#0000 0% 25%, rgba(0,0,0,0.05) 0% 50%) 50% / 20px 20px;
-        }
+        .paper-sheet { background-color: var(--paper-bg); box-shadow: 2px 3px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; border: 1px solid #8c8680; }
+        .paper-sheet::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-texture); pointer-events: none; z-index: 0; mix-blend-mode: multiply; }
+        .paper-dirt { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.4; mix-blend-mode: multiply; background-image: radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 0%, transparent 20%), radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 25%), repeating-conic-gradient(#0000 0% 25%, rgba(0,0,0,0.05) 0% 50%) 50% / 20px 20px; }
 
         h1, h2, h3, .propaganda-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
 
@@ -124,40 +81,20 @@
         .shape-rect { border-radius: 2px; } .shape-round { border-radius: 50%; } .shape-oval { border-radius: 50%; } 
         .shape-tri { border: 4px solid currentColor; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .shape-none { border: none; clip-path: none; }
-        
-        .col-red { color: var(--stamp-red); } .col-blue { color: var(--stamp-blue); } 
-        .col-violet { color: var(--stamp-violet); } .col-green { color: var(--stamp-green); }
-        
-        .stamp-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; } 
-        .stamp-icon svg { width: 32px; height: 32px; fill: currentColor; }
-        .stamp-icon img { max-width: 100px; max-height: 60px; width: auto; height: auto; object-fit: contain; mix-blend-mode: multiply; }
+        .col-red { color: var(--stamp-red); } .col-blue { color: var(--stamp-blue); } .col-violet { color: var(--stamp-violet); } .col-green { color: var(--stamp-green); }
+        .stamp-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; } .stamp-icon svg { width: 32px; height: 32px; fill: currentColor; } .stamp-icon img { max-width: 100px; max-height: 60px; width: auto; height: auto; object-fit: contain; mix-blend-mode: multiply; }
 
-        .prl-input {
-            background: transparent; border: none; border-bottom: 2px dashed #57534e;
-            font-family: 'Courier Prime', monospace; padding: 4px; color: #1c1917; outline: none;
-        }
+        .prl-input { background: transparent; border: none; border-bottom: 2px dashed #57534e; font-family: 'Courier Prime', monospace; padding: 4px; color: #1c1917; outline: none; }
         .prl-input:focus { border-bottom-style: solid; border-color: #000; background-color: rgba(255,255,255,0.1); }
-        
-        .quote-banner {
-            background-color: #8c1c1c; color: #e5e5e5; padding: 8px;
-            font-family: 'Oswald', sans-serif; text-transform: uppercase;
-            letter-spacing: 1px; text-align: center; font-size: 0.9rem;
-            margin-bottom: 20px; border: 2px solid #2b2b2b; transform: rotate(0.5deg);
-            box-shadow: 3px 3px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s;
-        }
+        .quote-banner { background-color: #8c1c1c; color: #e5e5e5; padding: 8px; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; text-align: center; font-size: 0.9rem; margin-bottom: 20px; border: 2px solid #2b2b2b; transform: rotate(0.5deg); box-shadow: 3px 3px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; }
         .quote-banner:active { transform: scale(0.99); }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; }
-        .calendar-cell {
-            aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2);
-            position: relative; cursor: pointer; display: flex; flex-direction: column; padding: 1px; overflow: hidden;
-            transition: background 0.1s;
-        }
+        .calendar-cell { aspect-ratio: 1; border: 1px solid #a8a29e; background-color: rgba(255,255,255,0.2); position: relative; cursor: pointer; display: flex; flex-direction: column; padding: 1px; overflow: hidden; transition: background 0.1s; }
         .calendar-cell.weekend { background-color: rgba(140, 28, 28, 0.08) !important; color: #631212; }
         .calendar-cell.today { background-color: #fca5a5 !important; border: 2px solid #8c1c1c; }
         .calendar-cell.active { background-color: #bfdbfe; }
         .calendar-cell.empty { background-color: transparent !important; border: none; cursor: default; pointer-events: none; }
-        
         .cal-header { text-align: center; font-weight: bold; background-color: #a8a29e; padding: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; color: #1c1917; }
         .cal-event-text { font-size: 0.55rem; line-height: 1; word-break: break-word; text-align: center; color: #1e3a8a; font-weight: bold; background-color: rgba(255, 255, 255, 0.8); margin-top: 1px; padding: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .event-marker { width: 6px; height: 6px; background-color: #8c1c1c; border-radius: 50%; position: absolute; top: 2px; right: 2px; z-index: 5; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
@@ -167,11 +104,15 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        /* MODALE SYSTEMOWE */
+        /* ZMIENIONA TABLICA OGŁOSZEŃ (SZARA, Z DROBNYMI KROPKAMI) */
+        .corkboard { background-color: #a8a29e; background-image: radial-gradient(rgba(0,0,0,0.2) 1px, transparent 1px); background-size: 8px 8px; border: 4px solid #57534e; padding: 10px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.4); margin-bottom: 2rem; }
+        .corkboard-pin { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); box-shadow: 2px 5px 5px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; }
+        .pinned-paper { background-color: #fefae0; padding: 12px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); transform: rotate(-1deg); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 80px; }
+        .pinned-paper:hover { transform: rotate(0deg) scale(1.01); }
+
         .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); overscroll-behavior: contain; }
         .app-modal-overlay.active { display: flex !important; }
-        #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
-        
+        #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal, #inspection-modal { z-index: 100000; }
         .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: none; }
 
         .stamp-item { height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.1s; }
@@ -181,21 +122,13 @@
         .sc-input { width: 100%; background: transparent; border: none; border-bottom: 1px dashed #4b5563; font-family: 'Courier Prime', monospace; font-size: 0.8rem; padding: 2px 0; outline: none; margin-bottom: 0.5rem; }
         .sc-input:focus { border-bottom-style: solid; background-color: rgba(255,255,255,0.2); }
 
-        .bg-graph-paper {
-            background-color: #f5eedc;
-            background-image: linear-gradient(rgba(180, 110, 50, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(180, 110, 50, 0.2) 1px, transparent 1px);
-            background-size: 20px 20px;
-            box-shadow: inset 0 0 10px rgba(80, 40, 0, 0.1);
-        }
-        
+        .bg-graph-paper { background-color: #f5eedc; background-image: linear-gradient(rgba(180, 110, 50, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(180, 110, 50, 0.2) 1px, transparent 1px); background-size: 20px 20px; box-shadow: inset 0 0 10px rgba(80, 40, 0, 0.1); }
         .chart-container { display: flex; align-items: flex-end; gap: 20px; height: 280px; padding: 10px; padding-top: 40px; padding-bottom: 90px; overflow-x: auto; border: 2px solid #333; }
         .chart-col { display: flex; flex-direction: column; align-items: center; width: 90px; flex-shrink: 0; position: relative; height: 100%; justify-content: flex-end; }
         .bar-track { width: 100%; height: 100%; background: rgba(255,255,255,0.2); border: 2px solid #444; position: relative; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; transition: background 0.1s; }
         .bar-fill { width: 100%; background-color: #8c1c1c; transition: height 0.5s ease-out; position: relative; border-top: 2px solid #000; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px); pointer-events: none; }
         .bar-fill.complete { background-color: #15803d; }
-        
         .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 12px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 6px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: calc(100% - 30px); overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
-        
         .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; pointer-events: none; }
         .chart-controls { position: absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
         .chart-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; cursor: pointer; border: 2px solid rgba(0,0,0,0.3); user-select: none; font-family: monospace; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); border-radius: 4px; }
@@ -203,27 +136,25 @@
         .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
 
         .archive-pane { display: none; flex-direction: column; height: 100%; }
-        
         .archive-item { cursor: pointer; padding: 4px; border-bottom: 1px dashed #a8a29e; transition: background 0.1s; }
         .archive-item.active { background-color: #e7e5e4; font-weight: bold; border-left: 3px solid #8c1c1c; }
         .note-checkbox { margin-right: 6px; cursor: pointer; }
-        
         .folder-item { cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #ccc; font-weight: bold; font-family: 'Oswald', sans-serif; letter-spacing: 1px; color: #444; }
         .folder-item.active { background-color: #8c1c1c; color: white; border-color: #631212; }
-
         .task-edit-input { width: 100%; background: rgba(255,255,255,0.4); border: none; border-bottom: 2px solid #8c1c1c; font-family: 'Courier Prime', monospace; font-size: 0.875rem; padding: 2px 4px; outline: none; color: #1a1a1a; font-weight: bold; }
         .prl-editor:empty:before { content: attr(placeholder); color: #6b7280; pointer-events: none; display: block; }
-
         [contenteditable] { caret-color: #1a1a1a !important; outline: none; }
         .marked { background-color: #ffcccc !important; color: black !important; border-radius: 2px; padding: 0 2px; font-weight: bold; }
 
-        /* ARCHIWUM PEŁNOEKRANOWE ODDZIELONE FUNKCJONALNIE */
+        /* Wymuszenie zawijania wierszy dla wklejanych tekstów */
+        #note-editor { word-wrap: break-word !important; overflow-wrap: break-word !important; word-break: break-word !important; white-space: pre-wrap !important; overflow-x: hidden; width: 100%; max-width: 100%; }
+        #note-editor * { white-space: pre-wrap !important; word-wrap: break-word !important; overflow-wrap: break-word !important; max-width: 100% !important; }
+        .viewer-content * { white-space: pre-wrap !important; word-wrap: break-word !important; overflow-wrap: break-word !important; max-width: 100% !important; }
+
         #archive-fullscreen { display: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
         #archive-fullscreen.active { display: flex; }
-        
         #note-viewer-overlay { position: fixed; inset: 0; z-index: 99998; background-color: #262626; display: none; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem; }
         #note-viewer-overlay.active { display: flex; }
-        
         .viewer-paper { width: 100%; max-width: 800px; min-height: calc(100vh - 120px); height: auto; background-color: var(--paper-bg); padding: 2rem; box-shadow: 10px 10px 40px rgba(0,0,0,0.8); position: relative; border: 1px solid #8c8680; margin-bottom: 2rem; flex-shrink: 0; overflow-x: hidden; }
         @media (min-width: 768px) { .viewer-paper { padding: 4rem; } }
         .viewer-paper::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-texture); pointer-events: none; mix-blend-mode: multiply; z-index: 1; }
@@ -234,35 +165,16 @@
         .viewer-tags { font-size: 0.875rem; color: #4b7db8; margin-top: 0.5rem; font-weight: bold; }
         .viewer-content { font-size: 1.125rem; line-height: 1.6; color: #1a1a1a; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word; position: relative; z-index: 2; }
         .viewer-footer { margin-top: 5rem; text-align: right; font-family: 'Special Elite', cursive; color: #8c1c1c; opacity: 0.8; transform: rotate(-3deg); line-height: 1.2; text-transform: uppercase; position: relative; z-index: 2; }
-        
         .close-viewer-btn { background-color: #8c1c1c; color: white; border: 3px solid #dcd0c0; font-family: 'Oswald', sans-serif; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); transition: transform 0.1s, box-shadow 0.1s; flex-shrink: 0; z-index: 99999; margin: 0 auto 4rem auto; display: block; width: 90%; max-width: 400px; text-align: center; }
         @media (min-width: 768px) { .close-viewer-btn { font-size: 1.25rem; width: auto; min-width: 300px; } }
         .close-viewer-btn:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px rgba(0,0,0,0.5); }
 
-        #install-button { display: none; }
-        
-        /* MOBILNE ZARZĄDZANIE PANELEMI ARCHIWUM */
         #pane-list.active-pane, #pane-editor.active-pane { display: flex; }
-        
-        /* BOCZNE MENU (DRAWER) DLA SKOROSZYTÓW NA TELEFONIE */
-        #pane-folders {
-            position: absolute; top: 0; left: 0; bottom: 0; width: 80%; max-width: 280px;
-            z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease;
-            display: flex !important;
-        }
+        #pane-folders { position: absolute; top: 0; left: 0; bottom: 0; width: 80%; max-width: 280px; z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; display: flex !important; }
         #pane-folders.open { transform: translateX(0); }
-        
-        #folder-drawer-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 45; display: none;
-        }
+        #folder-drawer-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 45; display: none; }
         #folder-drawer-overlay.active { display: block; }
-
-        @media (min-width: 768px) { 
-            .archive-pane { display: flex !important; } 
-            #pane-folders { position: relative; transform: none; width: 25%; max-width: none; z-index: 10; }
-            #folder-drawer-overlay { display: none !important; }
-        }
-
+        @media (min-width: 768px) { .archive-pane { display: flex !important; } #pane-folders { position: relative; transform: none; width: 25%; max-width: none; z-index: 10; } #folder-drawer-overlay { display: none !important; } }
         @media (hover: hover) {
             .calendar-cell:hover { background-color: rgba(255,255,255,0.5); }
             .stamp-item:hover { background-color: rgba(255,255,255,0.8); }
@@ -271,8 +183,6 @@
             .folder-item:hover { background-color: rgba(0,0,0,0.05); }
             .close-viewer-btn:hover { background-color: #631212; }
         }
-        
-        /* Responsywne dotknięcia na telefony */
         .calendar-cell:active { background-color: rgba(255,255,255,0.5); }
         .stamp-item:active { background-color: rgba(255,255,255,0.8); }
         .bar-track:active { background: rgba(255,255,255,0.5); border-color: #8c1c1c; }
@@ -282,26 +192,18 @@
 </head>
 <body>
 
-    <!-- EKRAN ŁADOWANIA - całkowicie zablokowane przewijanie -->
+    <!-- EKRAN ŁADOWANIA -->
     <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-hidden" style="touch-action: none;">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
             <p class="font-['Courier_Prime'] text-lg sm:text-xl mb-6 tracking-widest border-b border-[#dcd0c0] pb-2">PLANER ROBÓT LOKALNYCH</p>
-            
             <div id="loading-container">
-                <div class="w-full sm:w-64 h-4 border-2 border-[#dcd0c0] p-1 mx-auto mb-4">
-                    <div id="splash-progress" class="h-full bg-[#8c1c1c] w-0 transition-all duration-[2000ms] ease-linear"></div>
-                </div>
+                <div class="w-full sm:w-64 h-4 border-2 border-[#dcd0c0] p-1 mx-auto mb-4"><div id="splash-progress" class="h-full bg-[#8c1c1c] w-0 transition-all duration-[2000ms] ease-linear"></div></div>
                 <p id="splash-status" class="font-mono text-xs text-gray-500 uppercase tracking-widest h-4">Inicjalizacja biurokracji...</p>
             </div>
-
             <div id="start-container" class="hidden flex-col items-center mt-6">
-                <p class="font-['Special_Elite'] text-sm sm:text-lg mb-6 leading-relaxed text-[#dcd0c0] border-t border-b border-[#444] py-4">
-                    „Obywatelu, nie błądź myślami w chmurach, gdy na stanowisku czeka kolejka zadań!”
-                </p>
-                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] active:bg-[#631212] hover:scale-105 active:scale-105 transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">
-                    PRZYSTĄP DO PRACY
-                </button>
+                <p class="font-['Special_Elite'] text-sm sm:text-lg mb-6 leading-relaxed text-[#dcd0c0] border-t border-b border-[#444] py-4">„Obywatelu, nie błądź myślami w chmurach, gdy na stanowisku czeka kolejka zadań!”</p>
+                <button onclick="enterApp()" class="bg-[#8c1c1c] text-white font-['Oswald'] text-xl sm:text-2xl px-6 sm:px-8 py-2 sm:py-3 border-2 border-[#dcd0c0] hover:bg-[#631212] active:bg-[#631212] hover:scale-105 active:scale-105 transition shadow-[0_0_15px_rgba(140,28,28,0.5)] cursor-pointer">PRZYSTĄP DO PRACY</button>
             </div>
         </div>
     </div>
@@ -320,9 +222,8 @@
         <button class="close-viewer-btn" onclick="closeModalUI('note-viewer-overlay')">ZAMKNIJ I WRÓĆ DO PLANERA</button>
     </div>
 
-    <!-- NOWE, PEŁNOEKRANOWE ARCHIWUM (Z BOCZNYM MENU) -->
+    <!-- ARCHIWUM PEŁNOEKRANOWE -->
     <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col">
-        <!-- NAGŁÓWEK ARCHIWUM -->
         <div class="bg-[#1a1a1a] text-[#e7e5e4] px-3 pb-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20 shrink-0" style="padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));">
             <div class="flex items-center gap-3">
                 <button onclick="toggleFolderDrawer()" class="md:hidden bg-[#292524] text-white border border-[#57534e] px-3 py-2 font-bold font-['Oswald'] hover:bg-[#333] active:bg-[#333] tracking-widest text-sm shadow-sm transition">☰ KARTOTEKA</button>
@@ -332,95 +233,52 @@
         </div>
         
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#dcd0c0] relative z-10">
-            
             <div id="folder-drawer-overlay" onclick="toggleFolderDrawer()"></div>
-
-            <!-- PANE 1: SKOROSZYTY (MENU BOCZNE / LEWA KOLUMNA) -->
             <div id="pane-folders" class="w-full md:w-1/4 lg:w-1/5 border-r-2 border-[#57534e] bg-[#e5e5e5] shadow-[5px_0_15px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col">
-                <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] active:bg-[#1a1a1a] transition active:scale-[0.98]">
-                    <span>Dodaj akta</span>
-                    <span class="text-[#dcd0c0] text-2xl leading-none font-bold" title="Dodaj nowe akta">+</span>
-                </button>
-                
-                <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5] flex flex-col" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
-                    <!-- Foldery generowane w JS -->
-                </ul>
+                <button onclick="createNewFolder()" class="w-full p-4 bg-[#292524] text-white font-['Oswald'] tracking-wider uppercase text-base border-b-2 border-gray-600 flex justify-between items-center shrink-0 hover:bg-[#1a1a1a] active:bg-[#1a1a1a] transition active:scale-[0.98]"><span>Dodaj akta</span><span class="text-[#dcd0c0] text-2xl leading-none font-bold">+</span></button>
+                <ul id="archive-folder-list" class="flex-1 overflow-y-auto custom-scrollbar bg-[#f5f5f5] flex flex-col" style="padding-bottom: env(safe-area-inset-bottom, 0px);"></ul>
             </div>
-
-            <!-- PANE 2: LISTA AKT -->
             <div id="pane-list" class="archive-pane active-pane w-full md:w-1/3 lg:w-1/4 border-r-2 border-[#57534e] bg-white/50 relative">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
+                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0"><span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span><button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm ml-auto">Zniszcz</button></div>
+                <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0"><button onclick="createNewNoteMobile()" class="w-full md:hidden bg-[#8c1c1c] text-white py-2 mb-2 font-bold font-['Oswald'] text-base uppercase tracking-wider shadow-md hover:bg-[#631212] active:bg-[#631212] transition border border-[#3d0808]">+ ZAKŁADAM NOWE AKTA</button><input type="text" id="note-search" oninput="renderArchiveNotes()" placeholder="Szukaj w aktach..." class="w-full bg-white border border-gray-400 p-2 text-xs font-mono outline-none shadow-inner"></div>
                 
-                <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0">
-                    <span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span>
-                    <button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm ml-auto">Zniszcz</button>
-                </div>
-                
-                <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0">
-                    <button onclick="createNewNoteMobile()" class="w-full md:hidden bg-[#8c1c1c] text-white py-2 mb-2 font-bold font-['Oswald'] text-base uppercase tracking-wider shadow-md hover:bg-[#631212] active:bg-[#631212] transition border border-[#3d0808]">+ ZAKŁADAM NOWE AKTA</button>
-                    <input type="text" id="note-search" oninput="renderArchiveNotes()" placeholder="Szukaj w aktach..." class="w-full bg-white border border-gray-400 p-2 text-xs font-mono outline-none shadow-inner">
-                </div>
-                
-                <ul id="archive-notes-list" class="flex-1 overflow-y-auto custom-scrollbar p-1 text-xs font-mono space-y-1 z-10" style="padding-bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px));">
-                    <!-- Notatki generowane w JS -->
-                </ul>
+                <!-- LISTA NOTATEK W ARCHIWUM -->
+                <ul id="archive-notes-list" class="flex-1 overflow-y-auto custom-scrollbar p-1 text-xs font-mono space-y-1 z-10" style="padding-bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px));"></ul>
             </div>
-
-            <!-- PANE 3: EDYTOR -->
             <div id="pane-editor" class="archive-pane w-full md:flex-1 bg-white relative shadow-inner">
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
-                
                 <div class="p-3 md:p-4 border-b-2 border-[#57534e] bg-[#f5eedc] z-10 flex flex-col gap-2 shrink-0">
                     <div class="flex items-center gap-2 mb-1">
-                        <button onclick="goBackFromEditor()" class="md:hidden bg-[#8c1c1c] text-white px-3 py-1.5 text-xs font-bold font-['Oswald'] uppercase border border-[#3d0808] shadow-sm hover:bg-[#631212] active:bg-[#631212] transition">◀ WSTECZ DO SPISU</button>
+                        <button onclick="goBackFromEditor()" class="md:hidden bg-[#8c1c1c] text-white px-3 py-1.5 text-xs font-bold font-['Oswald'] uppercase border border-[#3d0808] shadow-sm hover:bg-[#631212] active:bg-[#631212] transition">◀ WSTECZ</button>
                     </div>
-                    
                     <input type="text" id="note-title-input" placeholder="TYTUŁ DOKUMENTU..." class="w-full bg-transparent border-b-2 border-gray-400 border-dashed outline-none font-bold font-['Courier_Prime'] text-xl md:text-2xl text-[#8c1c1c] placeholder-gray-500 pb-1">
-                    
                     <div class="flex flex-col sm:flex-row gap-2 mt-1">
                         <textarea id="note-tags-input" rows="1" placeholder="#tagi (np. #ważne)..." class="flex-1 bg-transparent border-none outline-none font-['Courier_Prime'] text-sm text-[#4b7db8] placeholder-gray-500 resize-none overflow-hidden py-1"></textarea>
-                        <select id="note-folder-select" class="bg-white border border-gray-400 font-mono text-xs p-1 outline-none h-8 min-w-[120px] shadow-sm">
-                            <!-- Opcje generowane w JS -->
-                        </select>
+                        <select id="note-folder-select" class="bg-white border border-gray-400 font-mono text-xs p-1 outline-none h-8 min-w-[120px] shadow-sm"></select>
                     </div>
                 </div>
-                
                 <div id="note-editor" contenteditable="true" oninput="scheduleSave();" onkeyup="sanitizeEditor(this);" class="flex-1 bg-transparent p-4 md:p-6 outline-none font-['Courier_Prime'] text-base md:text-lg leading-relaxed text-[#1a1a1a] z-10 custom-scrollbar prl-editor overflow-y-auto break-words whitespace-pre-wrap" placeholder="Tutaj wprowadź treść notatki służbowej..."></div>
-                
                 <div class="border-t-2 border-[#57534e] px-3 pt-3 flex flex-wrap justify-between items-center bg-[#292524] z-10 gap-2 shrink-0" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div class="flex items-center shadow-[1px_1px_0px_#444]">
-                            <button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-3 py-2 border border-[#444] border-r-0 hover:bg-[#631212] active:bg-[#631212] transition uppercase">Zaznacz</button>
-                            <button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-3 py-2 border border-[#444] hover:bg-gray-200 active:bg-gray-200 transition uppercase">Odznacz</button>
-                        </div>
-                        <button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-3 py-2 border border-gray-600 hover:bg-black active:bg-black transition uppercase ml-1 sm:ml-2">FOTO</button>
-                        <input type="file" id="note-photo-upload" class="hidden" accept="image/*" onchange="insertPhotoToNote(this)">
-                    </div>
-                    <div class="flex gap-2">
-                        <button id="btn-cancel-edit" onclick="clearEditor()" class="hidden md:block bg-gray-600 text-white border border-[#444] px-4 py-2 text-xs font-bold uppercase hover:bg-gray-700 active:bg-gray-700 transition">Anuluj</button>
-                        <button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#dcd0c0] px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition tracking-wide font-['Oswald'] shadow-sm">ZAPISZ</button>
-                    </div>
+                    <div class="flex flex-wrap items-center gap-2"><div class="flex items-center shadow-[1px_1px_0px_#444]"><button onclick="applyZakreslacz()" class="text-[10px] sm:text-xs font-bold bg-[#8c1c1c] text-white px-3 py-2 border border-[#444] border-r-0 hover:bg-[#631212] active:bg-[#631212] transition uppercase">Zaznacz</button><button onclick="forceCleanEditor()" class="text-[10px] sm:text-xs font-bold bg-white text-[#1a1a1a] px-3 py-2 border border-[#444] hover:bg-gray-200 active:bg-gray-200 transition uppercase">Odznacz</button></div><button onclick="document.getElementById('note-photo-upload').click()" class="text-[10px] sm:text-xs font-bold bg-[#1a1a1a] text-[#dcd0c0] px-3 py-2 border border-gray-600 hover:bg-black active:bg-black transition uppercase ml-1 sm:ml-2">FOTO</button><input type="file" id="note-photo-upload" class="hidden" accept="image/*" onchange="insertPhotoToNote(this)"></div>
+                    <div class="flex gap-2"><button id="btn-cancel-edit" onclick="clearEditor()" class="hidden md:block bg-gray-600 text-white border border-[#444] px-4 py-2 text-xs font-bold uppercase hover:bg-gray-700 active:bg-gray-700 transition">Anuluj</button><button onclick="saveCurrentNote()" class="bg-[#8c1c1c] text-white border border-[#dcd0c0] px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition tracking-wide font-['Oswald'] shadow-sm">ZAPISZ</button></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ODDZIELNY GŁÓWNY KONTENER APLIKACJI (Znikanie przy Archiwum) -->
+    <!-- GŁÓWNY KONTENER APLIKACJI -->
     <main id="main-app-container" class="flex flex-col items-center justify-start md:justify-center px-2 md:px-4 min-h-screen w-full">
-        <!-- GŁÓWNA KARTA PLANERA -->
         <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative">
             <div class="paper-dirt"></div>
             <div id="quote-banner" class="quote-banner" onclick="cycleQuote()" title="Kliknij, aby zmienić hasło"></div>
 
             <header class="flex flex-col md:flex-row gap-8 mb-6 border-b-2 border-dashed border-[#57534e] pb-4 relative z-10">
                 <div class="relative shrink-0 mx-auto md:mx-0 mt-4">
-                    <div class="wire-clip-container">
-                        <div class="wire-clip-part clip-outer"></div>
-                        <div class="wire-clip-part clip-inner"></div>
-                    </div>
+                    <div class="wire-clip-container"><div class="wire-clip-part clip-outer"></div><div class="wire-clip-part clip-inner"></div></div>
                     <div class="w-32 h-40 bg-[#d1d5db] border border-gray-600 shadow-md relative rotate-[-2deg] flex items-center justify-center overflow-hidden cursor-pointer group" onclick="document.getElementById('photo-upload').click()">
                         <img id="user-photo" src="" class="w-full h-full object-cover hidden">
-                        <div id="photo-placeholder" class="text-center p-2 opacity-60 group-hover:opacity-100 transition"><span class="text-xs font-bold block mb-1">FOTOGRAFIA</span><span class="text-[10px] uppercase">(kliknij aby wkleić)</span></div>
+                        <div id="photo-placeholder" class="text-center p-2 opacity-60 group-hover:opacity-100 transition"><span class="text-xs font-bold block mb-1">FOTOGRAFIA</span><span class="text-[10px] uppercase">(kliknij)</span></div>
                         <input type="file" id="photo-upload" class="hidden" accept="image/*" onchange="loadPhoto(this)">
                     </div>
                 </div>
@@ -431,17 +289,14 @@
                             <span class="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1c1c] rotate-[-1deg] border-2 border-[#8c1c1c] px-1 sm:px-2 py-0.5">Dokument Ścisłego Zarachowania</span>
                             <div class="flex flex-row gap-2 mt-2">
                                 <button id="install-button" onclick="installPWA()" class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-blue-800 active:bg-blue-800 transition">INSTALACJA SYSTEMU</button>
-                                <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] active:bg-[#631212] transition" title="Zezwól na powiadomienia z Centrali">WŁĄCZ POWIADOMIENIA</button>
+                                <button onclick="window.requestFCMToken()" class="bg-[#8c1c1c] text-white text-[10px] font-bold px-2 py-1 uppercase shadow-md hover:bg-[#631212] active:bg-[#631212] transition">WŁĄCZ POWIADOMIENIA</button>
                             </div>
                         </div>
                     </div>
                     <h2 class="text-xl font-bold text-[#292524] mb-6">Planer Robót Lokalnych</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm font-mono">
                         <div><label class="block text-[10px] uppercase font-bold text-gray-700">Obywatel(ka):</label><input type="text" id="citizen-name" value="Jan Kowalski" class="prl-input w-full font-bold text-lg"></div>
-                        <div>
-                            <label class="block text-[10px] uppercase font-bold text-gray-700">Data sporządzenia:</label>
-                            <div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="resetCalendarToToday()" title="Kliknij, aby wrócić do bieżącego miesiąca"></div>
-                        </div>
+                        <div><label class="block text-[10px] uppercase font-bold text-gray-700">Data sporządzenia:</label><div id="date-display" class="border-b border-gray-500 py-1 font-bold cursor-pointer hover:bg-white/30 transition" onclick="resetCalendarToToday()"></div></div>
                     </div>
                 </div>
             </header>
@@ -449,15 +304,44 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-7 space-y-6 relative z-10">
                     
-                    <!-- CZYN SPOŁECZNY (ZADANIA) -->
+                    <!-- TABLICA OGŁOSZEŃ -->
+                    <div class="corkboard">
+                        <div class="corkboard-pin"></div>
+                        <h3 class="text-sm font-bold uppercase mb-2 text-[#1c1917] text-center border-b border-[#57534e] pb-1 font-['Oswald']">Tablica Ogłoszeń (Przypięte Akta)</h3>
+                        <div id="pinned-note-content" class="pinned-paper" onclick="openPinnedNote()">
+                            <span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>
+                        </div>
+                    </div>
+
+                    <!-- CZYN SPOŁECZNY Z ZAKŁADKAMI WYDZIAŁÓW -->
                     <div>
-                        <div class="flex items-end gap-2 mb-2 justify-between"><h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3></div>
-                        <div class="flex gap-2 mb-4"><input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie..."><button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black active:bg-black transition">Zatwierdź</button></div>
-                        <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"><div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div></ul>
-                        <div class="mt-2"><div class="flex justify-between text-[10px] font-bold uppercase mb-1"><span>Wykonanie Zadań w Czynie Społecznym:</span><span id="task-progress-text">0%</span></div><div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div></div>
+                        <div class="flex items-end gap-2 mb-2 justify-between">
+                            <h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-1 mb-3 border-b-2 border-dashed border-[#57534e] pb-2">
+                            <button onclick="switchDepartment('ogolny')" id="dep-btn-ogolny" class="dep-btn bg-[#1c1917] text-[#dcd0c0] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm">Ogólny</button>
+                            <button onclick="switchDepartment('zaopatrzenie')" id="dep-btn-zaopatrzenie" class="dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100">Zaopatrzenie</button>
+                            <button onclick="switchDepartment('domowy')" id="dep-btn-domowy" class="dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100">Domowy</button>
+                            <button onclick="switchDepartment('sluzbowy')" id="dep-btn-sluzbowy" class="dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100">Służbowy</button>
+                        </div>
+                        
+                        <!-- POLE ZADAŃ -->
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie ogólne...">
+                            <button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black active:bg-black transition shadow-sm">Zatwierdź</button>
+                        </div>
+
+                        <ul id="task-list" class="space-y-3 min-h-[120px] relative pb-4"></ul>
+                        
+                        <div class="mt-2">
+                            <div class="flex justify-between text-[10px] font-bold uppercase mb-1">
+                                <span>Wykonanie Zadań (Wszystkie Wydziały):</span><span id="task-progress-text">0%</span>
+                            </div>
+                            <div class="h-4 border border-[#44403c] p-[1px] bg-white/30"><div id="task-progress-bar" class="h-full bg-[#1e3a8a] w-0 transition-all duration-500"></div></div>
+                        </div>
                     </div>
                     
-                    <!-- PLAN DŁUGOTERMINOWY (WYKRESY) -->
                     <div class="border-t-4 double border-gray-500 pt-4 bg-[#fefce840] p-4 shadow-inner relative">
                         <div class="flex justify-between items-center mb-2"><h3 class="text-lg font-bold uppercase text-[#8c1c1c] flex items-center gap-2">Plan Długoterminowy</h3><span class="text-[9px] uppercase font-bold border border-[#8c1c1c] px-1 text-[#8c1c1c]">Wykres Postępu</span></div>
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 bg-gray-300 p-2 border border-gray-500 gap-2 sm:gap-0">
@@ -468,23 +352,16 @@
                         <p class="text-[9px] mt-2 text-center italic text-gray-600">Każdy słupek to fundament dobrobytu! <br><span class="font-bold text-black">(Kliknij w tło słupka, aby go edytować)</span></p>
                     </div>
                     
-                    <!-- PRZYCISK DO NOWEGO ARCHIWUM -->
                     <div class="mt-4 border-t-2 border-dashed border-[#57534e] pt-6 pb-2">
                         <h3 class="text-sm font-bold uppercase text-[#8c1c1c] mb-3 pl-2 border-l-4 border-[#8c1c1c]">Zarządzanie Aktami</h3>
-                        <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer mb-4">
-                            <img src="tablicanotatek.png" alt="Notatnik Archiwalny" class="w-full h-auto block">
-                        </button>
+                        <button onclick="setTimeout(() => this.blur(), 100); openModalUI('archive-fullscreen')" class="w-full transition shadow-[6px_6px_0px_rgba(0,0,0,0.4)] active:translate-y-1 active:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] md:hover:translate-y-1 md:hover:shadow-[3px_3px_0px_rgba(0,0,0,0.6)] overflow-hidden border-4 border-[#1a1a1a] bg-[#292524] p-0 cursor-pointer mb-4"><img src="tablicanotatek.png" alt="Notatnik Archiwalny" class="w-full h-auto block"></button>
                     </div>
 
-                    <!-- PROTOKÓŁ SAMOKRYTYKI -->
                     <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">PROTOKÓŁ SAMOKRYTYKI</h3><div class="border border-gray-500 p-3 bg-white/30"><label class="sc-label">PRZEDMIOT UCHYBIENIA:</label><select id="sc-subject" class="sc-input"><option value="lenistwo">LENISTWO</option><option value="media">DYWERSJA UWAGI PRZEZ MEDIA KOLOROWE</option><option value="rzeczywistosc">STANOWCZA ODMOWA WSPÓŁPRACY Z RZECZYWISTOŚCIĄ</option><option value="wola">CHWILOWY NIEDOWŁAD WOLI</option></select><label class="sc-label">OPIS CZYNU:</label><input type="text" id="sc-desc" class="sc-input selectable-text" placeholder="Co poszło nie tak?"><label class="sc-label">UZASADNIENIE IDEOWE:</label><input type="text" id="sc-reason" class="sc-input selectable-text" placeholder="Dlaczego?"><label class="sc-label">DEKLARACJA POPRAWY:</label><input type="text" id="sc-fix" class="sc-input selectable-text" placeholder="Obietnica na jutro"><button onclick="submitSelfCriticism()" class="w-full bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-1 text-xs hover:bg-[#631212] active:bg-[#631212] transition mt-2 font-['Oswald'] tracking-wider uppercase">Złóż raport</button></div></div>
                     <div class="mt-4"><h3 class="text-sm font-bold uppercase mb-1">ARCHIWUM PRZEWINIEŃ:</h3><ul id="sc-history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar border-t border-gray-500 pt-2"></ul></div>
                 </div>
 
-                <!-- PRAWA STRONA (KALENDARZ, PIECZĄTKI, BEZPIECZEŃSTWO) -->
                 <div class="lg:col-span-5 space-y-6 relative z-10">
-                    
-                    <!-- Kalendarz obsługujący Swipe -->
                     <div id="calendar-swipe-zone" class="bg-white/30 p-2 border border-gray-500 shadow-sm relative touch-pan-y">
                         <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-[#444] border-2 border-[#222] shadow-[2px_3px_5px_rgba(0,0,0,0.5)] z-20"></div>
                         <div class="flex justify-between items-center mb-2 border-b border-gray-500 pb-1 mt-2">
@@ -493,24 +370,19 @@
                             <button onclick="changeMonth(1)" class="font-bold hover:text-[#8c1c1c] active:text-[#8c1c1c] px-2 text-lg hover:bg-gray-300 active:bg-gray-300 transition">&gt;</button>
                         </div>
                         <div id="calendar-grid" class="calendar-grid"></div>
-                        <p class="text-[8px] text-center mt-2 text-gray-600 uppercase leading-tight">Wskazówka: Możesz przewijać miesiące palcem ↔<br>lub kliknąć w miesiąc u góry, by zmienić przydział czasu.</p>
+                        <p class="text-[8px] text-center mt-2 text-gray-600 uppercase leading-tight">Wskazówka: Możesz przewijać miesiące palcem ↔<br>lub kliknąć w miesiąc u góry.</p>
                     </div>
                     
                     <div class="border-2 border-gray-500 p-4 bg-[#d1d5db] relative">
                         <div class="flex flex-col gap-2 mb-2 border-b border-gray-500 pb-2"><span class="text-[10px] font-bold uppercase">Tryb stemplowania:</span><div class="flex gap-2"><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="manual" onchange="setStampMode('manual')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Inicjatywa Własna</span></label><label class="flex items-center cursor-pointer"><input type="radio" name="stampMode" value="random" onchange="setStampMode('random')" class="mr-1 accent-[#8c1c1c]"><span class="text-[10px] font-mono">Przydział Centralny</span></label></div></div>
                         <div class="flex justify-between items-center bg-[#292524] text-[#e7e5e4] px-2 py-1 mb-3"><h3 class="text-xs font-bold uppercase">Pieczątki:</h3></div>
                         <div class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar transition-opacity duration-300" id="stamps-gallery"></div>
-                        <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie, bez konieczności wręczania łapówki.</p>
+                        <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2"><span class="font-bold">ZASADY:</span> wszystkie wzory są dostępne bezpłatnie.</p>
                     </div>
 
-                    <!-- LOKALIZACJA: BEZPIECZEŃSTWO DANYCH (EKSPORT / IMPORT) -->
                     <div class="border-2 border-gray-500 p-4 bg-white/30 relative shadow-sm">
                         <h3 class="text-sm font-bold uppercase text-[#4b7db8] mb-2 pl-2 border-l-4 border-[#4b7db8]">Bezpieczeństwo Danych</h3>
-                        <div class="flex flex-row gap-2">
-                            <button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">POBIERZ KOPIĘ</button>
-                            <button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button>
-                            <input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)">
-                        </div>
+                        <div class="flex flex-row gap-2"><button onclick="exportData()" class="flex-1 bg-[#292524] text-[#dcd0c0] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-black active:bg-black transition">POBIERZ KOPIĘ</button><button onclick="document.getElementById('import-upload').click()" class="flex-1 bg-[#dcd0c0] text-[#1a1a1a] font-bold text-[10px] uppercase border border-[#1a1a1a] py-2 shadow-sm hover:bg-gray-300 active:bg-gray-300 transition">WGRAJ KOPIĘ</button><input type="file" id="import-upload" class="hidden" accept=".json" onchange="importData(this)"></div>
                         <p class="text-[9px] mt-2 text-center leading-tight border-t border-gray-500 pt-2 text-gray-700 italic">Ochrona akt to Twój obowiązek!</p>
                     </div>
                 </div>
@@ -521,331 +393,86 @@
 
     <!-- MODALE SYSTEMOWE -->
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black active:bg-black transition">Zrozumiałem</button></div></div>
-    
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
 
-    <!-- SZYBKI SKOK DO DATY W KALENDARZU -->
-    <div id="jump-date-modal" class="app-modal-overlay">
-        <div class="app-modal-window">
-            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3>
-            <div class="flex gap-2 mb-6">
-                <select id="jump-month" class="w-2/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner cursor-pointer">
-                    <option value="0">Styczeń</option><option value="1">Luty</option><option value="2">Marzec</option><option value="3">Kwiecień</option><option value="4">Maj</option><option value="5">Czerwiec</option><option value="6">Lipiec</option><option value="7">Sierpień</option><option value="8">Wrzesień</option><option value="9">Październik</option><option value="10">Listopad</option><option value="11">Grudzień</option>
-                </select>
-                <input type="number" id="jump-year" class="w-1/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center" value="2024">
-            </div>
-            <div class="flex gap-2">
-                <button type="button" onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button>
-                <button type="button" onclick="executeJumpToToday()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button>
-                <button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition text-xs">Przenieś</button>
-            </div>
+    <!-- WIZYTACJA -->
+    <div id="inspection-modal" class="app-modal-overlay">
+        <div class="app-modal-window border-red-800 border-8 bg-[#dcd0c0] relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGg0MHY0MEgwem0yMCAyMGgyMHYyMEgyMHoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjE1IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')]"></div>
+            <h2 class="text-2xl font-['Oswald'] text-red-800 mb-2 uppercase relative z-10 border-b-2 border-red-800 pb-2">Komitet Kontroli</h2>
+            <div class="mb-4 relative z-10"><img src="kierownik.png" alt="Inspektor" class="mx-auto h-24 mix-blend-multiply" onerror="this.style.display='none'"></div>
+            <p id="inspection-text" class="font-mono text-sm mb-6 font-bold relative z-10 text-gray-900"></p>
+            <button onclick="closeModalUI('inspection-modal')" class="w-full bg-[#8c1c1c] text-white py-3 font-bold uppercase relative z-10 shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none transition">Przyjmuję do wiadomości</button>
         </div>
     </div>
 
-    <div id="event-modal" class="app-modal-overlay">
-        <div class="app-modal-window" style="max-width: 400px; width: 95%;">
-            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3>
-            <p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p>
-            
-            <div id="existing-events-container" class="mb-4 max-h-60 overflow-y-auto custom-scrollbar border border-gray-400 bg-white/50 text-left p-2 hidden shadow-inner">
-                <ul id="existing-events-list" class="space-y-2"></ul>
-            </div>
-
-            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nowe zgłoszenie:</label>
-            <textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="6" placeholder="Treść zadania..."></textarea>
-            
-            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label>
-            <select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-1 font-mono mb-4 outline-none text-xs shadow-inner cursor-pointer">
-                <option value="none">Nie powtarza się</option>
-                <option value="daily">Codziennie</option>
-                <option value="weekly">Co tydzień</option>
-                <option value="monthly">Co miesiąc</option>
-                <option value="yearly">Co rok</option>
-            </select>
-            
-            <div class="flex gap-2">
-                <button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Zamknij</button>
-                <button id="btn-save-event" onclick="saveNewEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dodaj</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="add-goal-modal" class="app-modal-overlay">
-        <div class="app-modal-window">
-            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3>
-            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <textarea id="goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4" placeholder="np. Radio"></textarea>
-            <div class="flex gap-2">
-                <div class="flex-1">
-                    <label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label>
-                    <input type="number" id="goal-target" class="sc-input bg-white mb-2" placeholder="np. 500">
-                </div>
-                <div class="w-1/3">
-                    <label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label>
-                    <select id="goal-unit" class="sc-input bg-white mb-2 h-8">
-                        <option value="zł">zł</option><option value="str.">str.</option><option value="min.">min.</option><option value="ml">ml</option><option value="%">%</option><option value="km">km</option><option value="kg">kg</option><option value="szt.">szt.</option><option value="godz.">godz.</option><option value="pkt">pkt</option>
-                    </select>
-                </div>
-            </div>
-            <div class="flex gap-4 mt-4">
-                <button onclick="closeModalUI('add-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
-                <button onclick="saveNewGoal()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="edit-goal-modal" class="app-modal-overlay">
-        <div class="app-modal-window">
-            <h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3>
-            <input type="hidden" id="edit-goal-id">
-            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label>
-            <textarea id="edit-goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4"></textarea>
-            
-            <div class="flex gap-2 mb-2">
-                <div class="flex-1">
-                    <label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label>
-                    <input type="number" id="edit-goal-target" class="sc-input bg-white mb-2">
-                </div>
-                <div class="w-1/3">
-                    <label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label>
-                    <select id="edit-goal-unit" class="sc-input bg-white mb-2 h-8">
-                        <option value="zł">zł</option><option value="str.">str.</option><option value="min.">min.</option><option value="ml">ml</option><option value="%">%</option><option value="km">km</option><option value="kg">kg</option><option value="szt.">szt.</option><option value="godz.">godz.</option><option value="pkt">pkt</option>
-                    </select>
-                </div>
-            </div>
-            
-            <label class="block text-[10px] uppercase font-bold mb-1 text-left">Obecny stan wykonania (ręczna korekta):</label>
-            <input type="number" id="edit-goal-current" class="sc-input bg-white mb-4" placeholder="0">
-            
-            <div class="flex gap-4">
-                <button onclick="closeModalUI('edit-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button>
-                <button onclick="saveEditedGoal()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition">Aktualizuj</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- INNE MODALE -->
+    <div id="jump-date-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3><div class="flex gap-2 mb-6"><select id="jump-month" class="w-2/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner cursor-pointer"><option value="0">Styczeń</option><option value="1">Luty</option><option value="2">Marzec</option><option value="3">Kwiecień</option><option value="4">Maj</option><option value="5">Czerwiec</option><option value="6">Lipiec</option><option value="7">Sierpień</option><option value="8">Wrzesień</option><option value="9">Październik</option><option value="10">Listopad</option><option value="11">Grudzień</option></select><input type="number" id="jump-year" class="w-1/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center" value="2024"></div><div class="flex gap-2"><button type="button" onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button><button type="button" onclick="executeJumpToToday()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button><button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition text-xs">Przenieś</button></div></div></div>
+    <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding-top: calc(2rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));"><div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0"><div id="diploma-capture-area" class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)] bg-white"><button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ</button><img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]"><div id="diploma-goal" class="absolute text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div><div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div><div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;"><span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span><strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong></div><div id="diploma-right-text" class="absolute text-right text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; right: 10%;"><span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Z ramienia:</span><strong class="text-xs sm:text-sm md:text-base leading-tight block">P.R.L<br>Planer Robót Lokalnych</strong></div></div><button onclick="closeModalUI('diploma-modal')" class="w-full mt-6 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">ZAMKNIJ</button></div></div>
+    <div id="event-modal" class="app-modal-overlay"><div class="app-modal-window" style="max-width: 400px; width: 95%;"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3><p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p><div id="existing-events-container" class="mb-4 max-h-60 overflow-y-auto custom-scrollbar border border-gray-400 bg-white/50 text-left p-2 hidden shadow-inner"><ul id="existing-events-list" class="space-y-2"></ul></div><label class="block text-[10px] uppercase font-bold mb-1 text-left">Nowe zgłoszenie:</label><textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="6" placeholder="Treść zadania..."></textarea><label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label><select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-1 font-mono mb-4 outline-none text-xs shadow-inner cursor-pointer"><option value="none">Nie powtarza się</option><option value="daily">Codziennie</option><option value="weekly">Co tydzień</option><option value="monthly">Co miesiąc</option><option value="yearly">Co rok</option></select><div class="flex gap-2"><button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Zamknij</button><button id="btn-save-event" onclick="saveNewEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dodaj</button></div></div></div>
+    <div id="add-goal-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3><label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label><textarea id="goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4" placeholder="np. Radio"></textarea><div class="flex gap-2"><div class="flex-1"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label><input type="number" id="goal-target" class="sc-input bg-white mb-2" placeholder="np. 500"></div><div class="w-1/3"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label><select id="goal-unit" class="sc-input bg-white mb-2 h-8"><option value="zł">zł</option><option value="str.">str.</option><option value="min.">min.</option><option value="ml">ml</option><option value="%">%</option><option value="km">km</option><option value="kg">kg</option><option value="szt.">szt.</option><option value="godz.">godz.</option><option value="pkt">pkt</option></select></div></div><div class="flex gap-4 mt-4"><button onclick="closeModalUI('add-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="saveNewGoal()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
+    <div id="edit-goal-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">EDYCJA PLANU</h3><input type="hidden" id="edit-goal-id"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label><textarea id="edit-goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4"></textarea><div class="flex gap-2 mb-2"><div class="flex-1"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label><input type="number" id="edit-goal-target" class="sc-input bg-white mb-2"></div><div class="w-1/3"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label><select id="edit-goal-unit" class="sc-input bg-white mb-2 h-8"><option value="zł">zł</option><option value="str.">str.</option><option value="min.">min.</option><option value="ml">ml</option><option value="%">%</option><option value="km">km</option><option value="kg">kg</option><option value="szt.">szt.</option><option value="godz.">godz.</option><option value="pkt">pkt</option></select></div></div><label class="block text-[10px] uppercase font-bold mb-1 text-left">Obecny stan wykonania (ręczna korekta):</label><input type="number" id="edit-goal-current" class="sc-input bg-white mb-4" placeholder="0"><div class="flex gap-4"><button onclick="closeModalUI('edit-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="saveEditedGoal()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition">Aktualizuj</button></div></div></div>
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        // --- INICJALIZACJA ---
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const akcja = urlParams.get('akcja');
-            const sharedTitle = urlParams.get('title');
-            const sharedText = urlParams.get('text');
-            const sharedUrl = urlParams.get('url');
-            
-            if (akcja === 'nowanotatka' || sharedTitle || sharedText || sharedUrl) {
-                const splash = document.getElementById('splash-screen');
-                if (splash) splash.style.display = 'none';
-                
+            if (urlParams.get('akcja') === 'nowanotatka' || urlParams.get('title') || urlParams.get('text') || urlParams.get('url')) {
+                const splash = document.getElementById('splash-screen'); if (splash) splash.style.display = 'none';
                 init().then(() => {
-                    openModalUI('archive-fullscreen');
-                    createNewNoteMobile(); 
-                    
-                    let finalHtml = '';
-                    let textContent = sharedText || '';
-                    let urlContent = sharedUrl || '';
-                    
-                    if (sharedTitle) {
-                        const tInput = document.getElementById('note-title-input');
-                        if (tInput) tInput.value = sharedTitle.substring(0, 40);
-                        finalHtml += `<span style="font-weight:bold; font-size:1.1em;">${sharedTitle}</span><br><br>`;
-                    }
-
-                    const urlRegex = /(https?:\/\/[^\s]+)/g;
-                    textContent = textContent.replace(urlRegex, '<a href="$1" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">$1</a>');
-
+                    openModalUI('archive-fullscreen'); createNewNoteMobile(); 
+                    let finalHtml = ''; let textContent = urlParams.get('text') || ''; let urlContent = urlParams.get('url') || '';
+                    if (urlParams.get('title')) { const tInput = document.getElementById('note-title-input'); if (tInput) tInput.value = urlParams.get('title').substring(0, 40); finalHtml += `<span style="font-weight:bold; font-size:1.1em;">${urlParams.get('title')}</span><br><br>`; }
+                    textContent = textContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">$1</a>');
                     if (textContent) { finalHtml += `${textContent}<br><br>`; }
-                    if (urlContent && !textContent.includes(urlContent)) {
-                         finalHtml += `<a href="${urlContent}" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">${urlContent}</a><br>`;
-                    }
-
-                    const editor = document.getElementById('note-editor');
-                    if (editor) {
-                        editor.innerHTML = finalHtml;
-                        scheduleSave();
-                    }
+                    if (urlContent && !textContent.includes(urlContent)) { finalHtml += `<a href="${urlContent}" target="_blank" contenteditable="false" style="color:#103090; text-decoration:underline; font-weight:bold;">${urlContent}</a><br>`; }
+                    const editor = document.getElementById('note-editor'); if (editor) { editor.innerHTML = finalHtml; scheduleSave(); }
                     window.history.replaceState({}, document.title, window.location.pathname);
                 });
-            } else {
-                initSplashScreen();
-                init();
-            }
-
+            } else { initSplashScreen(); init(); }
             const swipeZone = document.getElementById('calendar-swipe-zone');
-            if(swipeZone) {
-                swipeZone.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-                swipeZone.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
-            }
+            if(swipeZone) { swipeZone.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true}); swipeZone.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true}); }
         });
 
-        // --- LIKWIDACJA "LEPKIEGO PALCA" ---
         document.addEventListener('touchend', (e) => { const btn = e.target.closest('button'); if(btn) { setTimeout(() => btn.blur(), 150); } });
         document.addEventListener('click', (e) => { const btn = e.target.closest('button'); if(btn) { setTimeout(() => btn.blur(), 150); } });
 
-        // --- REJESTRACJA SERVICE WORKERA ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(registration => { console.log('SW ok'); }).catch(error => { console.log('SW error'); });
-            });
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(r => console.log('SW ok')).catch(e => console.log('SW error')); }
+        let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-button').style.display = 'block'; });
+        async function installPWA() { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') document.getElementById('install-button').style.display = 'none'; deferredPrompt = null; } }
 
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); deferredPrompt = e;
-            document.getElementById('install-button').style.display = 'block';
-        });
-
-        async function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') document.getElementById('install-button').style.display = 'none';
-                deferredPrompt = null;
-            }
-        }
-
-        // --- SYSTEM ZARZĄDZANIA OKNAMI ---
-        let modalStack = [];
-        window.ignorePopstate = false;
-
+        let modalStack = []; window.ignorePopstate = false;
         function openModalUI(id) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            
-            // UKRYWANIE GŁÓWNEGO WIDOKU PRZY ARCHIWUM
-            if (id === 'archive-fullscreen') {
-                document.getElementById('main-app-container').style.display = 'none';
-            } else {
-                if (modalStack.length === 0) {
-                    document.body.classList.add('body-locked');
-                }
-            }
-
-            el.classList.add('active');
-            if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
-            
-            modalStack.push(id);
-            window.history.pushState({ modalId: id }, "");
-            
-            if(document.activeElement) document.activeElement.blur();
+            const el = document.getElementById(id); if (!el) return;
+            if (id === 'archive-fullscreen') { document.getElementById('main-app-container').style.display = 'none'; } else { if (modalStack.length === 0) { document.body.classList.add('body-locked'); } }
+            el.classList.add('active'); if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal' || el.id === 'inspection-modal') el.style.display = 'flex';
+            modalStack.push(id); window.history.pushState({ modalId: id }, ""); if(document.activeElement) document.activeElement.blur();
         }
-
-        function closeModalUI(id) {
-            if (modalStack.length > 0 && modalStack[modalStack.length - 1] === id) {
-                window.history.back(); 
-            } else {
-                forceCloseModal(id);
-            }
-        }
-
+        function closeModalUI(id) { if (modalStack.length > 0 && modalStack[modalStack.length - 1] === id) { window.history.back(); } else { forceCloseModal(id); } }
         function forceCloseModal(id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.remove('active');
-                if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'none';
-            }
+            const el = document.getElementById(id); if (el) { el.classList.remove('active'); if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal' || el.id === 'inspection-modal') el.style.display = 'none'; }
             modalStack = modalStack.filter(m => m !== id);
-            
-            // PRZYWRACANIE GŁÓWNEGO WIDOKU
-            if (id === 'archive-fullscreen') {
-                document.getElementById('main-app-container').style.display = 'flex';
-            }
-            
-            // ODBLOKOWANIE TŁA DLA ZWYKŁYCH MODALI
-            const hasRegularModals = modalStack.some(m => m !== 'archive-fullscreen');
-            if (!hasRegularModals) {
-                document.body.classList.remove('body-locked');
-            }
-            
+            if (id === 'archive-fullscreen') { document.getElementById('main-app-container').style.display = 'flex'; }
+            const hasRegularModals = modalStack.some(m => m !== 'archive-fullscreen'); if (!hasRegularModals) { document.body.classList.remove('body-locked'); }
             setTimeout(() => { if(document.activeElement) document.activeElement.blur(); }, 10);
         }
-
         window.addEventListener('popstate', (e) => {
             if (window.ignorePopstate) return;
-
-            if (modalStack.length > 0) {
-                const id = modalStack.pop();
-                
-                if (id === 'archive-pane-editor') {
-                    switchArchivePane('list', false);
-                } else if (id === 'folder-drawer') {
-                    document.getElementById('pane-folders').classList.remove('open');
-                    document.getElementById('folder-drawer-overlay').classList.remove('active');
-                } else if (id === 'archive-folder') {
-                    state.activeFolderId = 'all';
-                    saveState();
-                    renderArchiveFolders();
-                    renderArchiveNotes();
-                    switchArchivePane('list', false);
-                } else {
-                    forceCloseModal(id);
-                }
-            }
+            if (modalStack.length > 0) { const id = modalStack.pop(); if (id === 'archive-pane-editor') { switchArchivePane('list', false); } else if (id === 'folder-drawer') { document.getElementById('pane-folders').classList.remove('open'); document.getElementById('folder-drawer-overlay').classList.remove('active'); } else if (id === 'archive-folder') { state.activeFolderId = 'all'; saveState(); renderArchiveFolders(); renderArchiveNotes(); switchArchivePane('list', false); } else { forceCloseModal(id); } }
             setTimeout(() => { if (document.activeElement) document.activeElement.blur(); }, 10);
         });
 
-        function exitArchive() {
-            const index = modalStack.indexOf('archive-fullscreen');
-            if (index > -1) {
-                const steps = modalStack.length - index;
-                forceCloseModal('archive-fullscreen');
-                
-                modalStack.length = index; 
-                window.ignorePopstate = true;
-                window.history.go(-steps);
-                setTimeout(() => { window.ignorePopstate = false; }, 500); 
-            } else {
-                forceCloseModal('archive-fullscreen');
-            }
-            
-            state.activeFolderId = 'all';
-            saveState(); renderArchiveFolders(); renderArchiveNotes();
-        }
+        function exitArchive() { const index = modalStack.indexOf('archive-fullscreen'); if (index > -1) { const steps = modalStack.length - index; forceCloseModal('archive-fullscreen'); modalStack.length = index; window.ignorePopstate = true; window.history.go(-steps); setTimeout(() => { window.ignorePopstate = false; }, 500); } else { forceCloseModal('archive-fullscreen'); } state.activeFolderId = 'all'; saveState(); renderArchiveFolders(); renderArchiveNotes(); }
+        let confirmCallback = null; function showAlert(text) { document.getElementById('alert-text').innerText = text; openModalUI('alert-modal'); } function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); } function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
+        function downloadDiploma() { const captureArea = document.getElementById('diploma-capture-area'); const btn = document.getElementById('btn-download-diploma'); if(btn) btn.style.display = 'none'; html2canvas(captureArea, { scale: 2, useCORS: true, backgroundColor: null, scrollY: 0 }).then(canvas => { if(btn) btn.style.display = 'flex'; const link = document.createElement('a'); link.download = `Dyplom_${state.citizenName ? state.citizenName.replace(/\s+/g, '_') : 'Obywatel'}.png`; link.href = canvas.toDataURL('image/png'); link.click(); }).catch(err => { if(btn) btn.style.display = 'flex'; showAlert("Błąd aparatu."); }); }
 
-        let confirmCallback = null;
-        function showAlert(text) { document.getElementById('alert-text').innerText = text; openModalUI('alert-modal'); }
-        function showConfirm(text, callback) { document.getElementById('confirm-text').innerText = text; confirmCallback = callback; openModalUI('confirm-modal'); }
-        function resolveConfirm(result) { closeModalUI('confirm-modal'); if (result && confirmCallback) confirmCallback(); confirmCallback = null; }
+        const AudioContext = window.AudioContext || window.webkitAudioContext; const audioCtx = new AudioContext(); let stampBuffer = null; fetch('freesound_community-stamp-81635.mp3').then(res => res.arrayBuffer()).then(data => audioCtx.decodeAudioData(data)).then(buffer => { stampBuffer = buffer; }).catch(e => console.log(e));
+        const unlockAudio = () => { if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } document.removeEventListener('click', unlockAudio); document.removeEventListener('touchstart', unlockAudio); }; document.addEventListener('click', unlockAudio); document.addEventListener('touchstart', unlockAudio);
+        function playSound(type) { try { if (type === 'stamp' && stampBuffer) { if (audioCtx.state === 'suspended') audioCtx.resume(); const source = audioCtx.createBufferSource(); source.buffer = stampBuffer; const gain = audioCtx.createGain(); gain.gain.value = 0.7; source.connect(gain); gain.connect(audioCtx.destination); source.start(0); } } catch(e) {} }
 
-        function downloadDiploma() {
-            const captureArea = document.getElementById('diploma-capture-area');
-            const btn = document.getElementById('btn-download-diploma');
-            if(btn) btn.style.display = 'none';
+        function updateAppBadge() { if ('setAppBadge' in navigator) { const incomplete = state.tasks ? state.tasks.filter(t => !t.done).length : 0; if (incomplete > 0) navigator.setAppBadge(incomplete).catch(e => e); else navigator.clearAppBadge().catch(e => e); } }
 
-            html2canvas(captureArea, { scale: 2, useCORS: true, backgroundColor: null, scrollY: 0 }).then(canvas => {
-                if(btn) btn.style.display = 'flex';
-                const link = document.createElement('a');
-                link.download = `Dyplom_${state.citizenName ? state.citizenName.replace(/\s+/g, '_') : 'Obywatel'}.png`;
-                link.href = canvas.toDataURL('image/png'); link.click();
-            }).catch(err => {
-                if(btn) btn.style.display = 'flex';
-                showAlert("Błąd aparatu.");
-            });
-        }
-
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-        let stampBuffer = null;
-        fetch('freesound_community-stamp-81635.mp3').then(res => res.arrayBuffer()).then(data => audioCtx.decodeAudioData(data)).then(buffer => { stampBuffer = buffer; }).catch(e => console.log(e));
-
-        const unlockAudio = () => { if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } document.removeEventListener('click', unlockAudio); document.removeEventListener('touchstart', unlockAudio); };
-        document.addEventListener('click', unlockAudio); document.addEventListener('touchstart', unlockAudio);
-
-        function playSound(type) {
-            try { if (type === 'stamp' && stampBuffer) { if (audioCtx.state === 'suspended') audioCtx.resume(); const source = audioCtx.createBufferSource(); source.buffer = stampBuffer; const gain = audioCtx.createGain(); gain.gain.value = 0.7; source.connect(gain); gain.connect(audioCtx.destination); source.start(0); } } catch(e) {}
-        }
-
-        function updateAppBadge() {
-            if ('setAppBadge' in navigator) {
-                const incomplete = state.tasks ? state.tasks.filter(t => !t.done).length : 0;
-                if (incomplete > 0) navigator.setAppBadge(incomplete).catch(e => e);
-                else navigator.clearAppBadge().catch(e => e);
-            }
-        }
-
-        const quotes = ["Zmęczenie to tylko plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
+        const quotes = ["Zmęczenie to plotka rozsiewana przez nierobów!", "Masz dość? Pomyśl o tych, którzy mają jeszcze więcej!", "Niemożliwe to słowo, którego nie ma w słowniku biurowym!", "Jeśli zadanie cię przerasta, stań na palcach!", "Myślałeś, że to koniec? To dopiero wstęp do nadgodzin!", "Kryzys? To tylko kolejna okazja do wykazania się hartem ducha!", "Boisz się terminu? Termin boi się twojej determinacji!", "Masz lęki? Przykryj je stosem wykonanych zadań!", "Jeśli stres cię goni, uciekaj w stronę sukcesu!", "Twoja panika to tylko niepotrzebny szum na łączach!", "Odpoczniesz po wykonaniu normy, czyli nigdy!", "Twoje hobby to praca, twoja pasja to terminowość!", "Obywatelu! Czy już dzisiaj zawstydziłeś lenia w sobie!"];
         const stampDefinitions = [
             { id: 2, text: "", shape: "none", color: "custom", icon: '<img src="weryfikacja.png" alt="Weryfikacja" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
             { id: 16, text: "", shape: "none", color: "custom", icon: '<img src="kierownik.png" alt="Kierownik" onerror="this.style.display=\'none\'">', cost: 0, unlocked: true },
@@ -875,7 +502,8 @@
             selfCriticism: { subject: 'lenistwo', desc: '', reason: '', fix: '' }, 
             viewDate: null, citizenName: "Jan Kowalski", 
             notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "",
-            folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ]
+            folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ], activeDepartment: 'ogolny',
+            pinnedNoteId: null, lastAppOpen: null
         };
         let currentEditingDateKey = null, currentQuoteIndex = 0; let saveTimeout; let currentEditingEventId = null; let currentEditingEventSourceKey = null; let touchstartX = 0; let touchendX = 0;
 
@@ -897,45 +525,27 @@
 
         function scheduleSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500); }
 
-        function exportData() {
-            if(document.activeElement) document.activeElement.blur();
-            const dataStr = JSON.stringify(state); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob); const link = document.createElement('a'); link.href = url; const dObj = new Date(); const dStr = dObj.getFullYear() + String(dObj.getMonth()+1).padStart(2,'0') + String(dObj.getDate()).padStart(2,'0'); link.download = `PRL_Akta_${dStr}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); showAlert("Pobrano plik!");
-        }
-
-        function importData(input) {
-            if (!input.files || input.files.length === 0) return; const file = input.files[0]; const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const importedState = JSON.parse(e.target.result);
-                    if (importedState) {
-                        showConfirm("Trwale usunąć obecne i wgrać nowe?", async () => {
-                            state = { ...state, ...importedState }; await saveToDB(state);
-                            location.reload(); 
-                        });
-                    }
-                } catch (err) { showAlert("Plik uszkodzony."); } input.value = '';
-            }; reader.readAsText(file);
-        }
-
+        function exportData() { if(document.activeElement) document.activeElement.blur(); const dataStr = JSON.stringify(state); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob); const link = document.createElement('a'); link.href = url; const dObj = new Date(); const dStr = dObj.getFullYear() + String(dObj.getMonth()+1).padStart(2,'0') + String(dObj.getDate()).padStart(2,'0'); link.download = `PRL_Akta_${dStr}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); showAlert("Pobrano plik!"); }
+        function importData(input) { if (!input.files || input.files.length === 0) return; const file = input.files[0]; const reader = new FileReader(); reader.onload = async (e) => { try { const importedState = JSON.parse(e.target.result); if (importedState) { showConfirm("Trwale usunąć obecne i wgrać nowe?", async () => { state = { ...state, ...importedState }; await saveToDB(state); location.reload(); }); } } catch (err) { showAlert("Plik uszkodzony."); } input.value = ''; }; reader.readAsText(file); }
         function handleSwipe() { if (touchendX < touchstartX - 40) changeMonth(1); if (touchendX > touchstartX + 40) changeMonth(-1); }
-
-        function initSplashScreen() {
-            const bar = document.getElementById('splash-progress'), status = document.getElementById('splash-status'), loading = document.getElementById('loading-container'), start = document.getElementById('start-container');
-            setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100); setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600); setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów z serwera..."; }, 1200); setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800); setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200);
-        }
-
+        function initSplashScreen() { const bar = document.getElementById('splash-progress'), status = document.getElementById('splash-status'), loading = document.getElementById('loading-container'), start = document.getElementById('start-container'); setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100); setTimeout(() => { if(status) status.innerText = "Weryfikacja tożsamości..."; }, 600); setTimeout(() => { if(status) status.innerText = "Pobieranie przydziałów z serwera..."; }, 1200); setTimeout(() => { if(status) status.innerText = "Zatwierdzanie wniosków..."; }, 1800); setTimeout(() => { if(loading) loading.style.display = 'none'; if(start) { start.classList.remove('hidden'); start.classList.add('flex'); } }, 2200); }
         function enterApp() { const s = document.getElementById('splash-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 1000); }
         
         async function init() {
             try { await loadState(); } catch(e) { }
             
             if (!state.folders) state.folders = [{id: 'main', name: 'GŁÓWNE AKTA'}]; if (!state.activeFolderId) state.activeFolderId = 'all'; if (!state.events) state.events = {}; if (!state.tasks) state.tasks = []; if (!state.plans) state.plans = [];
+            if (!state.activeDepartment) state.activeDepartment = 'ogolny';
 
-            for (let k in state.events) { if (!Array.isArray(state.events[k])) { state.events[k] = [{ id: Date.now() + Math.random(), text: state.events[k].text, recurrence: state.events[k].recurrence || 'none' }]; } }
+            for (let k in state.events) { if (!Array.isArray(state.events[k])) { state.events[k] = [{ id: Date.now(), text: state.events[k].text, recurrence: state.events[k].recurrence || 'none' }]; } }
+            state.tasks.forEach(t => { if(!t.department) t.department = 'ogolny'; });
 
             state.viewDate = new Date(); 
-            
-            initQuote(); renderDate(); setInterval(renderDate, 60000); renderTasks(); renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderArchiveFolders(); renderArchiveNotes();
+            initQuote(); renderDate(); setInterval(renderDate, 60000); 
+            updateDepartmentTabsUI(state.activeDepartment); renderTasks(); 
+            renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderArchiveFolders(); renderArchiveNotes();
+            renderPinnedNote(); 
+            checkInspection(); 
             
             const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
             if(e && !state.activeNoteId) { e.innerHTML = state.scratchpad || "<div><br></div>"; if (t) t.value = state.scratchpadTitle || ""; if (tg) tg.value = state.scratchpadTags || ""; }
@@ -947,71 +557,111 @@
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
             
-            if (e) { 
-                e.addEventListener('input', scheduleSave); 
-                e.addEventListener('paste', function(ev) {
-                    if (ev.clipboardData && ev.clipboardData.items) { for (let i = 0; i < ev.clipboardData.items.length; i++) { if (ev.clipboardData.items[i].type.indexOf("image") !== -1) { ev.preventDefault(); let file = ev.clipboardData.items[i].getAsFile(); processImageFile(file); return; } } }
-                });
-            }
+            if (e) { e.addEventListener('input', scheduleSave); e.addEventListener('paste', function(ev) { if (ev.clipboardData && ev.clipboardData.items) { for (let i = 0; i < ev.clipboardData.items.length; i++) { if (ev.clipboardData.items[i].type.indexOf("image") !== -1) { ev.preventDefault(); let file = ev.clipboardData.items[i].getAsFile(); processImageFile(file); return; } } } }); }
             if (t) t.addEventListener('input', scheduleSave); if (tg) tg.addEventListener('input', scheduleSave);
             const ti = document.getElementById('task-input'); if (ti) ti.addEventListener('keypress', (ev) => { if(ev.key === 'Enter') addTask(); });
         }
 
+        function checkInspection() {
+            const now = Date.now();
+            if (!state.lastAppOpen) { state.lastAppOpen = now; saveState(); return; }
+            
+            const daysPassed = (now - state.lastAppOpen) / (1000 * 60 * 60 * 24);
+            
+            if ((daysPassed > 1.2 && Math.random() > 0.4) || daysPassed > 3) {
+                const pendingTasks = state.tasks.filter(t => !t.done).length;
+                let msg = "";
+                
+                if (pendingTasks >= 5) {
+                    msg = `Skandal, Obywatelu! Centralny Komitet Kontroli Wewnętrznej odkrył na Twoim biurku aż ${pendingTasks} zaległych spraw! Udzielamy Wam oficjalnej NAGANY. Do roboty, natychmiast!`;
+                    if (!state.reports) state.reports = [];
+                    state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: 'KONTROLA Z MINISTERSTWA', desc: 'Rażące opóźnienia w wyrabianiu normy na stanowisku pracy.', reason: 'Uciekanie w marazm i lenistwo.', fix: 'Ciężka praca w nadgodzinach.' });
+                    renderSelfCriticismHistory();
+                } else if (pendingTasks > 0) {
+                    msg = `Towarzyszu! Widzimy na biurku ${pendingTasks} nieskończonych zadań. Widzimy starania, ale normy trzeba pilnować bardziej rygorystycznie. Proszę zakasać rękawy!`;
+                } else {
+                    msg = `Wzorowa postawa obywatelska! Zastaliśmy czyste biurko, wszystko zrobione na 100%. Takich przodowników nam trzeba. Komitet przyznaje premię: +5 przydziału uznaniowego!`;
+                    state.credits = (state.credits || 0) + 5;
+                }
+                
+                document.getElementById('inspection-text').innerText = msg;
+                setTimeout(() => openModalUI('inspection-modal'), 1200);
+            }
+            state.lastAppOpen = now;
+            saveState();
+        }
+
+        function togglePinNoteFromList(id, ev) {
+            if(ev) ev.stopPropagation();
+            if (state.pinnedNoteId === id) {
+                state.pinnedNoteId = null;
+            } else {
+                state.pinnedNoteId = id;
+            }
+            saveState();
+            renderPinnedNote();
+            renderArchiveNotes();
+        }
+
+        function renderPinnedNote() {
+            const el = document.getElementById('pinned-note-content');
+            if (!el) return;
+            if (state.pinnedNoteId) {
+                const n = state.notes.find(x => x.id === state.pinnedNoteId);
+                if (n) {
+                    const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
+                    el.innerHTML = `<strong class="text-[#8c1c1c] uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1">${n.title || 'DOKUMENT POUFNY'}</strong><div class="line-clamp-3 overflow-hidden text-ellipsis">${cleanText.substring(0, 180)}${cleanText.length > 180 ? '...' : ''}</div>`;
+                    el.onclick = () => viewNoteInternal(n.id);
+                    return;
+                }
+            }
+            el.innerHTML = '<span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>';
+            el.onclick = null;
+        }
+
         function sanitizeEditor(e) { if (e.innerText.trim() === "" && e.querySelectorAll('img').length === 0) e.innerHTML = '<div><br></div>'; const s = e.querySelectorAll('span:empty'); s.forEach(x => x.remove()); }
-        
-        function applyZakreslacz() {
-            const e = document.getElementById('note-editor'), sel = window.getSelection(); if (!sel.rangeCount || sel.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst myszką.");
-            const r = sel.getRangeAt(0); if (!e.contains(r.commonAncestorContainer)) return;
-            const span = document.createElement('span'); span.className = 'marked';
-            try { span.appendChild(r.extractContents()); r.insertNode(span); const z = document.createTextNode('\u200B'); span.after(z); const nr = document.createRange(); nr.setStartAfter(z); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); e.focus(); scheduleSave(); } catch (err) { }
-        }
-        
-        function forceCleanEditor() {
-            const sel = window.getSelection(); if (!sel.rangeCount) return showAlert("Obywatelu! Najpierw kliknij na zakreślony tekst.");
-            const editor = document.getElementById('note-editor'); if (!editor.contains(sel.anchorNode)) return;
-            let removed = false; const isBadNode = (n) => { if (n.nodeType !== 1) return false; const t = n.tagName.toUpperCase(); return (t === 'SPAN' || t === 'B' || t === 'STRONG' || t === 'FONT' || t === 'I' || t === 'U' || t === 'MARK'); };
-            const unwrap = (el) => { const parent = el.parentNode; if (!parent) return; while (el.firstChild) { parent.insertBefore(el.firstChild, el); } parent.removeChild(el); removed = true; };
-            if (!sel.isCollapsed) { const range = sel.getRangeAt(0); const elements = Array.from(editor.querySelectorAll('*')); elements.forEach(el => { if (isBadNode(el) && (sel.containsNode(el, true) || range.intersectsNode(el))) { unwrap(el); } }); document.execCommand('removeFormat', false, null); removed = true; }
-            let node = sel.anchorNode; if (node === editor && editor.childNodes[sel.anchorOffset]) { node = editor.childNodes[sel.anchorOffset]; }
-            while (node && node !== editor) { let nextNode = node.parentNode; if (isBadNode(node)) { unwrap(node); } node = nextNode; }
-            editor.querySelectorAll('*').forEach(s => { if (isBadNode(s) && s.textContent.trim() === '') { s.remove(); } });
-            if (removed || !sel.isCollapsed) { editor.normalize(); scheduleSave(); } else { showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza."); }
-        }
+        function applyZakreslacz() { const e = document.getElementById('note-editor'), sel = window.getSelection(); if (!sel.rangeCount || sel.isCollapsed) return showAlert("Obywatelu! Najpierw zaznacz tekst myszką."); const r = sel.getRangeAt(0); if (!e.contains(r.commonAncestorContainer)) return; const span = document.createElement('span'); span.className = 'marked'; try { span.appendChild(r.extractContents()); r.insertNode(span); const z = document.createTextNode('\u200B'); span.after(z); const nr = document.createRange(); nr.setStartAfter(z); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); e.focus(); scheduleSave(); } catch (err) { } }
+        function forceCleanEditor() { const sel = window.getSelection(); if (!sel.rangeCount) return showAlert("Obywatelu! Najpierw kliknij na zakreślony tekst."); const editor = document.getElementById('note-editor'); if (!editor.contains(sel.anchorNode)) return; let removed = false; const isBadNode = (n) => { if (n.nodeType !== 1) return false; const t = n.tagName.toUpperCase(); return (t === 'SPAN' || t === 'B' || t === 'STRONG' || t === 'FONT' || t === 'I' || t === 'U' || t === 'MARK'); }; const unwrap = (el) => { const parent = el.parentNode; if (!parent) return; while (el.firstChild) { parent.insertBefore(el.firstChild, el); } parent.removeChild(el); removed = true; }; if (!sel.isCollapsed) { const range = sel.getRangeAt(0); const elements = Array.from(editor.querySelectorAll('*')); elements.forEach(el => { if (isBadNode(el) && (sel.containsNode(el, true) || range.intersectsNode(el))) { unwrap(el); } }); document.execCommand('removeFormat', false, null); removed = true; } let node = sel.anchorNode; if (node === editor && editor.childNodes[sel.anchorOffset]) { node = editor.childNodes[sel.anchorOffset]; } while (node && node !== editor) { let nextNode = node.parentNode; if (isBadNode(node)) { unwrap(node); } node = nextNode; } editor.querySelectorAll('*').forEach(s => { if (isBadNode(s) && s.textContent.trim() === '') { s.remove(); } }); if (removed || !sel.isCollapsed) { editor.normalize(); scheduleSave(); } else { showAlert("Obywatelu! W tym miejscu nie ma przydzielonego zakreślacza."); } }
 
-        function processImageFile(file) {
-            const rd = new FileReader();
-            rd.onload = (ev) => {
-                const img = new Image(); img.onload = function() {
-                    const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 1200, MAX_H = 1200; let w = img.width, h = img.height;
-                    if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } }
-                    cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h);
-                    const dataUrl = cvs.toDataURL('image/jpeg', 0.85); const editor = document.getElementById('note-editor'); editor.focus();
-                    const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`;
-                    if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) { const range = window.getSelection().getRangeAt(0); if (editor.contains(range.commonAncestorContainer)) { document.execCommand('insertHTML', false, imgHtml); } else { editor.innerHTML += imgHtml; } } else { editor.innerHTML += imgHtml; }
-                    scheduleSave();
-                }; img.src = ev.target.result;
-            }; rd.readAsDataURL(file);
-        }
+        function processImageFile(file) { const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 1200, MAX_H = 1200; let w = img.width, h = img.height; if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); const dataUrl = cvs.toDataURL('image/jpeg', 0.85); const editor = document.getElementById('note-editor'); editor.focus(); const imgHtml = `<br><img src="${dataUrl}" style="max-width: 100%; border: 2px solid #57534e; margin-top: 5px; margin-bottom: 5px;"><br>`; if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount > 0) { const range = window.getSelection().getRangeAt(0); if (editor.contains(range.commonAncestorContainer)) { document.execCommand('insertHTML', false, imgHtml); } else { editor.innerHTML += imgHtml; } } else { editor.innerHTML += imgHtml; } scheduleSave(); }; img.src = ev.target.result; }; rd.readAsDataURL(file); }
         function insertPhotoToNote(inp) { if(inp.files && inp.files[0]) { processImageFile(inp.files[0]); inp.value = ''; } }
-
-        function loadPhoto(inp) { 
-            if(inp.files && inp.files[0]) { 
-                const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { 
-                        const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; 
-                        if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } 
-                        cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.85); 
-                        const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); 
-                }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); 
-            } 
-        }
+        function loadPhoto(inp) { if(inp.files && inp.files[0]) { const rd = new FileReader(); rd.onload = (ev) => { const img = new Image(); img.onload = function() { const cvs = document.createElement('canvas'), ctx = cvs.getContext('2d'), MAX_W = 200, MAX_H = 260; let w = img.width, h = img.height; if (w > h) { if (w > MAX_W) { h *= MAX_W / w; w = MAX_W; } } else { if (h > MAX_H) { w *= MAX_H / h; h = MAX_H; } } cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h); state.photo = cvs.toDataURL('image/jpeg', 0.85); const pI = document.getElementById('user-photo'), pP = document.getElementById('photo-placeholder'); if(pI) { pI.src = state.photo; pI.classList.remove('hidden'); } if(pP) pP.classList.add('hidden'); saveState(); }; img.src = ev.target.result; }; rd.readAsDataURL(inp.files[0]); } }
 
         function initQuote() { currentQuoteIndex = Math.floor(Math.random() * quotes.length); renderQuote(); }
         function renderQuote() { const b = document.getElementById('quote-banner'); if (b) b.innerText = `"${quotes[currentQuoteIndex]}"`; }
         function cycleQuote() { currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length; renderQuote(); }
-        
         function renderDate() { const d = document.getElementById('date-display'); if (!d) return; try { d.innerText = new Date().toLocaleDateString('pl-PL', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase(); } catch(e) { const now = new Date(); d.innerText = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`; } }
 
-        function addTask() { const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0 }); i.value = ''; saveState(); renderTasks(); if(document.activeElement) document.activeElement.blur(); }
+        function switchDepartment(dep) {
+            state.activeDepartment = dep;
+            saveState();
+            updateDepartmentTabsUI(dep);
+            renderTasks();
+            if(document.activeElement) document.activeElement.blur();
+        }
+
+        function updateDepartmentTabsUI(activeDep) {
+            const deps = ['ogolny', 'zaopatrzenie', 'domowy', 'sluzbowy'];
+            const placeholders = { 'ogolny': 'Wpisz zadanie ogólne...', 'zaopatrzenie': 'Co trzeba kupić/zdobyć?', 'domowy': 'Wpisz obowiązek domowy...', 'sluzbowy': 'Wpisz zadanie z pracy...' };
+            deps.forEach(d => {
+                const btn = document.getElementById('dep-btn-' + d);
+                if (!btn) return;
+                if (d === activeDep) { btn.className = "dep-btn bg-[#1c1917] text-[#dcd0c0] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm"; } 
+                else { btn.className = "dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100"; }
+            });
+            const input = document.getElementById('task-input');
+            if (input) input.placeholder = placeholders[activeDep] || 'Wpisz zadanie...';
+        }
+
+        function addTask() { 
+            const i = document.getElementById('task-input'); 
+            if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
+            const dep = state.activeDepartment || 'ogolny';
+            state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0, department: dep }); 
+            i.value = ''; saveState(); renderTasks(); 
+            if(document.activeElement) document.activeElement.blur(); 
+        }
+
         function toggleTask(id) {
             const t = state.tasks.find(x => x.id === id);
             if (t) {
@@ -1021,18 +671,29 @@
             }
         }
         function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); renderTasks(); }
+        
         function startEditingTask(id, el) {
             const t = state.tasks.find(x => x.id === id); if (!t || t.done) return;
             const i = document.createElement('input'); i.type = 'text'; i.value = t.text; i.className = 'task-edit-input z-10';
             const finish = () => { const txt = i.value.trim(); if (txt && txt !== t.text) { t.text = txt; saveState(); } renderTasks(); };
             i.onblur = finish; i.onkeydown = (ev) => { if (ev.key === 'Enter') finish(); if (ev.key === 'Escape') renderTasks(); }; el.parentNode.replaceChild(i, el); i.focus();
         }
+
         function renderTasks() {
             const l = document.getElementById('task-list'); if (!l) return; l.innerHTML = '';
-            if (!state.tasks || state.tasks.length === 0) l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4">BRAK PLANU</span></div>';
-            else state.tasks.forEach(t => { l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 active:border-[#8c1c1c] active:bg-red-100 transition uppercase text-xs">USUŃ</button></li>`; });
+            const dep = state.activeDepartment || 'ogolny';
+            const filteredTasks = (state.tasks || []).filter(t => (t.department || 'ogolny') === dep);
+
+            if (filteredTasks.length === 0) {
+                l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4 text-center leading-none">CZYSTO</span></div>';
+            } else {
+                filteredTasks.forEach(t => { 
+                    l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 active:border-[#8c1c1c] active:bg-red-100 transition uppercase text-xs">USUŃ</button></li>`; 
+                });
+            }
             updateTaskProgress();
         }
+
         function updateTaskProgress() { const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; updateAppBadge(); }
 
         function saveNewGoal() {
@@ -1048,11 +709,7 @@
             const gIndex = state.plans.findIndex(p => p.id === id);
             if (gIndex > -1) { const wasComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue; state.plans[gIndex].text = n; state.plans[gIndex].targetValue = t; state.plans[gIndex].unit = u; state.plans[gIndex].currentValue = Math.max(0, c); const isComplete = state.plans[gIndex].currentValue >= state.plans[gIndex].targetValue; saveState(); renderPlans(); closeModalUI('edit-goal-modal'); if (!wasComplete && isComplete) { setTimeout(() => showDiploma(n), 300); } }
         }
-        function changeGoalProgress(ev, id, dir) {
-            ev.stopPropagation(); const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10;
-            if (g) { const wasComplete = g.currentValue >= g.targetValue; g.currentValue = Math.max(0, g.currentValue + (i * dir)); const isComplete = g.currentValue >= g.targetValue; saveState(); renderPlans(); if (!wasComplete && isComplete) { showDiploma(g.text); } }
-            if(document.activeElement) document.activeElement.blur();
-        }
+        function changeGoalProgress(ev, id, dir) { ev.stopPropagation(); const g = state.plans.find(p => p.id === id), i = parseFloat(document.getElementById('global-increment-input').value) || 10; if (g) { const wasComplete = g.currentValue >= g.targetValue; g.currentValue = Math.max(0, g.currentValue + (i * dir)); const isComplete = g.currentValue >= g.targetValue; saveState(); renderPlans(); if (!wasComplete && isComplete) { showDiploma(g.text); } } if(document.activeElement) document.activeElement.blur(); }
         function deleteGoal(ev, id) { ev.stopPropagation(); showConfirm("Zakończyć plan wykonania tego celu?", () => { state.plans = state.plans.filter(x => x.id !== id); saveState(); renderPlans(); }); if(document.activeElement) document.activeElement.blur(); }
         function renderPlans() {
             const c = document.getElementById('chart-area'); if (!c) return; c.innerHTML = '';
@@ -1150,12 +807,27 @@
             let fn = state.notes || []; if (state.activeFolderId !== 'all') { fn = fn.filter(n => n.folderId === state.activeFolderId || (!n.folderId && state.activeFolderId === 'main')); }
             if (term) fn = fn.filter(x => (x.title && x.title.toLowerCase().includes(term)) || (x.content && x.content.toLowerCase().includes(term)) || (x.tags && x.tags.toLowerCase().includes(term)) || (x.date && x.date.toLowerCase().includes(term)));
             if (!fn || fn.length === 0) l.innerHTML = '<li class="text-center text-gray-500 italic p-4 font-bold bg-white/50 border border-dashed border-gray-400 mt-2 mx-2">Teczka jest pusta.</li>';
-            else fn.forEach(x => { const li = document.createElement('li'); li.className = `archive-item flex items-center gap-2 p-3 bg-white/70 mb-1 border border-gray-300 shadow-sm ${state.activeNoteId === x.id ? 'active border-l-4 border-[#8c1c1c]' : ''}`; li.innerHTML = `<input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c] shrink-0 w-5 h-5" value="${x.id}" onclick="event.stopPropagation()"><div class="min-w-0 flex-1 cursor-pointer pl-1" onclick="viewNoteInternal(${x.id})"><div class="font-bold text-[#1a1a1a] truncate text-sm font-['Oswald'] tracking-wide">${x.title || 'Dokument bez tytułu'}</div><div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#4b7db8] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div></div><button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-3 py-2 hover:bg-black active:bg-black font-bold border border-gray-600 uppercase shrink-0 shadow-sm transition">EDYTUJ</button>`; l.appendChild(li); });
+            else fn.forEach(x => { 
+                const isPinned = state.pinnedNoteId === x.id;
+                const pinBtnText = isPinned ? 'ODEPNIJ' : 'PRZYPNIJ';
+                const pinBtnClass = isPinned ? 'bg-white text-[#1a1a1a] hover:bg-gray-200' : 'bg-[#292524] text-white hover:bg-black';
+
+                const li = document.createElement('li'); 
+                li.className = `archive-item flex items-center gap-2 p-3 bg-white/70 mb-1 border border-gray-300 shadow-sm ${state.activeNoteId === x.id ? 'active border-l-4 border-[#8c1c1c]' : ''}`; 
+                li.innerHTML = `<input type="checkbox" class="note-checkbox cursor-pointer accent-[#8c1c1c] shrink-0 w-5 h-5" value="${x.id}" onclick="event.stopPropagation()"><div class="min-w-0 flex-1 cursor-pointer pl-1" onclick="viewNoteInternal(${x.id})"><div class="font-bold text-[#1a1a1a] truncate text-sm font-['Oswald'] tracking-wide">${x.title || 'Dokument bez tytułu'}</div><div class="text-[10px] text-gray-600 mt-1 break-words whitespace-normal leading-tight font-mono">${x.date} ${x.tags ? `<span class="text-[#4b7db8] font-bold ml-1 break-words">${x.tags}</span>` : ''}</div></div><div class="flex gap-1 shrink-0"><button onclick="togglePinNoteFromList(${x.id}, event)" class="text-[10px] ${pinBtnClass} px-2 py-2 font-bold border border-gray-600 uppercase shadow-sm transition">📌 ${pinBtnText}</button><button onclick="event.stopPropagation(); loadNoteForEdit(${x.id})" class="text-[10px] bg-[#292524] text-white px-2 py-2 hover:bg-black active:bg-black font-bold border border-gray-600 uppercase shadow-sm transition">EDYTUJ</button></div>`; 
+                l.appendChild(li); 
+            });
             const cb = document.getElementById('btn-cancel-edit'); if(cb) cb.classList.toggle('hidden', !state.activeNoteId);
         }
         function viewNoteInternal(id) { const n = state.notes.find(x => x.id === id); if (!n) return; document.getElementById('viewer-date').innerText = n.date; document.getElementById('viewer-title').innerText = n.title || 'DOKUMENT POUFNY'; document.getElementById('viewer-tags').innerText = n.tags || ''; document.getElementById('viewer-content').innerHTML = n.content; document.getElementById('viewer-citizen').innerText = state.citizenName || "OBYWATEL(KA)"; openModalUI('note-viewer-overlay'); }
-        function loadNoteForEdit(id) { const n = state.notes.find(x => x.id === id); if (!n) return; const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select'), c = e.innerText.trim(); const load = (note) => { e.innerHTML = note.content; if(t) t.value = note.title || ""; if(tg) tg.value = note.tags || ""; if(fs) fs.value = note.folderId || 'main'; state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; renderArchiveNotes(); e.focus(); switchArchivePane('editor', true); }; if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n); }
+        function loadNoteForEdit(id) { 
+            const n = state.notes.find(x => x.id === id); if (!n) return; 
+            const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select'), c = e.innerText.trim(); 
+            const load = (note) => { e.innerHTML = note.content; if(t) t.value = note.title || ""; if(tg) tg.value = note.tags || ""; if(fs) fs.value = note.folderId || 'main'; state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; renderArchiveNotes(); updatePinButton(); e.focus(); switchArchivePane('editor', true); }; 
+            if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n); 
+        }
         function clearEditor() { state.activeNoteId = null; const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; saveState(); renderArchiveNotes(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); } }
+        
         function saveCurrentNote() {
             const ed = document.getElementById('note-editor'), tI = document.getElementById('note-title-input'), tgI = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select');
             if (!ed) return; const c = ed.innerHTML.trim(), pt = ed.innerText.trim(), ct = tI ? tI.value.trim() : "", tg = tgI ? tgI.value.trim() : "", fId = fs ? fs.value : 'main';
@@ -1163,9 +835,9 @@
             const t = ct || (pt ? pt.split('\n')[0].substring(0, 25) + (pt.length > 25 ? '...' : '') : 'Dokument ze zdjęciem'); 
             const dObj = new Date(), dys = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'], dStr = dObj.getFullYear() + "-" + String(dObj.getMonth()+1).padStart(2,'0') + "-" + String(dObj.getDate()).padStart(2,'0') + " | [" + dys[dObj.getDay()] + "]";
             if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; state.notes[i].folderId = fId; } showAlert("Dokument zaktualizowany."); } else { if(!state.notes) state.notes = []; state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg, folderId: fId }); showAlert("Dokument przyjęto do Składnicy Akt."); }
-            ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderArchiveNotes(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); }
+            ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderArchiveNotes(); renderPinnedNote(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); }
         }
-        function deleteMarkedNotes() { const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia."); const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?"; showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); saveState(); renderArchiveNotes(); }); }
+        function deleteMarkedNotes() { const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia."); const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?"; showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); if (ids.includes(state.pinnedNoteId)) state.pinnedNoteId = null; saveState(); renderArchiveNotes(); renderPinnedNote(); }); }
 
         async function saveState() {
             const s = document.getElementById('sc-subject'), d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), c = document.getElementById('citizen-name'), ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
