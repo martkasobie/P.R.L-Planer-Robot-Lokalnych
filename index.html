@@ -104,11 +104,14 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        /* ZMIENIONA TABLICA OGŁOSZEŃ (SZARA, Z DROBNYMI KROPKAMI) */
-        .corkboard { background-color: #a8a29e; background-image: radial-gradient(rgba(0,0,0,0.2) 1px, transparent 1px); background-size: 8px 8px; border: 4px solid #57534e; padding: 10px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.4); margin-bottom: 2rem; }
+        .corkboard { background-color: #a8a29e; background-image: radial-gradient(rgba(0,0,0,0.2) 1px, transparent 1px); background-size: 8px 8px; border: 4px solid #57534e; padding: 12px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.4); margin-bottom: 2rem; }
         .corkboard-pin { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); box-shadow: 2px 5px 5px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; }
-        .pinned-paper { background-color: #fefae0; padding: 12px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); transform: rotate(-1deg); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 80px; }
-        .pinned-paper:hover { transform: rotate(0deg) scale(1.01); }
+        .pinned-paper { position: relative; background-color: #fefae0; padding: 12px; padding-top: 16px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 100px; display: flex; flex-direction: column; }
+        .pinned-paper:hover { transform: scale(1.02) !important; z-index: 10; }
+
+        /* Twarda blokada przycisku instalacji jeśli PWA jest zainstalowane/działa w trybie aplikacji */
+        #install-button { display: none; }
+        @media all and (display-mode: standalone) { #install-button { display: none !important; } }
 
         .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); overscroll-behavior: contain; }
         .app-modal-overlay.active { display: flex !important; }
@@ -146,7 +149,6 @@
         [contenteditable] { caret-color: #1a1a1a !important; outline: none; }
         .marked { background-color: #ffcccc !important; color: black !important; border-radius: 2px; padding: 0 2px; font-weight: bold; }
 
-        /* Wymuszenie zawijania wierszy dla wklejanych tekstów */
         #note-editor { word-wrap: break-word !important; overflow-wrap: break-word !important; word-break: break-word !important; white-space: pre-wrap !important; overflow-x: hidden; width: 100%; max-width: 100%; }
         #note-editor * { white-space: pre-wrap !important; word-wrap: break-word !important; overflow-wrap: break-word !important; max-width: 100% !important; }
         .viewer-content * { white-space: pre-wrap !important; word-wrap: break-word !important; overflow-wrap: break-word !important; max-width: 100% !important; }
@@ -242,8 +244,6 @@
                 <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #000 20px);"></div>
                 <div class="p-3 border-b-2 border-[#57534e] bg-[#292524] flex justify-between items-center z-10 shrink-0"><span class="text-white font-['Oswald'] text-sm md:text-base tracking-wider uppercase">Spis Treści</span><button onclick="deleteMarkedNotes()" class="text-red-400 hover:text-red-300 active:text-red-300 transition text-[10px] font-bold uppercase border border-red-500 px-2 py-1 shadow-sm ml-auto">Zniszcz</button></div>
                 <div class="p-2 bg-gray-300 border-b border-gray-400 z-10 shrink-0"><button onclick="createNewNoteMobile()" class="w-full md:hidden bg-[#8c1c1c] text-white py-2 mb-2 font-bold font-['Oswald'] text-base uppercase tracking-wider shadow-md hover:bg-[#631212] active:bg-[#631212] transition border border-[#3d0808]">+ ZAKŁADAM NOWE AKTA</button><input type="text" id="note-search" oninput="renderArchiveNotes()" placeholder="Szukaj w aktach..." class="w-full bg-white border border-gray-400 p-2 text-xs font-mono outline-none shadow-inner"></div>
-                
-                <!-- LISTA NOTATEK W ARCHIWUM -->
                 <ul id="archive-notes-list" class="flex-1 overflow-y-auto custom-scrollbar p-1 text-xs font-mono space-y-1 z-10" style="padding-bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px));"></ul>
             </div>
             <div id="pane-editor" class="archive-pane w-full md:flex-1 bg-white relative shadow-inner">
@@ -304,16 +304,11 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-7 space-y-6 relative z-10">
                     
-                    <!-- TABLICA OGŁOSZEŃ -->
                     <div class="corkboard">
-                        <div class="corkboard-pin"></div>
                         <h3 class="text-sm font-bold uppercase mb-2 text-[#1c1917] text-center border-b border-[#57534e] pb-1 font-['Oswald']">Tablica Ogłoszeń (Przypięte Akta)</h3>
-                        <div id="pinned-note-content" class="pinned-paper" onclick="openPinnedNote()">
-                            <span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>
-                        </div>
+                        <div class="pinned-note-container p-4 text-center"></div>
                     </div>
 
-                    <!-- CZYN SPOŁECZNY Z ZAKŁADKAMI WYDZIAŁÓW -->
                     <div>
                         <div class="flex items-end gap-2 mb-2 justify-between">
                             <h3 class="text-xl font-bold uppercase border-b-4 border-[#1c1917] inline-block pr-4">Czyn Społeczny</h3>
@@ -326,7 +321,6 @@
                             <button onclick="switchDepartment('sluzbowy')" id="dep-btn-sluzbowy" class="dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100">Służbowy</button>
                         </div>
                         
-                        <!-- POLE ZADAŃ -->
                         <div class="flex gap-2 mb-4">
                             <input type="text" id="task-input" class="prl-input flex-1 text-base bg-white/20" placeholder="Wpisz zadanie ogólne...">
                             <button onclick="addTask()" class="bg-[#292524] text-[#e7e5e4] border border-[#1c1917] px-4 py-2 font-bold uppercase text-xs hover:bg-black active:bg-black transition shadow-sm">Zatwierdź</button>
@@ -438,7 +432,7 @@
         document.addEventListener('click', (e) => { const btn = e.target.closest('button'); if(btn) { setTimeout(() => btn.blur(), 150); } });
 
         if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(r => console.log('SW ok')).catch(e => console.log('SW error')); }
-        let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-button').style.display = 'block'; });
+        let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { if (window.matchMedia('(display-mode: standalone)').matches) return; e.preventDefault(); deferredPrompt = e; document.getElementById('install-button').style.display = 'block'; }); window.addEventListener('appinstalled', () => { document.getElementById('install-button').style.display = 'none'; deferredPrompt = null; });
         async function installPWA() { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') document.getElementById('install-button').style.display = 'none'; deferredPrompt = null; } }
 
         let modalStack = []; window.ignorePopstate = false;
@@ -503,7 +497,7 @@
             viewDate: null, citizenName: "Jan Kowalski", 
             notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "",
             folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ], activeDepartment: 'ogolny',
-            pinnedNoteId: null, lastAppOpen: null
+            pinnedNoteIds: [], lastAppOpen: null
         };
         let currentEditingDateKey = null, currentQuoteIndex = 0; let saveTimeout; let currentEditingEventId = null; let currentEditingEventSourceKey = null; let touchstartX = 0; let touchendX = 0;
 
@@ -533,6 +527,9 @@
         
         async function init() {
             try { await loadState(); } catch(e) { }
+            
+            if (state.pinnedNoteId) { state.pinnedNoteIds = [state.pinnedNoteId]; delete state.pinnedNoteId; }
+            if (!state.pinnedNoteIds) state.pinnedNoteIds = [];
             
             if (!state.folders) state.folders = [{id: 'main', name: 'GŁÓWNE AKTA'}]; if (!state.activeFolderId) state.activeFolderId = 'all'; if (!state.events) state.events = {}; if (!state.tasks) state.tasks = []; if (!state.plans) state.plans = [];
             if (!state.activeDepartment) state.activeDepartment = 'ogolny';
@@ -565,58 +562,45 @@
         function checkInspection() {
             const now = Date.now();
             if (!state.lastAppOpen) { state.lastAppOpen = now; saveState(); return; }
-            
             const daysPassed = (now - state.lastAppOpen) / (1000 * 60 * 60 * 24);
-            
             if ((daysPassed > 1.2 && Math.random() > 0.4) || daysPassed > 3) {
                 const pendingTasks = state.tasks.filter(t => !t.done).length;
                 let msg = "";
-                
                 if (pendingTasks >= 5) {
                     msg = `Skandal, Obywatelu! Centralny Komitet Kontroli Wewnętrznej odkrył na Twoim biurku aż ${pendingTasks} zaległych spraw! Udzielamy Wam oficjalnej NAGANY. Do roboty, natychmiast!`;
-                    if (!state.reports) state.reports = [];
-                    state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: 'KONTROLA Z MINISTERSTWA', desc: 'Rażące opóźnienia w wyrabianiu normy na stanowisku pracy.', reason: 'Uciekanie w marazm i lenistwo.', fix: 'Ciężka praca w nadgodzinach.' });
-                    renderSelfCriticismHistory();
-                } else if (pendingTasks > 0) {
-                    msg = `Towarzyszu! Widzimy na biurku ${pendingTasks} nieskończonych zadań. Widzimy starania, ale normy trzeba pilnować bardziej rygorystycznie. Proszę zakasać rękawy!`;
-                } else {
-                    msg = `Wzorowa postawa obywatelska! Zastaliśmy czyste biurko, wszystko zrobione na 100%. Takich przodowników nam trzeba. Komitet przyznaje premię: +5 przydziału uznaniowego!`;
-                    state.credits = (state.credits || 0) + 5;
-                }
-                
-                document.getElementById('inspection-text').innerText = msg;
-                setTimeout(() => openModalUI('inspection-modal'), 1200);
+                    if (!state.reports) state.reports = []; state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: 'KONTROLA Z MINISTERSTWA', desc: 'Rażące opóźnienia w wyrabianiu normy na stanowisku pracy.', reason: 'Uciekanie w marazm i lenistwo.', fix: 'Ciężka praca w nadgodzinach.' }); renderSelfCriticismHistory();
+                } else if (pendingTasks > 0) { msg = `Towarzyszu! Widzimy na biurku ${pendingTasks} nieskończonych zadań. Widzimy starania, ale normy trzeba pilnować bardziej rygorystycznie. Proszę zakasać rękawy!`; } else { msg = `Wzorowa postawa obywatelska! Zastaliśmy czyste biurko, wszystko zrobione na 100%. Takich przodowników nam trzeba. Komitet przyznaje premię: +5 przydziału uznaniowego!`; state.credits = (state.credits || 0) + 5; }
+                document.getElementById('inspection-text').innerText = msg; setTimeout(() => openModalUI('inspection-modal'), 1200);
             }
-            state.lastAppOpen = now;
-            saveState();
+            state.lastAppOpen = now; saveState();
         }
 
         function togglePinNoteFromList(id, ev) {
             if(ev) ev.stopPropagation();
-            if (state.pinnedNoteId === id) {
-                state.pinnedNoteId = null;
-            } else {
-                state.pinnedNoteId = id;
-            }
-            saveState();
-            renderPinnedNote();
-            renderArchiveNotes();
+            if (!state.pinnedNoteIds) state.pinnedNoteIds = [];
+            const idx = state.pinnedNoteIds.indexOf(id);
+            if (idx > -1) { state.pinnedNoteIds.splice(idx, 1); } else { if(state.pinnedNoteIds.length >= 6) return showAlert("Obywatelu! Tablica mieści maksymalnie 6 ogłoszeń. Odepnij coś najpierw!"); state.pinnedNoteIds.push(id); }
+            saveState(); renderPinnedNote(); renderArchiveNotes();
         }
 
         function renderPinnedNote() {
-            const el = document.getElementById('pinned-note-content');
-            if (!el) return;
-            if (state.pinnedNoteId) {
-                const n = state.notes.find(x => x.id === state.pinnedNoteId);
-                if (n) {
-                    const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
-                    el.innerHTML = `<strong class="text-[#8c1c1c] uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1">${n.title || 'DOKUMENT POUFNY'}</strong><div class="line-clamp-3 overflow-hidden text-ellipsis">${cleanText.substring(0, 180)}${cleanText.length > 180 ? '...' : ''}</div>`;
-                    el.onclick = () => viewNoteInternal(n.id);
-                    return;
-                }
-            }
-            el.innerHTML = '<span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>';
-            el.onclick = null;
+            const els = document.querySelectorAll('.pinned-note-container');
+            if (!state.pinnedNoteIds) state.pinnedNoteIds = [];
+            state.pinnedNoteIds = state.pinnedNoteIds.filter(pid => state.notes.some(n => n.id === pid));
+            els.forEach(el => {
+                if (state.pinnedNoteIds.length > 0) {
+                    el.className = "pinned-note-container grid grid-cols-2 md:grid-cols-3 gap-4 mt-3";
+                    let html = '';
+                    state.pinnedNoteIds.forEach((pid, index) => {
+                        const n = state.notes.find(x => x.id === pid);
+                        if (n) {
+                            const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
+                            const rot = (index % 2 === 0 ? -1 : 1) * ((index % 3) + 1);
+                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
+                        }
+                    }); el.innerHTML = html;
+                } else { el.className = "pinned-note-container p-4 text-center"; el.innerHTML = '<span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>'; }
+            });
         }
 
         function sanitizeEditor(e) { if (e.innerText.trim() === "" && e.querySelectorAll('img').length === 0) e.innerHTML = '<div><br></div>'; const s = e.querySelectorAll('span:empty'); s.forEach(x => x.remove()); }
@@ -634,9 +618,7 @@
 
         function switchDepartment(dep) {
             state.activeDepartment = dep;
-            saveState();
-            updateDepartmentTabsUI(dep);
-            renderTasks();
+            saveState(); updateDepartmentTabsUI(dep); renderTasks();
             if(document.activeElement) document.activeElement.blur();
         }
 
@@ -644,22 +626,18 @@
             const deps = ['ogolny', 'zaopatrzenie', 'domowy', 'sluzbowy'];
             const placeholders = { 'ogolny': 'Wpisz zadanie ogólne...', 'zaopatrzenie': 'Co trzeba kupić/zdobyć?', 'domowy': 'Wpisz obowiązek domowy...', 'sluzbowy': 'Wpisz zadanie z pracy...' };
             deps.forEach(d => {
-                const btn = document.getElementById('dep-btn-' + d);
-                if (!btn) return;
+                const btn = document.getElementById('dep-btn-' + d); if (!btn) return;
                 if (d === activeDep) { btn.className = "dep-btn bg-[#1c1917] text-[#dcd0c0] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm"; } 
                 else { btn.className = "dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100"; }
             });
-            const input = document.getElementById('task-input');
-            if (input) input.placeholder = placeholders[activeDep] || 'Wpisz zadanie...';
+            const input = document.getElementById('task-input'); if (input) input.placeholder = placeholders[activeDep] || 'Wpisz zadanie...';
         }
 
         function addTask() { 
-            const i = document.getElementById('task-input'); 
-            if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
+            const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
             const dep = state.activeDepartment || 'ogolny';
             state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0, department: dep }); 
-            i.value = ''; saveState(); renderTasks(); 
-            if(document.activeElement) document.activeElement.blur(); 
+            i.value = ''; saveState(); renderTasks(); if(document.activeElement) document.activeElement.blur(); 
         }
 
         function toggleTask(id) {
@@ -683,15 +661,11 @@
             const l = document.getElementById('task-list'); if (!l) return; l.innerHTML = '';
             const dep = state.activeDepartment || 'ogolny';
             const filteredTasks = (state.tasks || []).filter(t => (t.department || 'ogolny') === dep);
-
-            if (filteredTasks.length === 0) {
-                l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4 text-center leading-none">CZYSTO</span></div>';
-            } else {
+            if (filteredTasks.length === 0) { l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4 text-center leading-none">CZYSTO</span></div>'; } else {
                 filteredTasks.forEach(t => { 
                     l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 active:border-[#8c1c1c] active:bg-red-100 transition uppercase text-xs">USUŃ</button></li>`; 
                 });
-            }
-            updateTaskProgress();
+            } updateTaskProgress();
         }
 
         function updateTaskProgress() { const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; updateAppBadge(); }
@@ -808,7 +782,7 @@
             if (term) fn = fn.filter(x => (x.title && x.title.toLowerCase().includes(term)) || (x.content && x.content.toLowerCase().includes(term)) || (x.tags && x.tags.toLowerCase().includes(term)) || (x.date && x.date.toLowerCase().includes(term)));
             if (!fn || fn.length === 0) l.innerHTML = '<li class="text-center text-gray-500 italic p-4 font-bold bg-white/50 border border-dashed border-gray-400 mt-2 mx-2">Teczka jest pusta.</li>';
             else fn.forEach(x => { 
-                const isPinned = state.pinnedNoteId === x.id;
+                const isPinned = state.pinnedNoteIds && state.pinnedNoteIds.includes(x.id);
                 const pinBtnText = isPinned ? 'ODEPNIJ' : 'PRZYPNIJ';
                 const pinBtnClass = isPinned ? 'bg-white text-[#1a1a1a] hover:bg-gray-200' : 'bg-[#292524] text-white hover:bg-black';
 
@@ -823,7 +797,7 @@
         function loadNoteForEdit(id) { 
             const n = state.notes.find(x => x.id === id); if (!n) return; 
             const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'), fs = document.getElementById('note-folder-select'), c = e.innerText.trim(); 
-            const load = (note) => { e.innerHTML = note.content; if(t) t.value = note.title || ""; if(tg) tg.value = note.tags || ""; if(fs) fs.value = note.folderId || 'main'; state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; renderArchiveNotes(); updatePinButton(); e.focus(); switchArchivePane('editor', true); }; 
+            const load = (note) => { e.innerHTML = note.content; if(t) t.value = note.title || ""; if(tg) tg.value = note.tags || ""; if(fs) fs.value = note.folderId || 'main'; state.activeNoteId = note.id; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; renderArchiveNotes(); e.focus(); switchArchivePane('editor', true); }; 
             if (c !== "" && state.activeNoteId !== id) showConfirm("Obecna treść edytora zostanie zastąpiona (niezapisana). Kontynuować?", () => load(n)); else load(n); 
         }
         function clearEditor() { state.activeNoteId = null; const ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input'); if(ed) ed.innerHTML = state.scratchpad || '<div><br></div>'; if(t) t.value = state.scratchpadTitle || ''; if(tg) tg.value = state.scratchpadTags || ''; saveState(); renderArchiveNotes(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); } }
@@ -837,7 +811,7 @@
             if (state.activeNoteId) { const i = state.notes.findIndex(x => x.id === state.activeNoteId); if (i !== -1) { state.notes[i].content = c; state.notes[i].title = t; state.notes[i].tags = tg; state.notes[i].folderId = fId; } showAlert("Dokument zaktualizowany."); } else { if(!state.notes) state.notes = []; state.notes.unshift({ id: Date.now(), title: t, content: c, date: dStr, tags: tg, folderId: fId }); showAlert("Dokument przyjęto do Składnicy Akt."); }
             ed.innerHTML = '<div><br></div>'; if(tI) tI.value = ''; if(tgI) tgI.value = ''; state.scratchpad = ""; state.scratchpadTitle = ""; state.scratchpadTags = ""; state.activeNoteId = null; saveState(); renderArchiveNotes(); renderPinnedNote(); if (window.innerWidth < 768 && modalStack[modalStack.length - 1] === 'archive-pane-editor') { window.history.back(); } else { switchArchivePane('list', false); }
         }
-        function deleteMarkedNotes() { const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia."); const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?"; showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); if (ids.includes(state.pinnedNoteId)) state.pinnedNoteId = null; saveState(); renderArchiveNotes(); renderPinnedNote(); }); }
+        function deleteMarkedNotes() { const b = document.querySelectorAll('.note-checkbox:checked'); if (b.length === 0) return showAlert("Obywatelu! Nie wybrano akt do zniszczenia."); const msg = b.length === 1 ? "Wysłać 1 teczkę do niszczarki?" : "Wysłać " + b.length + " szt. teczek do niszczarki?"; showConfirm(msg, () => { const ids = Array.from(b).map(x => parseInt(x.value)); state.notes = state.notes.filter(x => !ids.includes(x.id)); if (ids.includes(state.activeNoteId)) clearEditor(); if (state.pinnedNoteIds) { state.pinnedNoteIds = state.pinnedNoteIds.filter(pid => !ids.includes(pid)); } saveState(); renderArchiveNotes(); renderPinnedNote(); }); }
 
         async function saveState() {
             const s = document.getElementById('sc-subject'), d = document.getElementById('sc-desc'), r = document.getElementById('sc-reason'), f = document.getElementById('sc-fix'), c = document.getElementById('citizen-name'), ed = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
