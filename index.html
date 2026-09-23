@@ -111,7 +111,7 @@
             font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); 
             cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 100px; 
             display: flex; flex-direction: column; 
-            background-color: #f5eedc; /* stary, pożółkły papier */
+            background-color: #f5eedc; /* bazowy kolor pożółkłego papieru - podmieniany w JS */
             background-image: repeating-linear-gradient(transparent, transparent 15px, rgba(0,0,0,0.1) 16px); /* poziome linie */
         }
         .pinned-paper:hover { transform: scale(1.02) !important; z-index: 10; }
@@ -312,7 +312,7 @@
                 <div class="lg:col-span-7 space-y-6 relative z-10">
                     
                     <div class="corkboard">
-                        <h3 class="text-sm font-bold uppercase mb-2 text-[#1c1917] text-center border-b-2 border-[#1c1917] pb-1 font-['Oswald']">Tablica Ogłoszeń (Przypięte Akta)</h3>
+                        <h3 class="text-sm font-bold uppercase mb-2 text-[#1c1917] text-center border-b-2 border-[#1c1917] pb-1 font-['Oswald'] drop-shadow-sm">Tablica Ogłoszeń (Przypięte Akta)</h3>
                         <div class="pinned-note-container p-4 text-center"></div>
                     </div>
 
@@ -545,18 +545,20 @@
             state.tasks.forEach(t => { if(!t.department) t.department = 'ogolny'; });
 
             state.viewDate = new Date(); 
+            
+            // --- PRZESUNIĘCIE HYDRATACJI DOM TUTAJ ABY ZAPOBIEC RESETOM ---
+            const cn = document.getElementById('citizen-name'); if (cn && state.citizenName) cn.value = state.citizenName;
+            const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
+            if(e && !state.activeNoteId) { e.innerHTML = state.scratchpad || "<div><br></div>"; if (t) t.value = state.scratchpadTitle || ""; if (tg) tg.value = state.scratchpadTags || ""; }
+            const rm = document.querySelector(`input[name="stampMode"][value="manual"]`), rr = document.querySelector(`input[name="stampMode"][value="random"]`);
+            if (state.stampSelectionMode === 'random') { if (rr) rr.checked = true; } else { if (rm) rm.checked = true; }
+            // ----------------------------------------------------------------
+
             initQuote(); renderDate(); setInterval(renderDate, 60000); 
             updateDepartmentTabsUI(state.activeDepartment); renderTasks(); 
             renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderArchiveFolders(); renderArchiveNotes();
             renderPinnedNote(); 
             checkInspection(); 
-            
-            const e = document.getElementById('note-editor'), t = document.getElementById('note-title-input'), tg = document.getElementById('note-tags-input');
-            if(e && !state.activeNoteId) { e.innerHTML = state.scratchpad || "<div><br></div>"; if (t) t.value = state.scratchpadTitle || ""; if (tg) tg.value = state.scratchpadTags || ""; }
-            
-            const rm = document.querySelector(`input[name="stampMode"][value="manual"]`), rr = document.querySelector(`input[name="stampMode"][value="random"]`);
-            if (state.stampSelectionMode === 'random') { if (rr) rr.checked = true; } else { if (rm) rm.checked = true; }
-            const cn = document.getElementById('citizen-name'); if (cn && state.citizenName) cn.value = state.citizenName;
             
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
@@ -603,8 +605,10 @@
                         if (n) {
                             const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
                             const rot = (index % 2 === 0 ? -1 : 1) * ((index % 3) + 1);
+                            const oldPaperColors = ['#f5eedc', '#e4ded4', '#ecdac2', '#dce0d9', '#e8d3cc', '#e5e1b8'];
+                            const bgColor = oldPaperColors[index % 6];
                             
-                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight leading-[16px]">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
+                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg); background-color: ${bgColor};" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight leading-[16px]">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
                         }
                     }); el.innerHTML = html;
                 } else { el.className = "pinned-note-container p-4 text-center"; el.innerHTML = '<span class="text-[#1c1917] text-[10px] font-mono italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>'; }
