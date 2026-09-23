@@ -104,46 +104,12 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        /* --- ZAKTUALIZOWANA TABLICA OGŁOSZEŃ Z NOWYM OBRAZKIEM I PROPORCJAMI --- */
-        .corkboard { 
-            background-image: url('nowatablicaogloszen.png'); 
-            background-size: 100% 100%; 
-            background-repeat: no-repeat; 
-            background-position: center; 
-            background-color: transparent;
-            border: none; 
-            border-radius: 6px;
-            position: relative; 
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.4); 
-            margin-bottom: 2rem; 
-            width: 100%;
-            aspect-ratio: 1.5 / 1; /* IDEALNE PROPORCJE 3:2! Tło się nie zepsuje */
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .pinned-note-container { 
-            width: 100%; height: 100%;
-            padding: 18% 5% 5% 5%; /* Zwiększony margines, aby zgrabnie ominąć szyld z obrazka */
-            overflow-y: auto; /* Zostawiamy auto na zapas */
-            flex: 1;
-        }
-        @media(min-width: 768px) { .pinned-note-container { padding: 16% 6% 6% 6%; } }
-        
-        .pinned-note-container.has-notes { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: min-content; gap: 6px; }
-        @media(min-width: 768px) { .pinned-note-container.has-notes { grid-template-columns: repeat(4, 1fr); gap: 12px; } }
-        
-        .corkboard-pin { position: absolute; top: -4px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); box-shadow: 1px 2px 2px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; }
-        @media(min-width: 768px) { .corkboard-pin { width: 12px; height: 12px; top: -6px; } }
-        
-        .pinned-paper { position: relative; background-color: #fefae0; padding: 6px; padding-top: 10px; font-family: 'Courier Prime', monospace; box-shadow: 1px 1px 3px rgba(0,0,0,0.4); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; display: flex; flex-direction: column; overflow: hidden; min-height: 40px; }
-        @media(min-width: 768px) { .pinned-paper { padding: 10px; padding-top: 14px; min-height: 70px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); } }
-        .pinned-paper:hover { transform: scale(1.05) !important; z-index: 10; box-shadow: 2px 3px 6px rgba(0,0,0,0.5); }
-        
-        .empty-note-paper { position: relative; background-color: #fefae0; padding: 6px; padding-top: 10px; font-family: 'Courier Prime', monospace; box-shadow: 1px 1px 3px rgba(0,0,0,0.4); transform: rotate(2deg); color: #1a1a1a; font-size: 0.45rem; text-align: center; max-width: 130px; margin: 0 auto; margin-top: 5%; }
-        @media(min-width: 768px) { .empty-note-paper { font-size: 0.7rem; max-width: 200px; padding: 12px; padding-top: 16px; margin-top: 4%; } }
+        .corkboard { background-color: #a8a29e; background-image: radial-gradient(rgba(0,0,0,0.2) 1px, transparent 1px); background-size: 8px 8px; border: 4px solid #57534e; padding: 12px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.4); margin-bottom: 2rem; }
+        .corkboard-pin { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); box-shadow: 2px 5px 5px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; }
+        .pinned-paper { position: relative; background-color: #fefae0; padding: 12px; padding-top: 16px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 100px; display: flex; flex-direction: column; }
+        .pinned-paper:hover { transform: scale(1.02) !important; z-index: 10; }
 
+        /* Twarda blokada przycisku instalacji jeśli PWA jest zainstalowane/działa w trybie aplikacji */
         #install-button { display: none; }
         @media all and (display-mode: standalone) { #install-button { display: none !important; } }
 
@@ -167,7 +133,7 @@
         .bar-fill.complete { background-color: #15803d; }
         .bar-label-vertical { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 12px; font-weight: 900; color: #1f1f1f; background-color: rgba(255,255,255,0.6); padding: 6px 2px; border-radius: 4px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotate(180deg); max-height: calc(100% - 30px); overflow: hidden; text-overflow: ellipsis; z-index: 10; pointer-events: none; letter-spacing: 0.5px; }
         .bar-value { position: absolute; top: -24px; width: 140%; left: -20%; text-align: center; font-size: 9px; font-weight: bold; font-family: monospace; color: #1c1917; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 1px 2px rgba(0,0,0,0.1); z-index: 20; pointer-events: none; }
-        .chart-controls { absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
+        .chart-controls { position: absolute; bottom: -70px; left: 0; width: 100%; display: flex; justify-content: space-between; gap: 2px; z-index: 30; }
         .chart-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; cursor: pointer; border: 2px solid rgba(0,0,0,0.3); user-select: none; font-family: monospace; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); border-radius: 4px; }
         .chart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
         .btn-plus { background: #15803d; } .btn-minus { background: #8c1c1c; } .btn-del { background: #333; color: #fff; font-size: 14px; flex: 0.5; }
@@ -228,6 +194,7 @@
 </head>
 <body>
 
+    <!-- EKRAN ŁADOWANIA -->
     <div id="splash-screen" class="fixed inset-0 bg-[#262626] z-[99999] flex flex-col items-center justify-center text-[#dcd0c0] transition-opacity duration-1000 overflow-hidden" style="touch-action: none;">
         <div class="border-4 border-[#dcd0c0] p-4 sm:p-8 text-center bg-[#1f1f1f] shadow-[10px_10px_0px_rgba(0,0,0,0.5)] w-[85%] max-w-sm sm:max-w-md sm:transform sm:-rotate-2 mx-auto my-auto relative">
             <h1 class="text-4xl sm:text-6xl font-['Oswald'] mb-4 text-[#8c1c1c] drop-shadow-md tracking-wider">P.R.L</h1>
@@ -243,6 +210,7 @@
         </div>
     </div>
 
+    <!-- PEŁNOEKRANOWY PODGLĄD POJEDYNCZEJ NOTATKI -->
     <div id="note-viewer-overlay">
         <div class="viewer-paper">
             <div class="viewer-header">
@@ -256,6 +224,7 @@
         <button class="close-viewer-btn" onclick="closeModalUI('note-viewer-overlay')">ZAMKNIJ I WRÓĆ DO PLANERA</button>
     </div>
 
+    <!-- ARCHIWUM PEŁNOEKRANOWE -->
     <div id="archive-fullscreen" class="fixed inset-0 bg-[#262626] z-[99990] flex-col">
         <div class="bg-[#1a1a1a] text-[#e7e5e4] px-3 pb-3 flex justify-between items-center border-b-4 border-[#8c1c1c] shadow-md z-20 shrink-0" style="padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));">
             <div class="flex items-center gap-3">
@@ -298,6 +267,7 @@
         </div>
     </div>
 
+    <!-- GŁÓWNY KONTENER APLIKACJI -->
     <main id="main-app-container" class="flex flex-col items-center justify-start md:justify-center px-2 md:px-4 min-h-screen w-full">
         <div class="paper-sheet w-full max-w-5xl p-3 sm:p-6 md:p-12 relative">
             <div class="paper-dirt"></div>
@@ -335,7 +305,8 @@
                 <div class="lg:col-span-7 space-y-6 relative z-10">
                     
                     <div class="corkboard">
-                        <div class="pinned-note-container custom-scrollbar"></div>
+                        <h3 class="text-sm font-bold uppercase mb-2 text-[#1c1917] text-center border-b border-[#57534e] pb-1 font-['Oswald']">Tablica Ogłoszeń (Przypięte Akta)</h3>
+                        <div class="pinned-note-container p-4 text-center"></div>
                     </div>
 
                     <div>
@@ -618,21 +589,17 @@
             state.pinnedNoteIds = state.pinnedNoteIds.filter(pid => state.notes.some(n => n.id === pid));
             els.forEach(el => {
                 if (state.pinnedNoteIds.length > 0) {
-                    el.className = "pinned-note-container has-notes custom-scrollbar";
+                    el.className = "pinned-note-container grid grid-cols-2 md:grid-cols-3 gap-4 mt-3";
                     let html = '';
                     state.pinnedNoteIds.forEach((pid, index) => {
                         const n = state.notes.find(x => x.id === pid);
                         if (n) {
                             const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
-                            const rot = (index % 2 === 0 ? -2 : 2) * ((index % 3) + 1);
-                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})">
-                                        <div class="corkboard-pin"></div>
-                                        <strong class="text-[#8c1c1c] text-[8px] sm:text-[10px] uppercase block mb-0.5 tracking-wider border-b border-gray-400 pb-0.5 leading-none line-clamp-1 break-words">${n.title || 'DOKUMENT POUFNY'}</strong>
-                                        <div class="text-[7px] sm:text-[9px] line-clamp-3 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 80)}${cleanText.length > 80 ? '...' : ''}</div>
-                                     </div>`;
+                            const rot = (index % 2 === 0 ? -1 : 1) * ((index % 3) + 1);
+                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
                         }
                     }); el.innerHTML = html;
-                } else { el.className = "pinned-note-container flex items-start justify-center custom-scrollbar"; el.innerHTML = '<div class="empty-note-paper"><div class="corkboard-pin"></div><span class="text-gray-800 italic font-bold text-center leading-tight">Brak ogłoszeń.<br>Składnica Akt -> "PRZYPNIJ".</span></div>'; }
+                } else { el.className = "pinned-note-container p-4 text-center"; el.innerHTML = '<span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>'; }
             });
         }
 
