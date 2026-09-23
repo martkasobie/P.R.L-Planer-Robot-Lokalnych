@@ -104,9 +104,9 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        .corkboard { background-color: #a8a29e; background-image: radial-gradient(rgba(0,0,0,0.2) 1px, transparent 1px); background-size: 8px 8px; border: 4px solid #57534e; padding: 12px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.4); margin-bottom: 2rem; }
+        .corkboard { background-color: #3f3f46; background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 5px 5px; border: 4px solid #8c1c1c; padding: 12px; position: relative; box-shadow: 4px 4px 10px rgba(0,0,0,0.4); margin-bottom: 2rem; }
         .corkboard-pin { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); box-shadow: 2px 5px 5px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; }
-        .pinned-paper { position: relative; background-color: #fefae0; padding: 12px; padding-top: 16px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 100px; display: flex; flex-direction: column; }
+        .pinned-paper { position: relative; padding: 12px; padding-top: 16px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 100px; display: flex; flex-direction: column; }
         .pinned-paper:hover { transform: scale(1.02) !important; z-index: 10; }
 
         /* Twarda blokada przycisku instalacji jeśli PWA jest zainstalowane/działa w trybie aplikacji */
@@ -305,7 +305,7 @@
                 <div class="lg:col-span-7 space-y-6 relative z-10">
                     
                     <div class="corkboard">
-                        <h3 class="text-sm font-bold uppercase mb-2 text-[#1c1917] text-center border-b border-[#57534e] pb-1 font-['Oswald']">Tablica Ogłoszeń (Przypięte Akta)</h3>
+                        <h3 class="text-sm font-bold uppercase mb-2 text-[#ef4444] text-center border-b-2 border-[#ef4444] pb-1 font-['Oswald'] drop-shadow-md">Tablica Ogłoszeń (Przypięte Akta)</h3>
                         <div class="pinned-note-container p-4 text-center"></div>
                     </div>
 
@@ -596,7 +596,10 @@
                         if (n) {
                             const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
                             const rot = (index % 2 === 0 ? -1 : 1) * ((index % 3) + 1);
-                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
+                            const noteColors = ['#fefae0', '#fce7f3', '#dcfce7', '#f3e8ff', '#e0f2fe', '#ffedd5'];
+                            const bgColor = noteColors[index % 6];
+                            
+                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg); background-color: ${bgColor};" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
                         }
                     }); el.innerHTML = html;
                 } else { el.className = "pinned-note-container p-4 text-center"; el.innerHTML = '<span class="text-gray-600 italic">Brak przypiętych ogłoszeń. Wejdź do Składnicy Akt i kliknij "PRZYPNIJ" przy wybranej notatce.</span>'; }
