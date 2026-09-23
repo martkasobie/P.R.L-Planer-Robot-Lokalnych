@@ -104,48 +104,73 @@
         .clip-outer { top: 0; left: 10px; right: 10px; bottom: 30px; border-bottom: none; border-radius: 20px 20px 0 0; }
         .clip-inner { top: 20px; left: 20px; right: 20px; bottom: 10px; border-top: none; border-radius: 0 0 20px 20px; z-index: 2; }
 
-        /* NOWA TABLICA OGŁOSZEŃ (Ze stałą wysokością i wbudowanym scrollem) */
+        /* --- ZAKTUALIZOWANA TABLICA OGŁOSZEŃ - PERFEKCYJNE PROPORCJE I MINIATURY --- */
         .corkboard { 
             background-image: url('tablicaogloszen.png'); 
-            background-size: cover; 
-            background-position: top center; 
+            background-size: 100% 100%; /* Dopasowuje się do aspect ratio */
             background-repeat: no-repeat; 
+            background-position: center; 
+            background-color: transparent;
             border: none; 
-            border-radius: 8px; 
             position: relative; 
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.5); 
+            box-shadow: none; 
             margin-bottom: 2rem; 
-            height: 380px; /* Stała wysokość dla telefonów */
+            width: 100%;
+            aspect-ratio: 2.85 / 1; /* Ten wpis GWARANTUJE brak zniekształceń */
             display: flex;
             flex-direction: column;
-        }
-        @media(min-width: 768px) {
-            .corkboard { height: 500px; } /* Większa tablica na komputerze */
+            overflow: hidden;
         }
         
         .pinned-note-container { 
-            padding: 85px 15px 20px 15px; /* Odstęp od góry upewnia się, że nie zasłaniasz metalowego tytułu ze zdjęcia */
-            overflow-y: auto; /* Tu dzieje się magia przewijania W ŚRODKU! */
-            flex: 1;
-        }
-        @media(min-width: 768px) {
-            .pinned-note-container { padding: 110px 30px 30px 30px; }
+            width: 100%;
+            height: 100%;
+            padding: 16% 5% 5% 5%; /* Górny margines, by ominąć blachę z napisem */
+            overflow-y: auto; /* Pozwala na przewijanie w środku */
         }
         
-        /* Grid Layout dla liścików - układ siatki na tablicy */
+        /* Grid Layout dla małych karteczek */
         .pinned-note-container.has-notes {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            align-content: start;
+            grid-template-columns: repeat(3, 1fr); /* 3 karteczki w rzędzie na fonie */
+            grid-auto-rows: min-content;
+            gap: 6px;
         }
         @media(min-width: 768px) {
-            .pinned-note-container.has-notes { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .pinned-note-container.has-notes {
+                grid-template-columns: repeat(4, 1fr); /* 4 karteczki na komputerze */
+                gap: 12px;
+                padding: 14% 6% 6% 6%;
+            }
         }
 
-        .corkboard-pin { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); box-shadow: 1px 3px 4px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; }
-        .pinned-paper { position: relative; background-color: #fefae0; padding: 12px; padding-top: 16px; font-family: 'Courier Prime', monospace; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; color: #1a1a1a; min-height: 100px; display: flex; flex-direction: column; }
-        .pinned-paper:hover { transform: scale(1.02) !important; z-index: 10; }
+        .corkboard-pin { 
+            position: absolute; top: -4px; left: 50%; transform: translateX(-50%); 
+            width: 8px; height: 8px; border-radius: 50%; 
+            background: radial-gradient(circle at 30% 30%, #a03030, #8c1c1c); 
+            box-shadow: 1px 2px 2px rgba(0,0,0,0.5); border: 1px solid #4a0f0f; z-index: 5; 
+        }
+        @media(min-width: 768px) { .corkboard-pin { width: 12px; height: 12px; top: -6px; } }
+        
+        .pinned-paper { 
+            position: relative; background-color: #fefae0; 
+            padding: 6px; padding-top: 10px; 
+            font-family: 'Courier Prime', monospace; 
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.4); 
+            cursor: pointer; transition: transform 0.1s; color: #1a1a1a; 
+            display: flex; flex-direction: column; overflow: hidden; min-height: 40px; 
+        }
+        @media(min-width: 768px) { .pinned-paper { padding: 10px; padding-top: 14px; min-height: 70px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); } }
+        .pinned-paper:hover { transform: scale(1.05) !important; z-index: 10; box-shadow: 2px 3px 6px rgba(0,0,0,0.5); }
+
+        .empty-note-paper {
+            position: relative; background-color: #fefae0;
+            padding: 6px; padding-top: 10px; font-family: 'Courier Prime', monospace;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.4); transform: rotate(2deg);
+            color: #1a1a1a; font-size: 0.45rem; text-align: center;
+            max-width: 130px; margin: 0 auto; margin-top: 5%;
+        }
+        @media(min-width: 768px) { .empty-note-paper { font-size: 0.7rem; max-width: 200px; padding: 12px; padding-top: 16px; margin-top: 4%; } }
 
         /* Twarda blokada przycisku instalacji jeśli PWA jest zainstalowane/działa w trybie aplikacji */
         #install-button { display: none; }
@@ -345,7 +370,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-7 space-y-6 relative z-10">
                     
-                    <!-- TABLICA OGŁOSZEŃ GRAFICZNA -->
+                    <!-- TABLICA OGŁOSZEŃ GRAFICZNA (Z NOWYM TŁEM I SIATKĄ) -->
                     <div class="corkboard">
                         <div class="pinned-note-container custom-scrollbar"></div>
                     </div>
@@ -569,6 +594,7 @@
         async function init() {
             try { await loadState(); } catch(e) { }
             
+            // Migracja wsteczna: zamiana starej jednej notatki na tablicę (do 6 szt)
             if (state.pinnedNoteId) { state.pinnedNoteIds = [state.pinnedNoteId]; delete state.pinnedNoteId; }
             if (!state.pinnedNoteIds) state.pinnedNoteIds = [];
             
@@ -620,7 +646,12 @@
             if(ev) ev.stopPropagation();
             if (!state.pinnedNoteIds) state.pinnedNoteIds = [];
             const idx = state.pinnedNoteIds.indexOf(id);
-            if (idx > -1) { state.pinnedNoteIds.splice(idx, 1); } else { if(state.pinnedNoteIds.length >= 6) return showAlert("Obywatelu! Tablica mieści maksymalnie 6 ogłoszeń. Odepnij coś najpierw!"); state.pinnedNoteIds.push(id); }
+            if (idx > -1) {
+                state.pinnedNoteIds.splice(idx, 1);
+            } else {
+                if(state.pinnedNoteIds.length >= 6) return showAlert("Obywatelu! Tablica mieści maksymalnie 6 ogłoszeń. Odepnij coś najpierw!");
+                state.pinnedNoteIds.push(id);
+            }
             saveState(); renderPinnedNote(); renderArchiveNotes();
         }
 
@@ -628,6 +659,7 @@
             const els = document.querySelectorAll('.pinned-note-container');
             if (!state.pinnedNoteIds) state.pinnedNoteIds = [];
             state.pinnedNoteIds = state.pinnedNoteIds.filter(pid => state.notes.some(n => n.id === pid));
+            
             els.forEach(el => {
                 if (state.pinnedNoteIds.length > 0) {
                     el.className = "pinned-note-container has-notes custom-scrollbar";
@@ -636,11 +668,19 @@
                         const n = state.notes.find(x => x.id === pid);
                         if (n) {
                             const cleanText = n.content.replace(/<[^>]*>?/gm, ' ');
-                            const rot = (index % 2 === 0 ? -1 : 1) * ((index % 3) + 1);
-                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})"><div class="corkboard-pin"></div><strong class="text-[#8c1c1c] text-[10px] sm:text-xs uppercase block mb-1 tracking-wider border-b border-gray-400 pb-1 leading-tight line-clamp-2 break-words">${n.title || 'DOKUMENT POUFNY'}</strong><div class="text-[9px] sm:text-[10px] line-clamp-4 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 100)}${cleanText.length > 100 ? '...' : ''}</div></div>`;
+                            const rot = (index % 2 === 0 ? -2 : 2) * ((index % 3) + 1);
+                            html += `<div class="pinned-paper" style="transform: rotate(${rot}deg);" onclick="viewNoteInternal(${n.id})">
+                                        <div class="corkboard-pin"></div>
+                                        <strong class="text-[#8c1c1c] text-[8px] sm:text-[10px] uppercase block mb-0.5 tracking-wider border-b border-gray-400 pb-0.5 leading-none line-clamp-1 break-words">${n.title || 'DOKUMENT POUFNY'}</strong>
+                                        <div class="text-[7px] sm:text-[9px] line-clamp-3 overflow-hidden text-ellipsis flex-1 break-words whitespace-normal leading-tight">${cleanText.substring(0, 80)}${cleanText.length > 80 ? '...' : ''}</div>
+                                     </div>`;
                         }
-                    }); el.innerHTML = html;
-                } else { el.className = "pinned-note-container flex items-center justify-center custom-scrollbar"; el.innerHTML = '<div class="pinned-paper" style="transform: rotate(2deg); max-width: 250px; margin: 0 auto; cursor: default;"><div class="corkboard-pin"></div><span class="text-gray-800 italic font-bold text-center text-xs">Brak ogłoszeń.<br><br>Wejdź do Składnicy Akt i kliknij "PRZYPNIJ".</span></div>'; }
+                    });
+                    el.innerHTML = html;
+                } else {
+                    el.className = "pinned-note-container flex items-start justify-center";
+                    el.innerHTML = '<div class="empty-note-paper"><div class="corkboard-pin"></div><span class="text-gray-800 italic font-bold text-center leading-tight">Brak ogłoszeń.<br>Składnica Akt -> "PRZYPNIJ".</span></div>';
+                }
             });
         }
 
@@ -659,7 +699,9 @@
 
         function switchDepartment(dep) {
             state.activeDepartment = dep;
-            saveState(); updateDepartmentTabsUI(dep); renderTasks();
+            saveState();
+            updateDepartmentTabsUI(dep);
+            renderTasks();
             if(document.activeElement) document.activeElement.blur();
         }
 
@@ -667,18 +709,22 @@
             const deps = ['ogolny', 'zaopatrzenie', 'domowy', 'sluzbowy'];
             const placeholders = { 'ogolny': 'Wpisz zadanie ogólne...', 'zaopatrzenie': 'Co trzeba kupić/zdobyć?', 'domowy': 'Wpisz obowiązek domowy...', 'sluzbowy': 'Wpisz zadanie z pracy...' };
             deps.forEach(d => {
-                const btn = document.getElementById('dep-btn-' + d); if (!btn) return;
+                const btn = document.getElementById('dep-btn-' + d);
+                if (!btn) return;
                 if (d === activeDep) { btn.className = "dep-btn bg-[#1c1917] text-[#dcd0c0] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm"; } 
                 else { btn.className = "dep-btn bg-[#dcd0c0] text-[#1c1917] border-2 border-[#1c1917] px-2 py-1 text-[10px] sm:text-xs font-bold uppercase transition hover:scale-105 active:scale-95 shadow-sm opacity-60 hover:opacity-100"; }
             });
-            const input = document.getElementById('task-input'); if (input) input.placeholder = placeholders[activeDep] || 'Wpisz zadanie...';
+            const input = document.getElementById('task-input');
+            if (input) input.placeholder = placeholders[activeDep] || 'Wpisz zadanie...';
         }
 
         function addTask() { 
-            const i = document.getElementById('task-input'); if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
+            const i = document.getElementById('task-input'); 
+            if (!i || !i.value.trim()) return showAlert("Obywatelu! Pusty wniosek odrzucono."); 
             const dep = state.activeDepartment || 'ogolny';
             state.tasks.push({ id: Date.now(), text: i.value.trim(), done: false, stamp: null, stampRotation: 0, department: dep }); 
-            i.value = ''; saveState(); renderTasks(); if(document.activeElement) document.activeElement.blur(); 
+            i.value = ''; saveState(); renderTasks(); 
+            if(document.activeElement) document.activeElement.blur(); 
         }
 
         function toggleTask(id) {
@@ -702,11 +748,15 @@
             const l = document.getElementById('task-list'); if (!l) return; l.innerHTML = '';
             const dep = state.activeDepartment || 'ogolny';
             const filteredTasks = (state.tasks || []).filter(t => (t.department || 'ogolny') === dep);
-            if (filteredTasks.length === 0) { l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4 text-center leading-none">CZYSTO</span></div>'; } else {
+
+            if (filteredTasks.length === 0) {
+                l.innerHTML = '<div id="empty-tasks" class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"><span class="text-4xl font-bold -rotate-12 border-4 border-gray-500 p-4 text-center leading-none">CZYSTO</span></div>';
+            } else {
                 filteredTasks.forEach(t => { 
                     l.innerHTML += `<li class="flex items-center gap-3 p-2 border-b border-gray-500 bg-white/20 relative group hover:bg-white/40 transition min-h-[50px]"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 accent-[#44403c] cursor-pointer z-10"><span class="font-mono text-sm flex-1 ${t.done ? 'line-through opacity-50' : 'cursor-pointer'} z-10 selectable-text" onclick="startEditingTask(${t.id}, this)">${t.text}</span>${t.done && t.stamp ? `<div class="stamp-container" style="transform: rotate(${t.stampRotation}deg); right: 50px; position: absolute;"><div class="stamp-border shape-${t.stamp.shape} col-${t.stamp.color}"></div><div class="stamp-inner col-${t.stamp.color}"><div class="stamp-icon">${t.stamp.icon}</div><div style="margin-top:2px;">${t.stamp.text}</div></div></div>` : ''}<button onclick="deleteTask(${t.id})" class="text-[#8c1c1c] font-bold px-3 py-1 z-10 border border-transparent hover:border-[#8c1c1c] hover:bg-red-100 active:border-[#8c1c1c] active:bg-red-100 transition uppercase text-xs">USUŃ</button></li>`; 
                 });
-            } updateTaskProgress();
+            }
+            updateTaskProgress();
         }
 
         function updateTaskProgress() { const p = (!state.tasks || state.tasks.length === 0) ? 0 : Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100); document.getElementById('task-progress-text').innerText = p + "%"; document.getElementById('task-progress-bar').style.width = p + "%"; updateAppBadge(); }
