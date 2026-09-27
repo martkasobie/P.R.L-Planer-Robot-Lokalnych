@@ -122,7 +122,7 @@
 
         .app-modal-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); overscroll-behavior: contain; }
         .app-modal-overlay.active { display: flex !important; }
-        #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal, #inspection-modal { z-index: 100000; }
+        #alert-modal, #confirm-modal, #diploma-modal, #jump-date-modal { z-index: 100000; }
         .app-modal-window { background-color: #dcd0c0; border: 4px solid #1a1a1a; padding: 20px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 10px 10px 30px rgba(0,0,0,0.9); transform: none; }
 
         .stamp-item { height: 5rem; border: 1px solid #9ca3af; background-color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.1s; }
@@ -396,17 +396,6 @@
     <div id="alert-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">KOMUNIKAT</h3><p id="alert-text" class="mb-6 font-mono text-sm"></p><button onclick="closeModalUI('alert-modal')" class="w-full px-4 py-2 bg-[#2b2b2b] text-white font-bold uppercase hover:bg-black active:bg-black transition">Zrozumiałem</button></div></div>
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
 
-    <!-- WIZYTACJA -->
-    <div id="inspection-modal" class="app-modal-overlay">
-        <div class="app-modal-window border-red-800 border-8 bg-[#dcd0c0] relative overflow-hidden">
-            <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGg0MHY0MEgwem0yMCAyMGgyMHYyMEgyMHoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjE1IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')]"></div>
-            <h2 class="text-2xl font-['Oswald'] text-red-800 mb-2 uppercase relative z-10 border-b-2 border-red-800 pb-2">Komitet Kontroli</h2>
-            <div class="mb-4 relative z-10"><img src="kierownik.png" alt="Inspektor" class="mx-auto h-24 mix-blend-multiply" onerror="this.style.display='none'"></div>
-            <p id="inspection-text" class="font-mono text-sm mb-6 font-bold relative z-10 text-gray-900"></p>
-            <button onclick="closeModalUI('inspection-modal')" class="w-full bg-[#8c1c1c] text-white py-3 font-bold uppercase relative z-10 shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none transition">Przyjmuję do wiadomości</button>
-        </div>
-    </div>
-
     <!-- INNE MODALE -->
     <div id="jump-date-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3><div class="flex gap-2 mb-6"><select id="jump-month" class="w-2/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner cursor-pointer"><option value="0">Styczeń</option><option value="1">Luty</option><option value="2">Marzec</option><option value="3">Kwiecień</option><option value="4">Maj</option><option value="5">Czerwiec</option><option value="6">Lipiec</option><option value="7">Sierpień</option><option value="8">Wrzesień</option><option value="9">Październik</option><option value="10">Listopad</option><option value="11">Grudzień</option></select><input type="number" id="jump-year" class="w-1/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center" value="2024"></div><div class="flex gap-2"><button type="button" onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button><button type="button" onclick="executeJumpToToday()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button><button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition text-xs">Przenieś</button></div></div></div>
     <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding-top: calc(2rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));"><div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0"><div id="diploma-capture-area" class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)] bg-white"><button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ</button><img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]"><div id="diploma-goal" class="absolute text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div><div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div><div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;"><span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span><strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong></div><div id="diploma-right-text" class="absolute text-right text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; right: 10%;"><span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Z ramienia:</span><strong class="text-xs sm:text-sm md:text-base leading-tight block">P.R.L<br>Planer Robót Lokalnych</strong></div></div><button onclick="closeModalUI('diploma-modal')" class="w-full mt-6 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">ZAMKNIJ</button></div></div>
@@ -446,12 +435,12 @@
         function openModalUI(id) {
             const el = document.getElementById(id); if (!el) return;
             if (id === 'archive-fullscreen') { document.getElementById('main-app-container').style.display = 'none'; } else { if (modalStack.length === 0) { document.body.classList.add('body-locked'); } }
-            el.classList.add('active'); if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal' || el.id === 'inspection-modal') el.style.display = 'flex';
+            el.classList.add('active'); if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'flex';
             modalStack.push(id); window.history.pushState({ modalId: id }, ""); if(document.activeElement) document.activeElement.blur();
         }
         function closeModalUI(id) { if (modalStack.length > 0 && modalStack[modalStack.length - 1] === id) { window.history.back(); } else { forceCloseModal(id); } }
         function forceCloseModal(id) {
-            const el = document.getElementById(id); if (el) { el.classList.remove('active'); if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal' || el.id === 'inspection-modal') el.style.display = 'none'; }
+            const el = document.getElementById(id); if (el) { el.classList.remove('active'); if (el.id === 'event-modal' || el.id === 'archive-fullscreen' || el.id === 'diploma-modal') el.style.display = 'none'; }
             modalStack = modalStack.filter(m => m !== id);
             if (id === 'archive-fullscreen') { document.getElementById('main-app-container').style.display = 'flex'; }
             const hasRegularModals = modalStack.some(m => m !== 'archive-fullscreen'); if (!hasRegularModals) { document.body.classList.remove('body-locked'); }
@@ -504,7 +493,7 @@
             viewDate: null, citizenName: "Jan Kowalski", 
             notes: [], activeNoteId: null, scratchpad: "", scratchpadTitle: "", scratchpadTags: "",
             folders: [ {id: 'main', name: 'GŁÓWNE AKTA'} ], activeDepartment: 'ogolny',
-            pinnedNoteIds: [], lastAppOpen: null
+            pinnedNoteIds: []
         };
         let currentEditingDateKey = null, currentQuoteIndex = 0; let saveTimeout; let currentEditingEventId = null; let currentEditingEventSourceKey = null; let touchstartX = 0; let touchendX = 0;
 
@@ -558,7 +547,6 @@
             updateDepartmentTabsUI(state.activeDepartment); renderTasks(); 
             renderPlans(); renderCalendar(); renderStampsGallery(); renderSelfCriticismHistory(); renderArchiveFolders(); renderArchiveNotes();
             renderPinnedNote(); 
-            checkInspection(); 
             
             ['sc-subject', 'sc-desc', 'sc-reason', 'sc-fix'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', scheduleSave); });
             if (cn) cn.addEventListener('input', scheduleSave);
@@ -566,22 +554,6 @@
             if (e) { e.addEventListener('input', scheduleSave); e.addEventListener('paste', function(ev) { if (ev.clipboardData && ev.clipboardData.items) { for (let i = 0; i < ev.clipboardData.items.length; i++) { if (ev.clipboardData.items[i].type.indexOf("image") !== -1) { ev.preventDefault(); let file = ev.clipboardData.items[i].getAsFile(); processImageFile(file); return; } } } }); }
             if (t) t.addEventListener('input', scheduleSave); if (tg) tg.addEventListener('input', scheduleSave);
             const ti = document.getElementById('task-input'); if (ti) ti.addEventListener('keypress', (ev) => { if(ev.key === 'Enter') addTask(); });
-        }
-
-        function checkInspection() {
-            const now = Date.now();
-            if (!state.lastAppOpen) { state.lastAppOpen = now; saveState(); return; }
-            const daysPassed = (now - state.lastAppOpen) / (1000 * 60 * 60 * 24);
-            if ((daysPassed > 1.2 && Math.random() > 0.4) || daysPassed > 3) {
-                const pendingTasks = state.tasks.filter(t => !t.done).length;
-                let msg = "";
-                if (pendingTasks >= 5) {
-                    msg = `Skandal, Obywatelu! Centralny Komitet Kontroli Wewnętrznej odkrył na Twoim biurku aż ${pendingTasks} zaległych spraw! Udzielamy Wam oficjalnej NAGANY. Do roboty, natychmiast!`;
-                    if (!state.reports) state.reports = []; state.reports.unshift({ id: Date.now(), date: new Date().toLocaleDateString('pl-PL'), subject: 'KONTROLA Z MINISTERSTWA', desc: 'Rażące opóźnienia w wyrabianiu normy na stanowisku pracy.', reason: 'Uciekanie w marazm i lenistwo.', fix: 'Ciężka praca w nadgodzinach.' }); renderSelfCriticismHistory();
-                } else if (pendingTasks > 0) { msg = `Towarzyszu! Widzimy na biurku ${pendingTasks} nieskończonych zadań. Widzimy starania, ale normy trzeba pilnować bardziej rygorystycznie. Proszę zakasać rękawy!`; } else { msg = `Wzorowa postawa obywatelska! Zastaliśmy czyste biurko, wszystko zrobione na 100%. Takich przodowników nam trzeba. Komitet przyznaje premię: +5 przydziału uznaniowego!`; state.credits = (state.credits || 0) + 5; }
-                document.getElementById('inspection-text').innerText = msg; setTimeout(() => openModalUI('inspection-modal'), 1200);
-            }
-            state.lastAppOpen = now; saveState();
         }
 
         function togglePinNoteFromList(id, ev) {
