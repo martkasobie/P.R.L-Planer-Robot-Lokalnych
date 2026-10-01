@@ -96,7 +96,16 @@
         .calendar-cell.active { background-color: #bfdbfe; }
         .calendar-cell.empty { background-color: transparent !important; border: none; cursor: default; pointer-events: none; }
         .cal-header { text-align: center; font-weight: bold; background-color: #a8a29e; padding: 1px; font-family: 'Courier Prime', monospace; font-size: 0.6rem; color: #1c1917; }
-        .cal-event-text { font-size: 0.55rem; line-height: 1; word-break: break-word; text-align: center; color: #1e3a8a; font-weight: bold; background-color: rgba(255, 255, 255, 0.8); margin-top: 1px; padding: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cal-event-text { font-size: 0.55rem; line-height: 1; word-break: break-word; text-align: center; font-weight: bold; margin-top: 1px; padding: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* KOLORY DLA ŚWIĄT W KALENDARZU */
+        .holiday-pl { background-color: rgba(140, 28, 28, 0.15) !important; color: #8c1c1c !important; border-bottom: 1px dashed #8c1c1c; }
+        .holiday-other { background-color: rgba(87, 83, 78, 0.15) !important; color: #44403c !important; border-bottom: 1px dashed #57534e; }
+        
+        /* ZADANIA DODANE PRZEZ UŻYTKOWNIKA */
+        .user-event { background-color: rgba(255, 255, 255, 0.9); color: #1e3a8a; border: 1px solid transparent; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .weekend .user-event { border: 1px solid #8c1c1c !important; } /* Czerwona ramka na zadaniu wpisanym w weekend */
+
         .event-marker { width: 6px; height: 6px; background-color: #8c1c1c; border-radius: 50%; position: absolute; top: 2px; right: 2px; z-index: 5; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
 
         .wire-clip-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 60px; height: 80px; z-index: 20; pointer-events: none; }
@@ -397,7 +406,11 @@
     <div id="confirm-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">DECYZJA</h3><p id="confirm-text" class="mb-6 font-mono text-sm"></p><div class="flex gap-4"><button onclick="resolveConfirm(false)" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="resolveConfirm(true)" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
 
     <!-- INNE MODALE -->
-    <div id="jump-date-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3><div class="flex gap-2 mb-6"><select id="jump-month" class="w-2/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner cursor-pointer"><option value="0">Styczeń</option><option value="1">Luty</option><option value="2">Marzec</option><option value="3">Kwiecień</option><option value="4">Maj</option><option value="5">Czerwiec</option><option value="6">Lipiec</option><option value="7">Sierpień</option><option value="8">Wrzesień</option><option value="9">Październik</option><option value="10">Listopad</option><option value="11">Grudzień</option></select><input type="number" id="jump-year" class="w-1/3 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center" value="2024"></div><div class="flex gap-2"><button type="button" onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button><button type="button" onclick="executeJumpToToday()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button><button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition text-xs">Przenieś</button></div></div></div>
+    <div id="jump-date-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">PRZYDZIAŁ CZASU</h3><div class="flex gap-1 mb-6">
+        <input type="number" id="jump-day" class="w-1/4 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center" min="1" max="31">
+        <select id="jump-month" class="w-2/4 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner cursor-pointer"><option value="0">Styczeń</option><option value="1">Luty</option><option value="2">Marzec</option><option value="3">Kwiecień</option><option value="4">Maj</option><option value="5">Czerwiec</option><option value="6">Lipiec</option><option value="7">Sierpień</option><option value="8">Wrzesień</option><option value="9">Październik</option><option value="10">Listopad</option><option value="11">Grudzień</option></select>
+        <input type="number" id="jump-year" class="w-1/4 bg-white border-2 border-gray-600 p-2 font-mono outline-none text-sm shadow-inner text-center">
+    </div><div class="flex gap-2"><button type="button" onclick="closeModalUI('jump-date-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Anuluj</button><button type="button" onclick="executeJumpToToday()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dziś</button><button type="button" onclick="executeJumpDate()" class="flex-1 px-2 py-2 bg-[#4b7db8] text-white font-bold uppercase hover:bg-[#3a6597] active:bg-[#3a6597] transition text-xs">Przenieś</button></div></div></div>
     <div id="diploma-modal" class="app-modal-overlay" style="align-items: flex-start; overflow-y: auto; padding-top: calc(2rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));"><div class="app-modal-window my-auto p-0 bg-transparent border-none shadow-none w-[95%] max-w-[500px] relative flex flex-col items-center shrink-0"><div id="diploma-capture-area" class="relative w-full shadow-[15px_15px_30px_rgba(0,0,0,0.9)] bg-white"><button id="btn-download-diploma" onclick="downloadDiploma()" class="absolute top-2 right-2 bg-[#8c1c1c] text-white border-2 border-[#dcd0c0] font-['Oswald'] tracking-wider px-3 py-1 text-xs sm:text-sm hover:bg-[#631212] transition z-50 shadow-[2px_2px_0_rgba(0,0,0,0.5)] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>ZAPISZ</button><img id="diploma-bg-img" src="diplomprl.png" alt="Dyplom P.R.L" class="w-full h-auto block rounded-sm border-2 border-[#1a1a1a]"><div id="diploma-goal" class="absolute text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] font-bold text-base sm:text-xl md:text-2xl leading-tight" style="top: 48%;"></div><div id="diploma-citizen" class="absolute w-[85%] text-center left-1/2 -translate-x-1/2 text-[#1a1a1a] font-['Courier_Prime'] tracking-widest text-xl sm:text-2xl md:text-3xl" style="top: 69.5%;"></div><div id="diploma-left-text" class="absolute text-left text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; left: 10%;"><span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Data nadania:</span><strong id="diploma-date" class="text-xs sm:text-sm md:text-base"></strong></div><div id="diploma-right-text" class="absolute text-right text-[#1a1a1a] font-['Special_Elite'] transition-all duration-300" style="bottom: 15%; right: 10%;"><span class="text-[8px] sm:text-[10px] text-gray-700 block mb-1">Z ramienia:</span><strong class="text-xs sm:text-sm md:text-base leading-tight block">P.R.L<br>Planer Robót Lokalnych</strong></div></div><button onclick="closeModalUI('diploma-modal')" class="w-full mt-6 bg-[#8c1c1c] text-white border-2 border-[#3d0808] font-bold py-3 text-sm hover:bg-[#631212] active:bg-[#631212] transition font-['Oswald'] tracking-wider uppercase shadow-[3px_3px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none">ZAMKNIJ</button></div></div>
     <div id="event-modal" class="app-modal-overlay"><div class="app-modal-window" style="max-width: 400px; width: 95%;"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">WEZWANIA NA DZIEŃ</h3><p class="text-sm font-bold mb-2 font-mono">DATA: <span id="event-date-display" class="text-[#8c1c1c] text-lg"></span></p><div id="existing-events-container" class="mb-4 max-h-60 overflow-y-auto custom-scrollbar border border-gray-400 bg-white/50 text-left p-2 hidden shadow-inner"><ul id="existing-events-list" class="space-y-2"></ul></div><label class="block text-[10px] uppercase font-bold mb-1 text-left">Nowe zgłoszenie:</label><textarea id="event-input" class="w-full bg-white border-2 border-gray-600 p-2 font-mono mb-2 outline-none text-sm shadow-inner resize-none custom-scrollbar selectable-text overflow-x-hidden" rows="6" placeholder="Treść zadania..."></textarea><label class="block text-[10px] uppercase font-bold mb-1 text-left">Powtarzalność:</label><select id="event-recurrence" class="w-full bg-white border-2 border-gray-600 p-1 font-mono mb-4 outline-none text-xs shadow-inner cursor-pointer"><option value="none">Nie powtarza się</option><option value="daily">Codziennie</option><option value="weekly">Co tydzień</option><option value="monthly">Co miesiąc</option><option value="yearly">Co rok</option></select><div class="flex gap-2"><button onclick="closeModalUI('event-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition text-xs">Zamknij</button><button id="btn-save-event" onclick="saveNewEvent()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition text-xs">Dodaj</button></div></div></div>
     <div id="add-goal-modal" class="app-modal-overlay"><div class="app-modal-window"><h3 class="font-bold text-xl mb-4 text-[#8c1c1c] uppercase border-b-2 border-gray-600 pb-2 font-['Oswald']">NOWY CEL</h3><label class="block text-[10px] uppercase font-bold mb-1 text-left">Nazwa celu:</label><textarea id="goal-name" class="sc-input bg-white mb-2 resize-none custom-scrollbar selectable-text" rows="4" placeholder="np. Radio"></textarea><div class="flex gap-2"><div class="flex-1"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Wartość Docelowa:</label><input type="number" id="goal-target" class="sc-input bg-white mb-2" placeholder="np. 500"></div><div class="w-1/3"><label class="block text-[10px] uppercase font-bold mb-1 text-left">Jedn.:</label><select id="goal-unit" class="sc-input bg-white mb-2 h-8"><option value="zł">zł</option><option value="str.">str.</option><option value="min.">min.</option><option value="ml">ml</option><option value="%">%</option><option value="km">km</option><option value="kg">kg</option><option value="szt.">szt.</option><option value="godz.">godz.</option><option value="pkt">pkt</option></select></div></div><div class="flex gap-4 mt-4"><button onclick="closeModalUI('add-goal-modal')" class="flex-1 px-2 py-2 border-2 border-[#2b2b2b] font-bold uppercase hover:bg-gray-300 active:bg-gray-300 transition">Anuluj</button><button onclick="saveNewGoal()" class="flex-1 px-2 py-2 bg-[#8c1c1c] text-white font-bold uppercase hover:bg-[#631212] active:bg-[#631212] transition">Zatwierdź</button></div></div></div>
@@ -695,9 +708,97 @@
 
         function resetCalendarToToday() { state.viewDate = new Date(); renderCalendar(); }
         function changeMonth(dir) { const d = state.viewDate || new Date(); d.setMonth(d.getMonth() + dir); state.viewDate = d; renderCalendar(); if(document.activeElement) document.activeElement.blur(); }
-        function openJumpDateModal() { const d = state.viewDate || new Date(); document.getElementById('jump-month').value = d.getMonth(); document.getElementById('jump-year').value = d.getFullYear(); openModalUI('jump-date-modal'); }
+        
+        // ------------- LOGIKA ŚWIĄT ------------
+        function getEaster(year) {
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4;
+            const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, month - 1, day);
+        }
+        function addDays(date, days) { const result = new Date(date); result.setDate(result.getDate() + days); return result; }
+        function getBlackFriday(year) {
+            let d = new Date(year, 10, 1), offset = (4 - d.getDay() + 7) % 7;
+            return new Date(year, 10, 1 + offset + 22); // Friday after 4th Thursday
+        }
+        function getLastSunday(year, month) {
+            let d = new Date(year, month + 1, 0);
+            d.setDate(d.getDate() - d.getDay()); return d;
+        }
+        
+        function getHolidays(year) {
+            const holidays = [];
+            const add = (date, name, isFree = false, type = 'other') => { holidays.push({ d: date.getDate(), m: date.getMonth() + 1, name, isFree, type }); };
+            const addFixed = (d, m, name, isFree = false, type = 'other') => add(new Date(year, m - 1, d), name, isFree, type);
+
+            // Ustawowo wolne Polska (pl)
+            addFixed(1, 1, "Nowy Rok", true, 'pl'); addFixed(6, 1, "Trzech Króli", true, 'pl'); addFixed(1, 5, "Święto Pracy", true, 'pl');
+            addFixed(3, 5, "Święto Konstytucji 3 Maja", true, 'pl'); addFixed(15, 8, "Wniebowzięcie NMP / Wojsko Polskie", true, 'pl');
+            addFixed(1, 11, "Wszystkich Świętych", true, 'pl'); addFixed(11, 11, "Święto Niepodległości", true, 'pl');
+            addFixed(25, 12, "Boże Narodzenie (I)", true, 'pl'); addFixed(26, 12, "Boże Narodzenie (II)", true, 'pl');
+
+            // Tradycyjne PL (pl)
+            addFixed(21, 1, "Dzień Babci", false, 'pl'); addFixed(22, 1, "Dzień Dziadka", false, 'pl'); addFixed(14, 2, "Walentynki", false, 'pl');
+            addFixed(8, 3, "Dzień Kobiet", false, 'pl'); addFixed(10, 3, "Dzień Mężczyzn", false, 'pl'); addFixed(26, 5, "Dzień Matki", false, 'pl');
+            addFixed(1, 6, "Dzień Dziecka", false, 'pl'); addFixed(23, 6, "Dzień Ojca", false, 'pl'); addFixed(6, 12, "Mikołajki", false, 'pl'); addFixed(24, 12, "Wigilia", false, 'pl');
+
+            // Branżowe i Międzynarodowe (other)
+            addFixed(22, 4, "Dzień Ziemi", false, 'other'); addFixed(10, 10, "Światowy Dzień Zdr. Psych.", false, 'other'); addFixed(12, 4, "Dzień Kosmonautyki", false, 'other');
+            const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+            addFixed(isLeap ? 12 : 13, 9, "Dzień Programisty", false, 'other');
+
+            // Ruchome (Wielkanoc i pochodne)
+            const easter = getEaster(year);
+            add(easter, "Wielkanoc", true, 'pl'); add(addDays(easter, 1), "Poniedziałek Wielkanocny", true, 'pl');
+            add(addDays(easter, -52), "Tłusty Czwartek", false, 'pl');
+            add(addDays(easter, 49), "Zielone Świątki", true, 'pl');
+            add(addDays(easter, 60), "Boże Ciało", true, 'pl');
+
+            // Black Friday / Cyber Monday (other)
+            const bf = getBlackFriday(year); add(bf, "Black Friday", false, 'other'); add(addDays(bf, 3), "Cyber Monday", false, 'other');
+
+            // Niedziele Handlowe (Ogólne zasady polskie) (other)
+            add(getLastSunday(year, 0), "Niedz. Handlowa", false, 'other'); add(getLastSunday(year, 3), "Niedz. Handlowa", false, 'other');
+            add(getLastSunday(year, 5), "Niedz. Handlowa", false, 'other'); add(getLastSunday(year, 7), "Niedz. Handlowa", false, 'other');
+            add(addDays(easter, -7), "Niedz. Handlowa", false, 'other'); 
+            add(addDays(new Date(year, 11, 24), -new Date(year, 11, 24).getDay()), "Niedz. Handlowa", false, 'other');
+            add(addDays(new Date(year, 11, 24), -new Date(year, 11, 24).getDay() - 7), "Niedz. Handlowa", false, 'other');
+
+            // Zmiany czasu (other)
+            add(getLastSunday(year, 2), "Zmiana czasu (letni)", false, 'other'); add(getLastSunday(year, 9), "Zmiana czasu (zimowy)", false, 'other');
+
+            return holidays;
+        }
+        // ---------------------------------------
+
+        function openJumpDateModal() { 
+            const d = state.viewDate || new Date(); 
+            document.getElementById('jump-day').value = d.getDate();
+            document.getElementById('jump-month').value = d.getMonth(); 
+            document.getElementById('jump-year').value = d.getFullYear(); 
+            openModalUI('jump-date-modal'); 
+        }
         function executeJumpToToday() { state.viewDate = new Date(); renderCalendar(); closeModalUI('jump-date-modal'); }
-        function executeJumpDate() { const m = parseInt(document.getElementById('jump-month').value); const y = parseInt(document.getElementById('jump-year').value); const d = state.viewDate || new Date(); d.setMonth(m); d.setFullYear(y); state.viewDate = d; renderCalendar(); closeModalUI('jump-date-modal'); }
+        
+        function executeJumpDate() { 
+            let day = parseInt(document.getElementById('jump-day').value) || 1;
+            const m = parseInt(document.getElementById('jump-month').value); 
+            const y = parseInt(document.getElementById('jump-year').value); 
+            
+            const maxDays = new Date(y, m + 1, 0).getDate();
+            if (day < 1) day = 1; 
+            if (day > maxDays) day = maxDays;
+
+            const d = state.viewDate || new Date(); 
+            d.setFullYear(y); d.setMonth(m); d.setDate(day);
+            state.viewDate = d; 
+            renderCalendar(); 
+            closeModalUI('jump-date-modal'); 
+            
+            setTimeout(() => { openEventModal(`${day}-${m+1}-${y}`); }, 150);
+        }
 
         function getEventsForDate(d, m, y) {
             if (!state.events) return []; const cur = new Date(y, m - 1, d); let dayEvents = [];
@@ -713,12 +814,31 @@
             if(hdr) hdr.innerText = `${months[m]} ${y}`;
             ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'].forEach(txt => { const el = document.createElement('div'); el.className = "cal-header"; el.innerText = txt; g.appendChild(el); });
             const first = new Date(y, m, 1).getDay(), off = first === 0 ? 6 : first - 1, days = new Date(y, m + 1, 0).getDate(), today = new Date();
+            
+            const yearHolidays = getHolidays(y);
+
             for(let i=0; i<off; i++) g.appendChild(Object.assign(document.createElement('div'), {className: "calendar-cell empty"}));
             for(let i=1; i<=days; i++) {
-                const evs = getEventsForDate(i, m + 1, y); const isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear()); const isWknd = (new Date(y, m, i).getDay() === 0 || new Date(y, m, i).getDay() === 6); 
-                const c = document.createElement('div'); c.className = `calendar-cell ${isT ? 'today' : ''} ${isWknd ? 'weekend' : ''}`;
+                const evs = getEventsForDate(i, m + 1, y); 
+                const isT = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear()); 
+                const isWknd = (new Date(y, m, i).getDay() === 0 || new Date(y, m, i).getDay() === 6); 
+                
+                const dayHolidays = yearHolidays.filter(h => h.d === i && h.m === (m + 1));
+                const isFree = dayHolidays.some(h => h.isFree);
+
+                const c = document.createElement('div'); 
+                c.className = `calendar-cell ${isT ? 'today' : ''} ${(isWknd || isFree) ? 'weekend' : ''}`;
+                
                 let h = `<span style="font-weight: bold; margin-left: 2px;">${i}</span>`;
-                if(evs.length > 0) { c.classList.add('active'); h += `<div class="event-marker"></div>`; evs.slice(0, 2).forEach(ev => { h += `<div class="cal-event-text selectable-text">${ev.text}</div>`; }); if(evs.length > 2) { h += `<div class="cal-event-text selectable-text" style="font-size:7px; background: rgba(0,0,0,0.1);">+${evs.length - 2} więcej</div>`; } }
+                if(evs.length > 0) { c.classList.add('active'); h += `<div class="event-marker"></div>`; }
+                
+                dayHolidays.forEach(hol => {
+                    h += `<div class="cal-event-text holiday-${hol.type} selectable-text" title="${hol.name}">${hol.name}</div>`;
+                });
+
+                evs.slice(0, 2).forEach(ev => { h += `<div class="cal-event-text user-event selectable-text">${ev.text}</div>`; }); 
+                if(evs.length > 2) { h += `<div class="cal-event-text user-event selectable-text" style="font-size:7px;">+${evs.length - 2} więcej</div>`; } 
+                
                 c.innerHTML = h; c.onclick = () => openEventModal(`${i}-${m+1}-${y}`); g.appendChild(c);
             }
         }
@@ -727,13 +847,42 @@
             currentEditingDateKey = k; currentEditingEventId = null; currentEditingEventSourceKey = null;
             const p = k.split('-'); const mths = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
             const dDisp = document.getElementById('event-date-display'); if(dDisp) dDisp.innerText = `${p[0]} ${mths[parseInt(p[1])-1]} ${p[2]}`; 
-            const evs = getEventsForDate(parseInt(p[0]), parseInt(p[1]), parseInt(p[2])); const container = document.getElementById('existing-events-container'); const list = document.getElementById('existing-events-list');
-            if(evs.length > 0) { container.classList.remove('hidden'); list.innerHTML = evs.map(e => `
-                    <li class="flex justify-between items-start bg-gray-200 border border-gray-400 p-2">
+            
+            const evs = getEventsForDate(parseInt(p[0]), parseInt(p[1]), parseInt(p[2])); 
+            const hols = getHolidays(parseInt(p[2])).filter(h => h.d === parseInt(p[0]) && h.m === parseInt(p[1]));
+
+            const container = document.getElementById('existing-events-container'); const list = document.getElementById('existing-events-list');
+            
+            let modalHtml = '';
+            
+            if (hols.length > 0) {
+                modalHtml += hols.map(h => {
+                    let borderColor = h.type === 'pl' ? '#8c1c1c' : '#57534e';
+                    let textColor = h.type === 'pl' ? '#8c1c1c' : '#44403c';
+                    let badgeBg = '#8c1c1c';
+                    return `
+                    <li class="flex justify-between items-center bg-[#dcd0c0] border-2 border-dashed p-2 mb-1 shadow-sm" style="border-color: ${borderColor};">
+                        <div class="flex-1 text-[11px] font-bold uppercase flex items-center gap-1" style="color: ${textColor};">
+                            ${h.name} ${h.isFree ? `<span class="text-white px-1 ml-1 text-[9px] rounded-sm" style="background-color: ${badgeBg};">WOLNE</span>` : ''}
+                        </div>
+                    </li>`;
+                }).join('');
+            }
+
+            if(evs.length > 0) { 
+                modalHtml += evs.map(e => `
+                    <li class="flex justify-between items-start bg-gray-200 border border-gray-400 p-2 mb-1">
                         <div class="flex-1 text-[11px] break-words whitespace-normal font-mono leading-snug text-black mr-2 cursor-default"><span class="font-bold text-[#4b7db8]">${e.text}</span>${e.recurrence !== 'none' ? '<span class="text-[9px] text-gray-600 block mt-1">(cykl)</span>' : ''}</div>
                         <div class="flex flex-row gap-1 shrink-0 mt-0.5"><button onclick="editSpecificEvent('${e.sourceKey}', ${e.id})" class="text-[#4b7db8] font-bold px-2 py-1 text-[10px] border border-[#4b7db8] bg-white hover:bg-blue-50 transition shadow-sm">EDYTUJ</button><button onclick="deleteSpecificEvent('${e.sourceKey}', ${e.id})" class="text-red-600 font-bold px-2 py-1 text-[10px] border border-red-300 bg-white hover:bg-red-50 transition shadow-sm">X</button></div>
                     </li>`).join('');
-            } else { container.classList.add('hidden'); list.innerHTML = ''; }
+            } 
+            
+            if (modalHtml !== '') {
+                container.classList.remove('hidden'); list.innerHTML = modalHtml;
+            } else {
+                container.classList.add('hidden'); list.innerHTML = '';
+            }
+
             document.getElementById('event-input').value = ''; document.getElementById('event-recurrence').value = 'none'; document.getElementById('btn-save-event').innerText = 'Dodaj'; 
             openModalUI('event-modal');
         }
